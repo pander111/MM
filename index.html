@@ -170,6 +170,13 @@ const CT={weapon:'武器',armor:'鎧甲',shield:'盾牌',head:'頭上',garment:'
 const slotType=s=>s.startsWith('acc')?'acc':s;
 /* 道具（資料來源：rAthena 經典版道具表＋台服道具名稱與說明） */
 const BASE=GD.items;
+/* 遊樂幣兌換的加成道具與天地樹果實／芽 */
+const BOOSTI={i12208:{k:'exp',dur:1800000},i12210:{k:'drop',dur:1800000},iwtup:{k:'wt',dur:3600000}};
+function boostOn(k){return !!(typeof S!=='undefined'&&S&&S.boost&&S.boost[k]>S.clock)}
+{BASE.i12208=BASE.i12208||{n:'戰鬥教範',w:1,sell:0,t:'boost',d:'使用後 30 分鐘內，打怪得到的 Base／Job 經驗 +50%。'};
+ BASE.i12210=BASE.i12210||{n:'泡泡糖',w:1,sell:0,t:'boost',d:'使用後 30 分鐘內，怪物掉寶機率 ×2。'};
+ BASE.iwtup={n:'負重增加卷',w:0,sell:0,t:'boost',d:'使用後 60 分鐘內，負重上限 +2000。'};
+ for(const [k,p] of [['i607',100],['i608',50]])if(BASE[k])Object.assign(BASE[k],{t:'hp',php:p,psp:p,keep:1})}
 /* 忍者公會商店（官方開在忍者／槍手公會內，這裡放在天津）：飛鏢＋手臂護腕 */
 {const SH=[['i13250','飛鏢',4,10,1],['i13251','雨雲飛鏢',10,30,20],['i13252','閃光飛鏢',20,45,40],['i13253','銳葉飛鏢',40,70,60],['i13254','刺針飛鏢',100,100,80]];
  for(const [k,n,buy,atk,lv] of SH)if(!BASE[k])BASE[k]={n,w:.5,sell:Math.floor(buy/2),t:'shuri',atk,ele:'無',buy,lv,jobs:['ninja'],d:`忍者「投擲飛鏢」用的飛鏢，ATK ${atk}。\n裝備: 忍者（Lv ${lv} 以上）`};
@@ -259,6 +266,8 @@ function itemInfo(k){const it=ITEMS[k];if(!it)return'';
   if(it.t==='egg')return `寵物蛋（${MON[EGG2MOB[k]]?MON[EGG2MOB[k]].n:''}），在「人物」頁孵化`;
   if(it.heal||it.php)return `恢復${it.php?' ':'約 '}${healTxt(it)}`;
   if(it.t==='arrow')return `ATK ${it.atk}・${it.ele}屬性`;
+  if(it.t==='boost')return it.d.split('\n')[0];
+  if(it.php)return `恢復 ${it.php}% HP、${it.psp}% SP`;
   if(it.t==='shuri')return `投擲飛鏢用・ATK ${it.atk}・Lv ${it.lv} 以上`;
   return it.d?nl(it.d):''}
 const SHOP=GD.shop;
@@ -1039,7 +1048,7 @@ function D0(){
   const tm=S.trans?1.25:1;
   const maxHp=Math.floor(((35+j.hpK*S.lv*(S.lv+1)/2+S.lv*5)*(1+st.vit/100)*tm+(E.hp||0))*(1+(E.hpP||0)/100));
   const maxSp=Math.floor(((10+S.lv*j.spK)*(1+st.int/100)*tm+(E.sp||0))*(1+(E.spP||0)/100));
-  const maxW=j.wt+st.str*30+200*SL('enlarge')+(SLC('KN_RIDING')?1000:0);
+  const maxW=j.wt+st.str*30+200*SL('enlarge')+(SLC('KN_RIDING')?1000:0)+(boostOn('wt')?2000:0);
   return{st,atk:Math.max(1,Math.floor(atk)),matkMin,matkMax,hard:Math.min(90,hard),soft:Math.floor((st.vit/2+st.agi/5)*(1+(E.softP||0)/100)),
     hit:S.lv+st.dex+SL('vulture')+2*SL('wres')+(E.hit||0)+SL('snake')+(wc==='gun'?2*SL('single'):0),flee:S.lv+st.agi+3*SL('imflee')+(E.flee||0),crit:Math.round((1+st.luk*.3+(E.crit||0)+(bow?(E.critLong||0):0))*10)/10,mdef:(E.mdef||0)+Math.floor(st.int/5),E,
     oref,aspd,interval:Math.round(interval),maxHp,maxSp,maxW,wele:(()=>{for(const id in S.buffs){const s=SK[id];if(s&&s.eff&&buffOn(id)){const e=s.eff(S.buffs[id].lv);if(e&&e.wEle)return e.wEle}}return ammoOk()&&ITEMS[S.ammo.id].ele!=='無'?ITEMS[S.ammo.id].ele:(E.wEle||'無')})()}
@@ -1051,7 +1060,7 @@ const DCP=[0,7,9,11,13,15,17,19,21,23,24];
 const priceBuy=k=>Math.ceil(ITEMS[k].buy*(1-Math.max(DCP[SL('discount')],SLC('RG_COMPULSION')?5+4*SLC('RG_COMPULSION'):0)/100));
 const priceSell=k=>Math.floor(ITEMS[k].sell*(1+DCP[SL('overcharge')]/100));
 const keepDef=k=>{const c=C(),it=ITEMS[k],r=c.restock[k];if(typeof craftMat==='function'&&craftMat(k))return 999999;if(r&&r.on)return r.to;if(c.potList.includes(k)||c.spList.includes(k))return 30;if(c.cure&&c.cure[k]&&c.cure[k].on)return 10;return 0};
-const ih=k=>{const it=ITEMS[k];const d=String(k).includes('|')||it.t==='box'?'none':(it.t==='etc'||it.t==='eq'||it.t==='hp'||it.t==='sp')?'sell':it.t==='card'?'store':'none';const o=Object.assign({pick:true,act:d,keep:keepDef(k)},C().ih[k]||{});o.keep=Math.max(0,Math.floor(Number(o.keep)||0));return o};
+const ih=k=>{const it=ITEMS[k];const d=String(k).includes('|')||it.t==='box'||it.keep?'none':(it.t==='etc'||it.t==='eq'||it.t==='hp'||it.t==='sp')?'sell':it.t==='card'?'store':'none';const o=Object.assign({pick:true,act:d,keep:keepDef(k)},C().ih[k]||{});o.keep=Math.max(0,Math.floor(Number(o.keep)||0));return o};
 const sellQty=k=>{const h=ih(k);if(h.act!=='sell'||!(S.inv[k]>0))return 0;const r=C().restock[k];return Math.max(0,S.inv[k]-Math.max(h.keep,r&&r.on?r.to:0))};
 
 /* ================= 戰鬥訊息與聊天 ================= */
@@ -1272,8 +1281,9 @@ function potGain(k,d){const it=ITEMS[k],pm=1+(d.E.potP||0)/100;let hp=0,sp=0;
   else{hp=it.heal*(1+d.st.vit*.02)*(1+.05*SL('lpotion'))*pm*(.9+R()*.2);if(it.sp)sp=it.sp*(1+d.st.int*.02)*pm}
   hp=Math.round(hp);sp=Math.round(sp);S.hp=Math.min(d.maxHp,S.hp+hp);S.sp=Math.min(d.maxSp,S.sp+sp);
   return [hp?`${hp} HP`:'',sp?`${sp} SP`:''].filter(Boolean).join('、')}
+function useBoost(k){const b=BOOSTI[k];if(!b||!(S.inv[k]>0))return false;S.inv[k]--;if(!S.inv[k])delete S.inv[k];S.boost=S.boost||{};S.boost[b.k]=S.clock+b.dur;EBV++;dirty=true;log('skill',`使用 ${ITEMS[k].n}：${ITEMS[k].d}`);return true}
 function usePotions(d){
-  const c=C();
+  const c=C();if(c.boostAuto)for(const k in c.boostAuto)if(c.boostAuto[k]&&BOOSTI[k]&&(S.inv[k]||0)>0&&!boostOn(BOOSTI[k].k))useBoost(k);
   if(c.hpPot.on&&S.hp<d.maxHp*c.hpPot.pct/100){
     for(const k of c.potList){if((S.inv[k]||0)>0){useI(k,1);dirty=true;const g=potGain(k,d);log('skill',`使用 ${ITEMS[k].n}，恢復 ${g}。`);return}}
   }
@@ -1570,7 +1580,7 @@ function die(t){
 function addItem(k,n){S.inv[k]=(S.inv[k]||0)+n;S.stats.items[k]=(S.stats.items[k]||0)+n;dirty=true}
 function giveExp(t,ratio){
   const gap=S.lv-t.lv,pen=gap>10?Math.max(.1,1-(gap-10)*.06):1;
-  const rate=1+((((D().E.expRace)||{})[t.race]||0)+(D().E.expAll||0))/100,be=Math.max(1,Math.round(t.exp*pen*ratio*rate)),je=Math.max(1,Math.round(t.jexp*pen*ratio*rate));
+  const rate=(1+((((D().E.expRace)||{})[t.race]||0)+(D().E.expAll||0))/100)*(boostOn('exp')?1.5:1),be=Math.max(1,Math.round(t.exp*pen*ratio*rate)),je=Math.max(1,Math.round(t.jexp*pen*ratio*rate));
   if(pen<1&&!S.penWarn){S.penWarn=1;log('warn','怪物比你低 10 級以上，經驗值會打折。建議到「掛機設定 → 掛機地圖」換張圖。')}
   if(pen===1)S.penWarn=0;
   const bp=S.lv>=99?'MAX':(be/nextBase(S.lv)*100).toFixed(2)+'%',jp=S.jlv>=J().max?'MAX':(je/nextJob(S.jlv)*100).toFixed(2)+'%';
@@ -1635,9 +1645,9 @@ function win(d){
   if(SLC('HT_REMOVETRAP')&&t.fld){const n=TRAPF.filter(k=>t.fld[k]).length;if(n){addItem('i1065',n);log('skill',`解除陷阱：收回 ${n} 個沒踩到的陷阱。`)}}
   {const sdL=SLC('HW_SOULDRAIN');if(sdL&&t.lastMagic)S.sp=Math.min(d.maxSp,S.sp+Math.floor(t.lv*(95+15*sdL)/100))}
   if(SLC('BS_FINDINGORE')&&R()<.02){const o=pick(['i1002','i1003','i756','i757'].filter(k=>ITEMS[k]));if(o){addItem(o,1);log('drop',`尋找礦石：撿到 ${ITEMS[o].n} ×1。`)}}
-  {const E=d.E;if(E.spGain&&E.spGain[t.race])S.sp=Math.min(d.maxSp,S.sp+E.spGain[t.race]);if(E.ad)for(const [it,rc,r] of E.ad){if((!rc||rc===t.race)&&ITEMS[it]&&R()*100<r*DROPM()){addItem(it,1);log('drop',`裝備效果：得到 ${ITEMS[it].n} ×1。`)}}}
+  {const E=d.E;if(E.spGain&&E.spGain[t.race])S.sp=Math.min(d.maxSp,S.sp+E.spGain[t.race]);if(E.ad)for(const [it,rc,r] of E.ad){if((!rc||rc===t.race)&&ITEMS[it]&&R()*100<r*DROPB()){addItem(it,1);log('drop',`裝備效果：得到 ${ITEMS[it].n} ×1。`)}}}
   if(C().loot.on){let got=false;
-    for(const [k,r] of t.drops){if(R()*100<r*(1+d.st.luk*.005)*DROPM()){
+    for(const [k,r] of t.drops){if(R()*100<r*(1+d.st.luk*.005)*DROPB()){
       if(!ih(k).pick)continue;
       if(weight()+ITEMS[k].w>d.maxW){log('warn',`負重已滿，無法撿取 ${ITEMS[k].n}。`);continue}
       if(!got){setState('撿取物品');got=true}
@@ -1985,14 +1995,111 @@ function vendStep(){
 }
 
 /* ================= 介面 ================= */
+const SLOT={C:6,Rw:5,
+ S:[// key,name,weight,pays [8-9,10-11,12+]
+  ['red','紅色藥水',22,[0.175,0.525,1.4]],['ora','橙色藥水',20,[0.28,0.63,2.8]],['yel','黃色藥水',18,[0.35,0.7,3.5]],['wht','白色藥水',16,[0.56,0.84,5.6]],
+  ['blu','藍色藥水',13,[0.7,1.05,7]],['ore','神之金屬原石',10,[1.05,1.4,8.4]],['gem','藍色魔力礦石',8,[1.4,3.5,10.5]],['box','古老藍箱子',6,[1.75,7,17.5]]],
+ scW:1.6,mulW:0.6,mulWF:1.6,
+ MV:[[2,300],[3,200],[4,120],[5,100],[6,60],[8,50],[10,40],[12,25],[15,20],[20,15],[25,10],[50,5],[100,2]],
+ cap:5000};
+function slPick(r,F){const tot=SLOT.S.reduce((a,s)=>a+s[2],0)+SLOT.scW+(F?SLOT.mulWF:SLOT.mulW);let x=r()*tot;
+ for(let i=0;i<SLOT.S.length;i++){x-=SLOT.S[i][2];if(x<0)return{s:i}}x-=SLOT.scW;if(x<0)return{s:'sc'};
+ const mt=SLOT.MV.reduce((a,m)=>a+m[1],0);let y=r()*mt;for(const [v,w] of SLOT.MV){y-=w;if(y<0)return{s:'m',v}}return{s:'m',v:2}}
+function slSpin(r,F,acc){const {C,Rw}=SLOT;let g=[];for(let c=0;c<C;c++){g.push([]);for(let i=0;i<Rw;i++)g[c].push(slPick(r,F))}
+ const frames=[];let win=0;
+ for(let loop=0;loop<40;loop++){const cnt={};g.forEach((col,c)=>col.forEach((x,i)=>{if(typeof x.s==='number')(cnt[x.s]=cnt[x.s]||[]).push([c,i])}));
+  const wins=[];for(const k in cnt){const n=cnt[k].length;if(n>=8){const p=SLOT.S[k][3][n>=12?2:n>=10?1:0];wins.push({s:+k,n,p,cells:cnt[k]})}}
+  frames.push({g:g.map(c=>c.map(x=>({...x}))),wins});if(!wins.length)break;
+  win+=wins.reduce((a,w)=>a+w.p,0);const rm=new Set();wins.forEach(w=>w.cells.forEach(([c,i])=>rm.add(c+','+i)));
+  g=g.map((col,c)=>{const keep=col.filter((x,i)=>!rm.has(c+','+i));while(keep.length<Rw)keep.unshift(slPick(r,F));return keep})}
+ const last=frames[frames.length-1].g;let M=0,sc=0;last.forEach(col=>col.forEach(x=>{if(x.s==='m')M+=x.v;if(x.s==='sc')sc++}));
+ let mul=1;if(win>0&&M>0){if(F){acc+=M;mul=acc}else mul=M}else if(F&&acc>0&&win>0)mul=acc;
+ return{frames,base:win,M,mul,win:Math.min(SLOT.cap,win*mul),sc,acc}}
+function slRound(r,buy){let tot=0,sc=0;let first=null;const spins=[];
+ if(!buy){const s=slSpin(r,false,0);spins.push(s);tot+=s.win;sc=s.sc;first=s;if(sc>=4)tot+=sc>=6?100:sc>=5?5:3}
+ let fs=(buy||sc>=4)?15:0,acc=0,n=0;while(fs>0&&n<200){fs--;n++;const s=slSpin(r,true,acc);s.free=1;spins.push(s);acc=s.acc;tot+=s.win;if(s.sc>=3)fs+=5}
+ return{tot:Math.min(SLOT.cap,tot),first,free:n,spins,sc}}
+
+
+/* ================= 娛樂：仙境轉轉樂（6×5 消除）＋骰子比大小；贏的是遊樂幣，可換道具 ================= */
+const FUNX=[['i607',150],['i608',60],['i12208',300],['i12210',400],['iwtup',100]];
+const FUNBETS=[10000,100000,1000000],COINZ=1000,BUYX=85;
+const FUN={busy:false,auto:0,cv:null,show:null,hl:null,msg:'',dice:null,fx:[]};
+const fun=()=>{ROOT.fun=ROOT.fun||{coin:0,bet:100000,fast:false,st:{bet:0,coin:0,spins:0,best:0,free:0}};return ROOT.fun};
+const zShort=z=>z>=1e8?(z/1e8).toFixed(z%1e8?2:0)+' 億':z>=1e4?(z/1e4).toFixed(z%1e4?1:0)+' 萬':fmt(z);
+function slIcon(g,x,y,sz,cell,t){const s=sz/40;g.save();g.translate(x+sz/2,y+sz/2);g.scale(s,s);
+  const flask=(c1,c2)=>{g.fillStyle='rgba(0,0,0,.25)';g.beginPath();g.ellipse(0,15,11,3,0,0,7);g.fill();g.fillStyle=c1;g.beginPath();g.arc(0,4,11,0,7);g.fill();g.fillStyle=c2;g.beginPath();g.arc(-3,1,4,0,7);g.fill();
+    g.fillStyle='#e8e0d0';g.fillRect(-4,-12,8,7);g.fillStyle='#9a6a3a';g.fillRect(-5,-15,10,4);g.strokeStyle='rgba(255,255,255,.6)';g.lineWidth=1.5;g.beginPath();g.arc(0,4,8,3.6,4.6);g.stroke()};
+  if(cell.s==='m'){const r=10+Math.sin(t/200)*1;const gr=g.createRadialGradient(-3,-3,2,0,0,15);gr.addColorStop(0,'#f6d8ff');gr.addColorStop(1,'#7a3ab0');g.fillStyle=gr;g.beginPath();g.arc(0,0,14,0,7);g.fill();
+    g.strokeStyle='#ffe066';g.lineWidth=2;g.stroke();g.fillStyle='#fff';g.font='bold 13px sans-serif';g.textAlign='center';g.textBaseline='middle';g.fillText('×'+cell.v,0,1)}
+  else if(cell.s==='sc'){g.rotate(Math.sin(t/300)*.15);g.fillStyle='#ffd84a';g.beginPath();for(let i=0;i<10;i++){const r=i%2?7:16,a=i/10*Math.PI*2-Math.PI/2;g.lineTo(Math.cos(a)*r,Math.sin(a)*r)}g.closePath();g.fill();g.strokeStyle='#b8860b';g.lineWidth=1.5;g.stroke();g.fillStyle='#8a5a00';g.font='bold 8px sans-serif';g.textAlign='center';g.fillText('免費',0,3)}
+  else switch(SLOT.S[cell.s][0]){
+   case'red':flask('#d83a3a','#ff9a8a');break;case'ora':flask('#ee8a2a','#ffd09a');break;case'yel':flask('#e8c02a','#fff2a0');break;case'wht':flask('#e8ecf4','#ffffff');break;case'blu':flask('#4a6ad8','#9ab8ff');break;
+   case'ore':{g.fillStyle='#6a6a72';g.beginPath();g.moveTo(-13,6);g.lineTo(-9,-9);g.lineTo(4,-13);g.lineTo(13,-2);g.lineTo(9,11);g.lineTo(-6,13);g.closePath();g.fill();g.fillStyle='#9a9aa2';g.beginPath();g.moveTo(-9,-9);g.lineTo(4,-13);g.lineTo(1,-2);g.closePath();g.fill();g.fillStyle='#fff';[[-4,2],[5,4],[0,-6]].forEach(([a,b])=>{g.fillRect(a,b,2,2)});break}
+   case'gem':{for(const [dx,h,c] of [[-7,18,'#7a8ae8'],[7,16,'#6a7ad8'],[0,24,'#9aa8ff']]){g.fillStyle=c;g.beginPath();g.moveTo(dx,12);g.lineTo(dx-5,0);g.lineTo(dx,-h+10);g.lineTo(dx+5,0);g.closePath();g.fill()}g.fillStyle='rgba(255,255,255,.7)';g.fillRect(-1,-10,2,8);break}
+   case'box':{g.fillStyle='#3a4a9a';g.fillRect(-14,-6,28,18);g.fillStyle='#4a5ab8';g.fillRect(-14,-13,28,8);g.fillStyle='#d8b040';g.fillRect(-14,-6,28,2.5);g.fillRect(-3,-8,6,7);g.fillStyle='#2a2a3a';g.fillRect(-1,-5,2,3);break}}
+  g.restore()}
+function slDraw(){const cv=FUN.cv;if(!cv||!FUN.show)return;const g=cv.getContext('2d'),W=cv.width,H=cv.height,C=SLOT.C,Rw=SLOT.Rw,pad=6,cw=(W-pad*2)/C,ch=(H-pad*2)/Rw,t=performance.now();
+  const gr=g.createLinearGradient(0,0,0,H);gr.addColorStop(0,'#6a3e14');gr.addColorStop(1,'#3a200a');g.fillStyle=gr;g.fillRect(0,0,W,H);
+  FUN.show.forEach((col,c)=>col.forEach((cell,i)=>{if(!cell)return;const x=pad+c*cw,y=pad+i*ch;const hl=FUN.hl&&FUN.hl.has(c+','+i);
+    g.fillStyle=hl?'rgba(255,230,120,.55)':'rgba(255,255,255,.08)';g.beginPath();g.roundRect?g.roundRect(x+2,y+2,cw-4,ch-4,6):g.rect(x+2,y+2,cw-4,ch-4);g.fill();
+    const sz=Math.min(cw,ch)-6;const dy=cell._dy?cell._dy:0;slIcon(g,x+(cw-sz)/2,y+(ch-sz)/2-dy,sz,cell,t)}));
+  if(FUN.big){g.fillStyle='rgba(0,0,0,.45)';g.fillRect(0,H/2-26,W,52);g.fillStyle='#ffe066';g.font='bold 22px sans-serif';g.textAlign='center';g.textBaseline='middle';g.fillText(FUN.big,W/2,H/2)}}
+function slLoop(){if(!FUN.cv||!document.body.contains(FUN.cv)){FUN.raf=0;return}slDraw();FUN.raf=requestAnimationFrame(slLoop)}
+function funMount(){const slot=document.getElementById('slotSlot');if(!slot)return;if(!FUN.cv){FUN.cv=document.createElement('canvas');FUN.cv.width=360;FUN.cv.height=300;FUN.cv.style.cssText='width:100%;max-width:420px;display:block;margin:0 auto;border-radius:10px;image-rendering:auto'}
+  if(!FUN.show){FUN.show=Array.from({length:SLOT.C},()=>Array.from({length:SLOT.Rw},()=>slPick(R,false)))}
+  if(FUN.cv.parentNode!==slot)slot.appendChild(FUN.cv);if(!FUN.raf)FUN.raf=requestAnimationFrame(slLoop)}
+const wait=ms=>new Promise(r=>setTimeout(r,ms));
+async function slPlay(spin,fast){if(fast){FUN.hl=null;FUN.show=spin.frames[spin.frames.length-1].g;return}
+  for(let fi=0;fi<spin.frames.length;fi++){const f=spin.frames[fi];FUN.show=f.g;FUN.hl=null;if(fi===0){for(let k=0;k<6;k++){FUN.show.forEach(col=>col.forEach(x=>x._dy=(5-k)*8));await wait(40)}FUN.show.forEach(col=>col.forEach(x=>x._dy=0))}
+    else await wait(220);if(!f.wins.length)break;FUN.hl=new Set();f.wins.forEach(w=>w.cells.forEach(([c,i])=>FUN.hl.add(c+','+i)));await wait(450);FUN.hl=null}}
+async function funSpin(buy){const F=fun(),bet=F.bet,cost=buy?bet*BUYX:bet;if(FUN.busy)return;if(S.zeny<cost){toast(`Zeny 不夠，需要 ${fmt(cost)}z`);FUN.auto=0;renderTab();return}
+  FUN.busy=true;S.zeny-=cost;zOut('娛樂',cost);F.st.bet+=cost;F.st.spins++;FUN.big='';
+  const res=slRound(R,buy);let shown=0;
+  for(const sp of res.spins){if(sp.free&&!shown){FUN.big='免費遊戲 15 次！';await wait(F.fast?300:900);FUN.big=''}shown++;await slPlay(sp,F.fast);
+    if(sp.win>0&&!F.fast){FUN.msg=`${sp.free?'免費遊戲：':''}贏 ${(sp.base).toFixed(2)} 倍${sp.mul>1?` × 乘數 ${sp.mul}`:''}`;renderFunMsg();await wait(350)}}
+  const coins=Math.round(res.tot*bet/COINZ);F.coin+=coins;F.st.coin+=coins;if(res.free)F.st.free++;if(res.tot>F.st.best)F.st.best=res.tot;
+  FUN.msg=coins?`押 ${zShort(cost)}，贏 <b>${fmt(coins)}</b> 遊樂幣（${res.tot.toFixed(1)} 倍${res.free?`，免費遊戲 ${res.free} 次`:''}）`:`押 ${zShort(cost)}，沒有中獎`;
+  if(res.tot>=50){FUN.big=`大獎 ${Math.round(res.tot)} 倍！`;log('lvl',`★ 仙境轉轉樂中了 ${Math.round(res.tot)} 倍，得到 ${fmt(coins)} 遊樂幣！`)}
+  dirty=true;FUN.busy=false;renderTab();if(FUN.big){const bg=FUN.big;setTimeout(()=>{if(FUN.big===bg)FUN.big=''},2500)}
+  if(FUN.auto>0){FUN.auto--;if(res.tot>=100||res.free){FUN.auto=0;FUN.msg+='（中大獎或免費遊戲，自動轉已停止）';renderTab();return}await wait(F.fast?250:700);if(FUN.auto>0&&tab==='fun')funSpin(false);else FUN.auto=0}}
+function renderFunMsg(){const el=document.getElementById('funMsg');if(el)el.innerHTML=FUN.msg}
+function funDice(big){const F=fun(),bet=F.bet;if(S.zeny<bet){toast(`Zeny 不夠，需要 ${fmt(bet)}z`);return}S.zeny-=bet;zOut('娛樂',bet);F.st.bet+=bet;
+  const d=[rnd(1,6),rnd(1,6),rnd(1,6)],sum=d[0]+d[1]+d[2],tri=d[0]===d[1]&&d[1]===d[2],isBig=sum>=11,win=!tri&&isBig===big;const coins=win?Math.round(bet*2/COINZ):0;F.coin+=coins;F.st.coin+=coins;
+  FUN.dice={d,sum,tri,win,coins,big};dirty=true;renderTab()}
+function funBuyX(k,cost){const F=fun();if(F.coin<cost){toast('遊樂幣不夠');return}F.coin-=cost;S.inv[k]=(S.inv[k]||0)+1;dirty=true;log('drop',`用 ${cost} 遊樂幣換到 ${ITEMS[k].n}。`);toast(`換到 ${ITEMS[k].n}！`);renderTab()}
+const DIE=['','⚀','⚁','⚂','⚃','⚄','⚅'];
+function funView(){const F=fun(),bet=F.bet,c=C();setTimeout(funMount,0);
+  const bets=FUNBETS.map(b=>`<button type="button" class="sm ${b===bet?'on':''}" data-fun="bet" data-k="${b}">${zShort(b)}</button>`).join('');
+  const bl=k=>{const b=S.boost&&S.boost[k];return b>S.clock?`<span class="good">剩 ${Math.ceil((b-S.clock)/60000)} 分鐘</span>`:'<span class="note">未使用</span>'};
+  return box(`遊樂幣：${fmt(F.coin)}`,`<div class="note">用 Zeny 下注，贏的是<b>遊樂幣</b>（1 遊樂幣 = ${fmt(COINZ)}z 的獎金），遊樂幣只能拿來換下面的道具。遊樂幣是整個帳號共用，換到的道具會放進目前角色「${esc(S.name)}」的背包。</div>
+    <div class="row"><b>押注</b>${bets}<label class="chk"><input type="checkbox" data-fun="fast" ${F.fast?'checked':''}> 快速</label></div><div class="note">身上 ${fmt(S.zeny)}z</div>`)+
+   card('仙境轉轉樂',`<div id="slotSlot"></div><div id="funMsg" class="note" style="text-align:center;font-size:15px;min-height:22px">${FUN.msg||'同一種圖案在盤面上 8 個以上就得分，得分的圖案會消掉、上面的掉下來再算一次。'}</div>
+    <div class="row" style="justify-content:center"><button type="button" class="pri" data-fun="spin" ${FUN.busy?'disabled':''}>轉（${zShort(bet)}）</button><button type="button" data-fun="buy" ${FUN.busy?'disabled':''}>買免費遊戲（${zShort(bet*BUYX)}）</button></div>
+    <div class="row" style="justify-content:center">${FUN.auto>0?`<button type="button" data-fun="autostop">停止自動（還剩 ${FUN.auto} 次）</button>`:[10,50,100].map(n=>`<button type="button" class="sm" data-fun="auto" data-k="${n}" ${FUN.busy?'disabled':''}>自動 ${n} 次</button>`).join('')}</div>
+    <details class="note"><summary>規則與賠率</summary><div>・盤面 6×5，同一種圖案 8 個以上就得分（位置不限），得分圖案消掉後會掉新的下來，可以連續得分。<br>・<b>紫色球 ×N</b>：轉完時有得分，就把盤面上所有乘數加起來，乘上這一轉的獎金。<br>・<b>金色星星「免費」</b>：出現 4 個以上送 15 次免費遊戲（4／5／6 個另外送 3／5／100 倍）；免費遊戲中再出 3 個加 5 次，而且乘數會一路累加。<br>・也可以直接花 ${BUYX} 倍押注買免費遊戲。單次最多贏 ${fmt(SLOT.cap)} 倍。<br>
+    ${SLOT.S.map(s=>`${s[1]}：8–9 個 ${s[3][0]} 倍、10–11 個 ${s[3][1]} 倍、12 個以上 ${s[3][2]} 倍`).join('<br>')}<br>・長期平均大約拿回押注的 93%，請當作娛樂。</div></details>`)+
+   card('骰子比大小',`<div class="note">擲 3 顆骰子：總和 11–17 是「大」、4–10 是「小」；三顆一樣（豹子）算莊家贏。猜中拿回 2 倍押注的遊樂幣。</div>
+    <div class="row" style="justify-content:center"><button type="button" class="pri" data-fun="dice" data-k="big">押大</button><button type="button" class="pri" data-fun="dice" data-k="small">押小</button></div>
+    ${FUN.dice?`<div style="text-align:center;font-size:40px;line-height:1.2">${FUN.dice.d.map(x=>DIE[x]).join(' ')}</div><div style="text-align:center">總和 ${FUN.dice.sum}${FUN.dice.tri?'（豹子）':FUN.dice.sum>=11?'（大）':'（小）'}，你押${FUN.dice.big?'大':'小'}：${FUN.dice.win?`<b class="good">贏了 ${fmt(FUN.dice.coins)} 遊樂幣</b>`:'<span class="bad">輸了</span>'}</div>`:''}`,false)+
+   card('遊樂幣兌換',`<div class="tw"><table><thead><tr><th>道具</th><th class="r">遊樂幣</th><th class="r">背包</th><th></th></tr></thead><tbody>${FUNX.map(([k,cost])=>{const it=ITEMS[k];return `<tr><td>${it.n}<div class="note">${itemInfo(k)}</div></td><td class="r">${fmt(cost)}</td><td class="r">${S.inv[k]||0}</td><td class="r"><button type="button" class="sm" data-fun="x" data-k="${k}" ${F.coin<cost?'disabled':''}>換</button></td></tr>`}).join('')}</tbody></table></div>`)+
+   card('加成道具（目前角色）',`${Object.entries(BOOSTI).map(([k,b])=>`<div class="row"><b style="min-width:7em">${ITEMS[k].n}</b>${bl(b.k)}<span class="note">背包 ${S.inv[k]||0}</span><button type="button" class="sm" data-a="use" data-k="${k}" ${(S.inv[k]||0)>0?'':'disabled'}>使用</button><label class="chk"><input type="checkbox" data-fun="ba" data-k="${k}" ${(c.boostAuto||{})[k]?'checked':''}> 效果結束自動續用</label></div>`).join('')}
+    <div class="note">效果用遊戲時間計算，離線掛機也會照常倒數；再用一次會重新計時（不會疊加時間）。</div>`)+
+   card('統計',`<div class="kv"><div>總押注<b>${fmt(F.st.bet)}z</b></div><div>總共贏得<b>${fmt(F.st.coin)} 幣</b></div><div>轉轉樂次數<b>${fmt(F.st.spins)}</b></div><div>免費遊戲<b>${fmt(F.st.free)} 次</b></div><div>最大一次<b>${Math.round(F.st.best)} 倍</b></div></div>`,false)}
+
 const TABS=[['main','主控台'],['char','人物'],['job','職業'],['bag','背包'],['shop','商店與 NPC'],['stor','倉庫'],['query','查詢'],
-  ['auto','掛機設定'],['stats','統計'],['rank','排行榜'],['party','隊伍'],['guild','公會'],['trade','交易'],['cart','手推車與攤位'],['help','說明']];
+  ['auto','掛機設定'],['stats','統計'],['rank','排行榜'],['party','隊伍'],['guild','公會'],['trade','交易'],['cart','手推車與攤位'],['fun','娛樂'],['help','說明']];
 let tab='main',dirty=true,lastTouch=0,armed=null,ui={town:ROOT.ui.town||'普隆德拉',jobTab:null,shopTab:'tool',q:'',mapOpen:{},look:null,dir:0,lookSit:false};
 $('tabs').innerHTML=TABS.map(([k,n])=>`<button type="button" data-t="${k}">${n}</button>`).join('');
 $('tabs').onclick=e=>{const b=e.target.closest('button');if(!b)return;tab=b.dataset.t;armed=null;$('panelWin').classList.remove('min');renderTab();try{window.scrollTo(0,0)}catch(err){}};
 $('panelClose').onclick=()=>{tab='main';renderTab()};
 document.querySelectorAll('[data-min]').forEach(b=>b.onclick=()=>$(b.dataset.min).classList.toggle('min'));
 const panel=$('panel');
+panel.addEventListener('click',e=>{const b=e.target.closest('[data-fun]');if(!b||b.type==='checkbox')return;const a=b.dataset.fun,k=b.dataset.k,F=fun();
+  if(a==='bet'){F.bet=+k;renderTab()}else if(a==='spin')funSpin(false);else if(a==='buy'){if(armed!=='funbuy'){armed='funbuy';b.textContent=`再按一次確認（${zShort(F.bet*BUYX)}）`;return}armed=null;funSpin(true)}
+  else if(a==='auto'){FUN.auto=+k-1;funSpin(false)}else if(a==='autostop'){FUN.auto=0;renderTab()}else if(a==='dice')funDice(k==='big');else if(a==='x'){const x=FUNX.find(q=>q[0]===k);if(x)funBuyX(k,x[1])}});
+panel.addEventListener('change',e=>{const el=e.target;const a=el.dataset&&el.dataset.fun;if(!a)return;if(a==='fast'){fun().fast=el.checked;dirty=true}else if(a==='ba'){const c=C();c.boostAuto=c.boostAuto||{};c.boostAuto[el.dataset.k]=el.checked;dirty=true}});
+
 panel.addEventListener('pointerdown',()=>lastTouch=Date.now());
 panel.addEventListener('focusin',()=>lastTouch=Date.now());
 
@@ -2069,7 +2176,7 @@ main(){const d=D(),c=C();const notes=[];
   return box(`${esc(S.name)}　${J().n}`,`<div style="display:flex;gap:12px;align-items:center"><canvas id="sprMain" width="80" height="112" aria-label="角色形象" style="flex:none"></canvas><div class="bars" style="flex:1;min-width:0">${barHTML('hp','var(--hp)','HP')}${barHTML('sp','var(--sp)','SP')}${barHTML('bx','var(--xp)','Base')}${barHTML('jx','var(--jx)','Job')}${barHTML('wt','var(--wt)','負重')}</div></div>
    <div class="row"><button type="button" data-a="toggle" class="${S.auto?'on':'pri'}">${S.auto?'⏸ 停止掛機':'▶ 開始掛機'}</button><button type="button" data-a="town">回城整理</button><button type="button" data-a="sit">${sitting?'站起來':'坐下'}</button></div>
    <div class="note" id="tgt" style="min-height:3.2em;line-height:1.6em;white-space:pre-line">目標：—</div><div class="bad" id="lstop" style="display:none;font-size:13px"></div>
-   <div class="kv"><div>地圖<b>${MAPS[c.map].n}</b></div><div>Zeny<b id="zeny">${fmt(S.zeny)}</b></div><div>HP 藥水<b>${c.potList.reduce((s,k)=>s+(S.inv[k]||0),0)}</b></div><div>蒼蠅翅膀<b>免費</b></div>${needAmmo(wcls())?`<div>${needAmmo(wcls())==='bullet'?'子彈':'箭矢'}<b id="ammoN">${S.ammo.id&&ITEMS[S.ammo.id]&&S.ammo.n>0?ITEMS[S.ammo.id].n+' ':''}${fmt(S.ammo.n||0)}</b></div>`:''}</div>
+   <div class="kv"><div>地圖<b>${MAPS[c.map].n}</b></div><div>Zeny<b id="zeny">${fmt(S.zeny)}</b></div><div>HP 藥水<b>${c.potList.reduce((s,k)=>s+(S.inv[k]||0),0)}</b></div><div>蒼蠅翅膀<b>免費</b></div>${[['exp','經驗 +50%'],['drop','掉寶 ×2'],['wt','負重 +2000']].filter(([k])=>boostOn(k)).map(([k,n])=>`<div>${n}<b class="good">${Math.ceil((S.boost[k]-S.clock)/60000)} 分</b></div>`).join('')}${needAmmo(wcls())?`<div>${needAmmo(wcls())==='bullet'?'子彈':'箭矢'}<b id="ammoN">${S.ammo.id&&ITEMS[S.ammo.id]&&S.ammo.n>0?ITEMS[S.ammo.id].n+' ':''}${fmt(S.ammo.n||0)}</b></div>`:''}</div>
    ${buffs?`<div class="chips">${buffs}</div>`:''}
    ${Object.keys(STN_).some(hasS)?`<div class="chips">${Object.keys(STN_).filter(hasS).map(k=>`<span class="chip bad">▼ ${STN_[k]}（剩 ${dur(S.sts[k]-S.clock)}）</span>`).join('')}</div>`:''}
    <div class="note" id="homLine" ${S.hom?'':'hidden'}></div>${grafNote()}
@@ -2161,7 +2268,7 @@ bag(){const d=D();
   const sellable=other.filter(([k])=>ih(k).act==='sell'&&!protectedItem(k)).reduce((s,[k,n])=>s+priceSell(k)*n,0);
   const t=list=>list.length?`<div class="tw"><table><thead><tr><th>物品</th><th class="r">數量</th><th class="r">重量</th><th class="r">賣價</th><th></th></tr></thead><tbody>${list.map(([k,n])=>{const it=ITEMS[k];
     const info=itemInfo(k)+(it.t==='eq'&&!canWield(it)?' <span class="bad">職業無法裝備</span>':'');
-    return `<tr><td>${it.n}${info?`<div class="note">${info}</div>`:''}</td><td class="r">${n}</td><td class="r">${Math.round(it.w*n*10)/10}</td><td class="r">${fmt(priceSell(k))}</td><td class="r"><span class="btns" style="justify-content:flex-end">${it.t==='eq'&&canWield(it)?`<button type="button" class="sm" data-a="equip" data-k="${k}">裝備</button>`:''}${it.t==='eq'&&canWield(it)&&S.job==='assassin'&&it.slot==='weapon'&&!it.two&&['dagger','sword','axe'].includes(it.wc)?`<button type="button" class="sm" data-a="equipL" data-k="${k}">裝左手</button>`:''}${it.t==='arrow'||it.t==='bullet'?`<button type="button" class="sm" data-a="ammo" data-k="${k}">裝上</button>`:''}${it.heal||it.php||it.t==='box'||it.t==='food'||k==='i604'?`<button type="button" class="sm" data-a="use" data-k="${k}">${it.t==='box'?'打開':it.t==='food'?'吃':k==='i604'?'折斷':'使用'}</button>`:''}${n>1?`<input type="number" id="sq_${esc(k)}" min="1" max="${n}" value="1" inputmode="numeric" aria-label="賣出數量" style="width:4.2em;padding:3px 4px">`:''}<button type="button" class="sm" data-a="sell" data-k="${k}" data-q="1">賣</button>${n>1?`<button type="button" class="sm" data-a="sell" data-k="${k}" data-all="1">全賣 ${n}</button>`:''}</span></td></tr>`}).join('')}</tbody></table></div>`:'<div class="note">（沒有）</div>';
+    return `<tr><td>${it.n}${info?`<div class="note">${info}</div>`:''}</td><td class="r">${n}</td><td class="r">${Math.round(it.w*n*10)/10}</td><td class="r">${fmt(priceSell(k))}</td><td class="r"><span class="btns" style="justify-content:flex-end">${it.t==='eq'&&canWield(it)?`<button type="button" class="sm" data-a="equip" data-k="${k}">裝備</button>`:''}${it.t==='eq'&&canWield(it)&&S.job==='assassin'&&it.slot==='weapon'&&!it.two&&['dagger','sword','axe'].includes(it.wc)?`<button type="button" class="sm" data-a="equipL" data-k="${k}">裝左手</button>`:''}${it.t==='arrow'||it.t==='bullet'?`<button type="button" class="sm" data-a="ammo" data-k="${k}">裝上</button>`:''}${it.heal||it.php||it.t==='box'||it.t==='food'||it.t==='boost'||k==='i604'?`<button type="button" class="sm" data-a="use" data-k="${k}">${it.t==='box'?'打開':it.t==='food'?'吃':k==='i604'?'折斷':'使用'}</button>`:''}${n>1?`<input type="number" id="sq_${esc(k)}" min="1" max="${n}" value="1" inputmode="numeric" aria-label="賣出數量" style="width:4.2em;padding:3px 4px">`:''}<button type="button" class="sm" data-a="sell" data-k="${k}" data-q="1">賣</button>${n>1?`<button type="button" class="sm" data-a="sell" data-k="${k}" data-all="1">全賣 ${n}</button>`:''}</span></td></tr>`}).join('')}</tbody></table></div>`:'<div class="note">（沒有）</div>';
   const ct=cards.length?`<div class="tw"><table><tbody>${cards.map(([k,n])=>{const it=ITEMS[k];
     const tg=[...Object.entries(S.eq).filter(([sl,x])=>x&&slotType(sl)===it.ctype&&freeSlots(x)>0).map(([sl,x])=>[`eq:${sl}`,`（裝備中）${ITEMS[x].n}`]),
       ...Object.keys(S.inv).filter(x=>S.inv[x]>0&&ITEMS[x]&&ITEMS[x].t==='eq'&&ITEMS[x].slot===it.ctype&&freeSlots(x)>0).map(x=>[`inv:${x}`,ITEMS[x].n])];
@@ -2301,6 +2408,7 @@ cart(){const can=SL('pushcart')>0;
   (SLC('ALL_BUYING_STORE')?`<div style="height:10px"></div>`+box('收購（購買商店）',`<div class="note">擺攤時一起開收購：路過的玩家會把道具賣給你。出價越接近 NPC 收購價的 1.3 倍以上越容易收到。Zeny 不夠就收不到。</div>
     <div class="tw"><table><thead><tr><th>道具</th><th class="r">單價</th><th class="r">還要收</th><th></th></tr></thead><tbody>${Object.entries(S.vend.buy||{}).filter(([k])=>ITEMS[k]).map(([k,o])=>`<tr><td>${ITEMS[k].n}<div class="note">NPC 收購價 ${fmt(ITEMS[k].sell)}</div></td><td class="r">${fmt(o.p)}</td><td class="r">${o.n}</td><td class="r"><button type="button" class="sm" data-a="bsdel" data-k="${k}">✕</button></td></tr>`).join('')||'<tr><td class="note" colspan="4">還沒設定。</td></tr>'}</tbody></table></div>
     <div class="row"><select id="bsK" style="max-width:12em">${BUYABLE().map(k=>`<option value="${k}">${ITEMS[k].n}</option>`).join('')}</select><input type="number" id="bsP" placeholder="單價" inputmode="numeric" style="width:6em"><input type="number" id="bsN" placeholder="數量" inputmode="numeric" style="width:5em"><button type="button" class="sm pri" data-a="bsadd">加入</button></div>`):'')},
+fun(){return funView()},
 help(){return box('說明',`<div class="note" style="font-size:14px">
   <p>這是仿 RO 的放置文字遊戲（單機版）。角色會自動尋怪、戰鬥、撿東西、喝藥水、回城賣存。</p>
   <p><b>升級</b>：Base 升級得屬性點，花費隨屬性提高（每 10 點多 1）。Job 升級得技能點。<br>
@@ -2408,7 +2516,7 @@ async function xRecv(d){if(!NET.ok||NET.xseen.has(d.id))return;NET.xseen.add(d.i
   for(const [mi,mm] of Object.entries(v.m)){const js=RUNNERS().filter(j=>ROOT.chars[j]&&ROOT.chars[j].auto&&ROOT.chars[j].cfg.map===+mi&&ROOT.chars[j].hp>0);if(!js.length)continue;
     for(const j of js)withChar(j,()=>{let be=0,je=0;for(const [id,r] of Object.entries(mm)){const t=MONID[id];if(!t)continue;const gap=S.lv-t.lv,pen=gap>10?Math.max(.1,1-(gap-10)*.06):1;
         const rate=1+((((D().E.expRace)||{})[t.race]||0)+(D().E.expAll||0))/100;be+=t.exp*pen*r*rate/js.length;je+=t.jexp*pen*r*rate/js.length}
-      be=Math.round(be);je=Math.round(je);if(be<1&&je<1)return;log('exp',`隊友 ${v.fn||'玩家'} 打怪分到經驗：Base +${fmt(be)} / Job +${fmt(je)}。`);gainExp(be,je);if(homOut())homGain(Math.max(1,Math.round(be*.1)));tb+=be;tj+=je})}
+      if(boostOn('exp')){be*=1.5;je*=1.5}be=Math.round(be);je=Math.round(je);if(be<1&&je<1)return;log('exp',`隊友 ${v.fn||'玩家'} 打怪分到經驗：Base +${fmt(be)} / Job +${fmt(je)}。`);gainExp(be,je);if(homOut())homGain(Math.max(1,Math.round(be*.1)));tb+=be;tj+=je})}
   NET.xin.be+=tb;NET.xin.je+=tj;NET.xin.n++;dirty=true}
 function xpBox(){if(!NET.db)return box('跨玩家組隊','<div class="note">這個功能需要連線（在 Claude 裡開啟分享的遊戲頁面才有）。</div>');
   const x=myXP();const rule='<div class="note">和其他玩家組隊後，<b>雙方都開著遊戲</b>、而且有角色在<b>同一張地圖</b>掛機（等級差 15 以內）時，打怪的經驗會平均分給在場的隊友，每多 1 人總經驗 +10%（跟官方平均分配一樣）。掉落物不分享。一方關掉遊戲或離線計算時不會分享。</div>';
@@ -2535,7 +2643,7 @@ function swapJobs(){const j=JOBS[S.job];if(!j||j.ext||(j.tier!==1&&j.tier!==2))r
   const all=Object.keys(JOBS).filter(k=>k!==S.job&&!k.startsWith('t_')&&JOBS[k].tier===j.tier&&!JOBS[k].ext);
   return all.sort((a,b)=>(PARENT[b]===pa)-(PARENT[a]===pa))}
 const sameLine=k=>PARENT[k]===PARENT[S.job];
-const DROPM=()=>GHM?1:(ROOT.ui.drop||1);const freeTier=()=>(JOBS[S.job]||{}).tier<=1;
+const DROPM=()=>GHM?1:(ROOT.ui.drop||1);const DROPB=()=>DROPM()*(boostOn('drop')?2:1);const freeTier=()=>(JOBS[S.job]||{}).tier<=1;
 const swapCost=()=>!GHM||freeTier()?0:1e6*((S.swapN||0)+1);const resetCost=()=>!GHM||freeTier()?0:1e6;
 const payNote=z=>z?`（費用 ${fmt(z)}z${S.zeny<z?'，<span class="bad">Zeny 不夠</span>':''}）`:'';
 function jobReady(){const j=J();if(!transNext(j).length)return false;return S.jlv>=(j.tier===0?10:40)&&S.skp===0&&(j.tier>0||SL('basic')>=9)}
@@ -2758,7 +2866,7 @@ panel.addEventListener('click',e=>{
     if(w==='eq'){const cur=S.eq[key];if(!cur||freeSlots(cur)<1)break;nk=withCard(cur,k);S.eq[key]=nk}
     else{if(!(S.inv[key]>0)||freeSlots(key)<1)break;S.inv[key]--;nk=withCard(key,k);S.inv[nk]=(S.inv[nk]||0)+1}
     S.inv[k]--;log('sys',`把 ${ITEMS[k].n} 插進裝備，變成 ${ITEMS[nk].n}。`);toast(ITEMS[nk].n)}break;
-  case'use':{const it=ITEMS[k],d=D();if(it&&it.t==='food'){eatFood(k);break}
+  case'use':{const it=ITEMS[k],d=D();if(it&&it.t==='food'){eatFood(k);break}if(it&&it.t==='boost'){useBoost(k);break}
     if(k==='i604'&&S.inv[k]>0){S.inv[k]--;if(!S.inv[k])delete S.inv[k];S.summonQ=(S.summonQ||0)+1;log('warn','折斷了枯樹枝……附近好像有什麼東西被召喚出來了！');if(S.auto&&mode==='search'){}break}if(it&&it.t==='box'&&S.inv[k]>0){S.inv[k]--;const pool=it===ITEMS.album?CARDLIST:EQUIPS;const g=pick(pool);addItem(g,1);log(ITEMS[g].t==='card'?'lvl':'drop',`打開 ${it.n}，得到 ${ITEMS[g].n}！`);toast(`得到 ${ITEMS[g].n}！`);break}
     if(S.inv[k]>0){S.inv[k]--;if(!S.inv[k])delete S.inv[k];const g=potGain(k,d);log('skill',`使用 ${it.n}，恢復 ${g}。`)}}break;
   case'sell':if(S.inv[k]>0){const qi=b.dataset.q?document.getElementById('sq_'+k):null,qv=qi?Math.floor(Number(qi.value)||0):1;if(b.dataset.q&&qv<1){toast('請輸入要賣的數量');rr=false;break}const q=b.dataset.all?S.inv[k]:Math.min(b.dataset.q?qv:n,S.inv[k]),p=priceSell(k)*q;S.inv[k]-=q;if(!S.inv[k])delete S.inv[k];S.zeny+=p;zIn('手動賣出',p);log('sys',`賣出 ${ITEMS[k].n} ×${q}（+${fmt(p)}z）。`)}break;
