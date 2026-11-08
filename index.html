@@ -891,7 +891,8 @@ function normalize(c){if(!c.mapv){if(c.cfg&&MAPMIG[c.cfg.map]>=0)c.cfg.map=MAPMI
   for(const k in c.inv)if(!ITEMS[k])delete c.inv[k];for(const k in c.stor)if(!ITEMS[k])delete c.stor[k];return c}
 ROOT.chars.forEach(normalize);migStor();ROOT.ver=5;ROOT.ui.rate=1;
 let KICKED=false;
-const save=()=>{if(FF||KICKED)return;ROOT.ui.lastSeen=lastLive;ROOT.ui.savedAt=Date.now();try{localStorage.setItem(KEY,JSON.stringify(ROOT))}catch(e){}};
+const progScore=R0=>{try{return (R0&&R0.chars||[]).reduce((a,c)=>a+(c.lv||1)+(c.jlv||1)*.5+((c.trans||(JOBS[c.job]||{}).trans)?100:0)+((JOBS[c.job]||{}).tier||0)*20,0)}catch(e){return 0}};
+const save=()=>{if(FF||KICKED)return;ROOT.ui.lastSeen=lastLive;ROOT.ui.savedAt=Date.now();try{const txt=JSON.stringify(ROOT);localStorage.setItem(KEY,txt);const sc=progScore(ROOT);if(!LOCAL_FRESH&&sc>=(+localStorage.getItem(KEY+'-bestsc')||0)*.98){localStorage.setItem(KEY+'-best',txt);localStorage.setItem(KEY+'-bestsc',String(sc))}}catch(e){}};
 const C=()=>S.cfg;
 
 /* ================= 計算 ================= */
@@ -2428,7 +2429,7 @@ chars(){return box('換角色',`<div class="tw"><table><tbody>${ROOT.chars.map((
   ${ROOT.chars.length<MAXC?`<div class="row"><input type="text" id="newName" placeholder="新角色名稱" maxlength="12"><button type="button" class="pri" data-a="newchar">建立角色</button></div>`:`<div class="note">最多 ${MAXC} 個角色。</div>`}`)+
   `<div style="height:10px"></div>`+box('雲端存檔',CLOUD.ok?`<div><b class="good">● 已連到你的 Claude 帳號</b></div><div class="note">每分鐘、以及切到背景時自動上傳，另外每小時留一份備份。換手機或瀏覽器資料被清掉，只要用同一個 Claude 帳號打開這個網頁，就會自動載回來，不用另外設密碼。存檔只有你自己看得到。</div>
     <div>最後上傳：<b>${CLOUD.at?new Date(CLOUD.at).toLocaleString('zh-TW',{hour12:false}):'還沒有'}</b>${CLOUD.err?` <span class="bad">（上次失敗：${esc(CLOUD.err)}）</span>`:''}</div>
-    <div class="row"><button type="button" class="pri" data-a="cloudup">立刻上傳</button><button type="button" data-a="cloudbak">${armed==='cbk'?'<span class="bad">再按一次：載入 1 小時前的備份</span>':'載入備份'}</button><button type="button" data-a="clouddl">${armed==='cdl'?'<span class="bad">再按一次：用雲端存檔覆蓋這台</span>':'從雲端載入'}</button></div>
+    <div class="row"><button type="button" class="pri" data-a="cloudup">立刻上傳</button><button type="button" data-a="cloudbak">${armed==='cbk'?'<span class="bad">再按一次：載入 1 小時前的備份</span>':'載入備份'}</button><button type="button" data-a="cloudbest">${armed==='cbs'?'<span class="bad">再按一次：載入進度最高的備份</span>':'載入最高進度備份'}</button><button type="button" data-a="clouddl">${armed==='cdl'?'<span class="bad">再按一次：用雲端存檔覆蓋這台</span>':'從雲端載入'}</button></div>
     <label class="chk"><input type="checkbox" data-a2="sessStrict" ${ROOT.ui.sessStrict?'checked':''}> 同一個帳號只能在一個地方玩（另一邊會停止）</label><div class="note">預設關閉：多個裝置同時開著只會提醒，不會停止。打開後比較不會互相蓋存檔，但有些手機瀏覽器會在背景多開頁面，可能會誤判。</div>`
     :CLOUD.checked?(CLOUD.err==='perm'?'<div class="note"><span class="bad">你目前的權限只能看、不能雲端存檔。</span>請分享這個遊戲的人把你的權限改成「參與者（Contributor）」以上，重新整理後就能用。在那之前進度只存在這台裝置，請用下面的「存檔搬家」備份。</div>':'<div class="note">這個畫面用不了雲端存檔（可能沒登入 Claude）。請用下面的「存檔搬家」備份。</div>'):'<div class="note">連線中…</div>')+`<div style="height:10px"></div>`+box('存檔搬家',`<div class="note"><b>遊戲版本：搬家修正版 v26</b>（兩台裝置都要看到這個版本號才能互通）</div><div class="note">把這台裝置的全部角色、背包、倉庫、隊伍和設定變成一串文字，貼到另一台裝置就能接著玩。</div>
     <b>從這台裝置搬出</b><div class="row"><button type="button" class="pri" data-a="svexp">產生存檔文字</button><button type="button" data-a="svcpy">複製</button><span class="note" id="svMsg"></span></div>
@@ -2805,7 +2806,7 @@ async function cloudInit(){
     const id=await user.id();if(!id){CLOUD.checked=true;CLOUD.err='none';return}
     let cw=null;try{cw=await user.can('data.write')}catch(e){}
     if(cw===false){CLOUD.checked=true;CLOUD.err='perm';if(tab==='chars')renderTab();return}
-    CLOUD.db=db;CLOUD.doc=db.doc('data/users/'+id+'/save');CLOUD.bak=db.doc('data/users/'+id+'/backup');CLOUD.ok=true;
+    CLOUD.db=db;CLOUD.doc=db.doc('data/users/'+id+'/save');CLOUD.bak=db.doc('data/users/'+id+'/backup');CLOUD.best=db.doc('data/users/'+id+'/best');CLOUD.ok=true;
     try{SESS.doc=db.doc('data/users/'+id+'/sess');let prev=null;try{const sn=await SESS.doc.get();prev=sn&&sn.exists?sn.data():null}catch(e){}
       if(SBC){SBC.postMessage({type:'ping',sid:SESS.id});await new Promise(r=>setTimeout(r,600))}
       if(SESS.alive){sessKicked({dev:'這台裝置的另一個視窗'},false,true);if(KICKED)return}
@@ -2819,17 +2820,21 @@ async function cloudInit(){
     setInterval(()=>{if(!document.hidden)cloudPush(false)},60000);
   }catch(e){CLOUD.checked=true;CLOUD.err='none'}
   if(tab==='chars')renderTab()}
+function localBest(){try{const t=localStorage.getItem(KEY+'-best');return t?JSON.parse(t):null}catch(e){return null}}
+async function cloudBest(){if(!CLOUD.db||!CLOUD.best||LOCAL_FRESH||Date.now()-(CLOUD.bestAt||0)<600000)return;CLOUD.bestAt=Date.now();try{const sc=progScore(ROOT);const bs=await CLOUD.best.get();const bd=bs&&bs.exists?(typeof bs.data==='function'?bs.data():bs.data):null;if(!bd||!(bd.sc>sc)){const txt=await packSave();await CLOUD.best.set({save:txt,at:Date.now(),v:1,sc})}}catch(e){}}
 async function cloudPull(force){
   if(!CLOUD.ok)return;
-  let snap;try{snap=await CLOUD.doc.get()}catch(e){CLOUD.err=e&&e.code||'error';return}
+  let snap;try{snap=await CLOUD.doc.get()}catch(e){CLOUD.err=e&&e.code||'error';CLOUD.pullFail=true;return}CLOUD.pullFail=false;
   const data=snap&&snap.exists?(typeof snap.data==='function'?snap.data():snap.data):null;
   CLOUD.has=!!(data&&data.save);
   if(!data||!data.save){if(force)toast('雲端還沒有存檔');else if(!LOCAL_FRESH)cloudPush(true);return}
-  if(!CLOUD.at){CLOUD.at=data.at;CLOUD.last=data.save}
+  if(!CLOUD.at){CLOUD.at=data.at;CLOUD.last=data.save}CLOUD.pulled=true;
   const localAt=LOCAL_FRESH?0:(ROOT.ui.savedAt||0);
   if(!force&&!(data.at>localAt+5000)){CLOUD.last=data.save;CLOUD.at=data.at;cloudPush(false);return}
   const go=async()=>{if(FF){setTimeout(go,500);return}
-    try{const obj=await unpackSave(data.save);if(!obj||!Array.isArray(obj.chars)||!obj.chars.length)throw new Error('bad');
+    try{const obj=await unpackSave(data.save);if(!obj||!Array.isArray(obj.chars)||!obj.chars.length)throw new Error('bad');CLOUD.score=progScore(obj);
+      if(!force){const loc=LOCAL_FRESH?progScore(localBest()):progScore(ROOT);if(loc>CLOUD.score*1.25+10){CLOUD.guard=true;const lb=LOCAL_FRESH?localBest():null;if(lb){applySave(lb,true)}
+        log('warn',`⚠ 雲端存檔的進度比這台裝置少很多（可能被新角色蓋掉），已保留這台裝置的進度並重新上傳。`);toast('已保留這台裝置的進度');CLOUD.last='';CLOUD.has=true;LOCAL_FRESH=false;cloudBest();cloudPush(true);renderTab();return}}
       const gap=obj.ui&&obj.ui.lastSeen?Date.now()-obj.ui.lastSeen:0;
       applySave(obj,true);CLOUD.last=data.save;CLOUD.at=data.at;
       toast(force?'已從雲端載入存檔':'已載入雲端存檔');renderTab();
@@ -2838,10 +2843,12 @@ async function cloudPull(force){
 async function cloudPush(force){
   if(!CLOUD.ok||CLOUD.busy||FF||KICKED)return;CLOUD.busy=true;
   try{save();const txt=await packSave();
-    if(LOCAL_FRESH&&CLOUD.has&&!force){CLOUD.busy=false;return}
+    if(LOCAL_FRESH&&!force&&CLOUD.has!==false){CLOUD.busy=false;if(CLOUD.pullFail)cloudPull(false);return}
+    if(!force&&CLOUD.score&&progScore(ROOT)<CLOUD.score*.8-10){CLOUD.busy=false;if(!CLOUD.warnLow){CLOUD.warnLow=1;log('warn','⚠ 這裡的進度比雲端存檔少很多，暫停自動上傳，避免蓋掉雲端的進度。要用這裡的進度請到「換角色 → 雲端存檔」按「立刻上傳」。')}return}
     if(force||txt!==CLOUD.last){
-      if(CLOUD.last&&CLOUD.bak&&Date.now()-(CLOUD.bakAt||0)>3600000){try{await CLOUD.bak.set({save:CLOUD.last,at:CLOUD.at||0,v:1});CLOUD.bakAt=Date.now()}catch(e){}}
-      const at=ROOT.ui.savedAt||Date.now();await CLOUD.doc.set({save:txt,at,v:1});CLOUD.last=txt;CLOUD.at=at;CLOUD.has=true;CLOUD.err='';LOCAL_FRESH=false}}
+      if(CLOUD.last&&CLOUD.bak&&Date.now()-(CLOUD.bakAt||0)>3600000){try{const bs=await CLOUD.bak.get();const bd=bs&&bs.exists?(typeof bs.data==='function'?bs.data():bs.data):null;const lsc=CLOUD.score||progScore(ROOT);if(!bd||!(bd.sc>lsc*1.25+10))await CLOUD.bak.set({save:CLOUD.last,at:CLOUD.at||0,v:1,sc:lsc});CLOUD.bakAt=Date.now()}catch(e){}}
+      cloudBest();
+      const at=ROOT.ui.savedAt||Date.now();await CLOUD.doc.set({save:txt,at,v:1,sc:progScore(ROOT)});CLOUD.score=progScore(ROOT);CLOUD.last=txt;CLOUD.at=at;CLOUD.has=true;CLOUD.err='';LOCAL_FRESH=false}}
   catch(e){CLOUD.err=e&&e.code||'error';if(CLOUD.err==='invalid_argument'){CLOUD.ok=false;CLOUD.err='perm';if(tab==='chars')renderTab()}}
   CLOUD.busy=false}
 panel.addEventListener('click',e=>{
@@ -2999,6 +3006,9 @@ panel.addEventListener('click',e=>{
   case'cloudbak':if(armed==='cbk'){rr=false;(async()=>{try{const sn=await CLOUD.bak.get();const d=sn&&sn.exists?(typeof sn.data==='function'?sn.data():sn.data):null;if(!d||!d.save){toast('還沒有備份');return}
       const obj=await unpackSave(d.save);applySave(obj,true);toast('已載入備份');renderTab();cloudPush(true)}catch(e){toast('載入備份失敗')}})()}else{armed='cbk';keepArm=true}break;
   case'cloudup':rr=false;cloudPush(true).then(()=>renderTab());break;
+  case'cloudbest':if(armed==='cbs'){rr=false;(async()=>{let best=null,bsc=-1;const lb=localBest();if(lb){best=lb;bsc=progScore(lb)}
+    try{const sn=await CLOUD.best.get();const d=sn&&sn.exists?(typeof sn.data==='function'?sn.data():sn.data):null;if(d&&d.save&&(d.sc||0)>bsc){const o=await unpackSave(d.save);if(o&&o.chars&&o.chars.length){best=o;bsc=progScore(o)}}}catch(e){}
+    if(!best){toast('還沒有備份');return}applySave(best,true);LOCAL_FRESH=false;save();CLOUD.score=progScore(ROOT);await cloudPush(true);toast('已載入進度最高的備份');renderTab()})()}else{armed='cbs';keepArm=true}break;
   case'clouddl':if(armed==='cdl'){rr=false;cloudPull(true).then(()=>renderTab())}else{armed='cdl';keepArm=true}break;
   case'newchar':{if(ROOT.chars.length>=MAXC){toast(`最多 ${MAXC} 個角色`);break}let v=($('newName').value||'').trim();if(v){const bad=nameTaken(v,-1);if(bad){toast(bad+'，請換一個');rr=false;break}}else{let i=ROOT.chars.length+1;do{v='冒險者'+i++}while(nameTaken(v,-1))}ROOT.chars.push(freshChar(v));pushRank(true);switchChar(ROOT.chars.length-1)}break;
   }
@@ -3509,7 +3519,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden){AR.gAt=0;
   const gap=ROOT.ui.lastSeen?Date.now()-ROOT.ui.lastSeen:0;if(gap>60000)offlineRun(gap);
 })();
 cloudInit();netInit();
-window.__ro={arChar,arMon,arWeapon,AR,arHero,arSpell,arField,arMonState,spfxKind,SKBY,drawSprite,SESS,CLOUD,woundPick,cardCtx,cardEff,get S(){return S},withChar,engage,bump:()=>EBV++,offlineRun,itemInfo,eMul,homD,homGain,homCall,homTick,HOMC,twilight,grafWrite,berserkPitch,get ROOT(){return ROOT},SK,JOBS,ih,protectedItem,wPct,step,D,P,MAPS,ITEMS,BASE,MON,effText,EQUIPS,SHOP,GD};
+window.__ro={unpackSave,packSave,progScore,CLOUD,arChar,arMon,arWeapon,AR,arHero,arSpell,arField,arMonState,spfxKind,SKBY,drawSprite,SESS,CLOUD,woundPick,cardCtx,cardEff,get S(){return S},withChar,engage,bump:()=>EBV++,offlineRun,itemInfo,eMul,homD,homGain,homCall,homTick,HOMC,twilight,grafWrite,berserkPitch,get ROOT(){return ROOT},SK,JOBS,ih,protectedItem,wPct,step,D,P,MAPS,ITEMS,BASE,MON,effText,EQUIPS,SHOP,GD};
 })();
 </script>
 
