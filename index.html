@@ -171,11 +171,11 @@ const slotType=s=>s.startsWith('acc')?'acc':s;
 /* 道具（資料來源：rAthena 經典版道具表＋台服道具名稱與說明） */
 const BASE=GD.items;
 /* 遊樂幣兌換的加成道具與天地樹果實／芽 */
-const BOOSTI={i12208:{k:'exp',dur:1800000},i12210:{k:'drop',dur:1800000},iwtup:{k:'wt',dur:3600000}};
+const BOOSTI={i12208:{k:'exp',dur:1800000},i12210:{k:'drop',dur:1800000}};
 function boostOn(k){return !!(typeof S!=='undefined'&&S&&S.boost&&S.boost[k]>S.clock)}
 {BASE.i12208=BASE.i12208||{n:'戰鬥教範',w:1,sell:0,t:'boost',d:'使用後 30 分鐘內，打怪得到的 Base／Job 經驗 +50%。'};
  BASE.i12210=BASE.i12210||{n:'泡泡糖',w:1,sell:0,t:'boost',d:'使用後 30 分鐘內，怪物掉寶機率 ×2。'};
- BASE.iwtup={n:'負重增加卷',w:0,sell:0,t:'boost',d:'使用後 60 分鐘內，負重上限 +2000。'};
+ BASE.iwtup={n:'負重增加卷',w:0,sell:0,t:'boost',perm:1,d:'使用後這隻角色的負重上限永久 +100。'};
  for(const [k,p] of [['i607',100],['i608',50]])if(BASE[k])Object.assign(BASE[k],{t:'hp',php:p,psp:p,keep:1})}
 /* 忍者公會商店（官方開在忍者／槍手公會內，這裡放在天津）：飛鏢＋手臂護腕 */
 {const SH=[['i13250','飛鏢',4,10,1],['i13251','雨雲飛鏢',10,30,20],['i13252','閃光飛鏢',20,45,40],['i13253','銳葉飛鏢',40,70,60],['i13254','刺針飛鏢',100,100,80]];
@@ -1048,7 +1048,7 @@ function D0(){
   const tm=S.trans?1.25:1;
   const maxHp=Math.floor(((35+j.hpK*S.lv*(S.lv+1)/2+S.lv*5)*(1+st.vit/100)*tm+(E.hp||0))*(1+(E.hpP||0)/100));
   const maxSp=Math.floor(((10+S.lv*j.spK)*(1+st.int/100)*tm+(E.sp||0))*(1+(E.spP||0)/100));
-  const maxW=j.wt+st.str*30+200*SL('enlarge')+(SLC('KN_RIDING')?1000:0)+(boostOn('wt')?2000:0);
+  const maxW=j.wt+st.str*30+200*SL('enlarge')+(SLC('KN_RIDING')?1000:0)+(S.wtPlus||0);
   return{st,atk:Math.max(1,Math.floor(atk)),matkMin,matkMax,hard:Math.min(90,hard),soft:Math.floor((st.vit/2+st.agi/5)*(1+(E.softP||0)/100)),
     hit:S.lv+st.dex+SL('vulture')+2*SL('wres')+(E.hit||0)+SL('snake')+(wc==='gun'?2*SL('single'):0),flee:S.lv+st.agi+3*SL('imflee')+(E.flee||0),crit:Math.round((1+st.luk*.3+(E.crit||0)+(bow?(E.critLong||0):0))*10)/10,mdef:(E.mdef||0)+Math.floor(st.int/5),E,
     oref,aspd,interval:Math.round(interval),maxHp,maxSp,maxW,wele:(()=>{for(const id in S.buffs){const s=SK[id];if(s&&s.eff&&buffOn(id)){const e=s.eff(S.buffs[id].lv);if(e&&e.wEle)return e.wEle}}return ammoOk()&&ITEMS[S.ammo.id].ele!=='無'?ITEMS[S.ammo.id].ele:(E.wEle||'無')})()}
@@ -1281,7 +1281,7 @@ function potGain(k,d){const it=ITEMS[k],pm=1+(d.E.potP||0)/100;let hp=0,sp=0;
   else{hp=it.heal*(1+d.st.vit*.02)*(1+.05*SL('lpotion'))*pm*(.9+R()*.2);if(it.sp)sp=it.sp*(1+d.st.int*.02)*pm}
   hp=Math.round(hp);sp=Math.round(sp);S.hp=Math.min(d.maxHp,S.hp+hp);S.sp=Math.min(d.maxSp,S.sp+sp);
   return [hp?`${hp} HP`:'',sp?`${sp} SP`:''].filter(Boolean).join('、')}
-function useBoost(k){const b=BOOSTI[k];if(!b||!(S.inv[k]>0))return false;S.inv[k]--;if(!S.inv[k])delete S.inv[k];S.boost=S.boost||{};S.boost[b.k]=S.clock+b.dur;EBV++;dirty=true;log('skill',`使用 ${ITEMS[k].n}：${ITEMS[k].d}`);return true}
+function useBoost(k){if(ITEMS[k]&&ITEMS[k].perm&&S.inv[k]>0){S.inv[k]--;if(!S.inv[k])delete S.inv[k];S.wtPlus=(S.wtPlus||0)+100;EBV++;dirty=true;log('skill',`使用 ${ITEMS[k].n}：負重上限永久 +100（累計 +${S.wtPlus}）。`);return true}const b=BOOSTI[k];if(!b||!(S.inv[k]>0))return false;S.inv[k]--;if(!S.inv[k])delete S.inv[k];S.boost=S.boost||{};S.boost[b.k]=S.clock+b.dur;EBV++;dirty=true;log('skill',`使用 ${ITEMS[k].n}：${ITEMS[k].d}`);return true}
 function usePotions(d){
   const c=C();if(c.boostAuto)for(const k in c.boostAuto)if(c.boostAuto[k]&&BOOSTI[k]&&(S.inv[k]||0)>0&&!boostOn(BOOSTI[k].k))useBoost(k);
   if(c.hpPot.on&&S.hp<d.maxHp*c.hpPot.pct/100){
@@ -2022,7 +2022,7 @@ function slRound(r,buy){let tot=0,sc=0;let first=null;const spins=[];
 
 
 /* ================= 娛樂：仙境轉轉樂（6×5 消除）＋骰子比大小；贏的是遊樂幣，可換道具 ================= */
-const FUNX=[['i607',150],['i608',60],['i12208',300],['i12210',400],['iwtup',100]];
+const FUNX=[['i607',150],['i608',60],['i12208',300],['i12210',400],['iwtup',1000]];
 const FUNBETS=[10000,100000,1000000],COINZ=1000,BUYX=85;
 const FUN={busy:false,auto:0,cv:null,show:null,hl:null,msg:'',dice:null,fx:[]};
 const fun=()=>{ROOT.fun=ROOT.fun||{coin:0,bet:100000,fast:false,st:{bet:0,coin:0,spins:0,best:0,free:0}};return ROOT.fun};
@@ -2084,7 +2084,8 @@ function funView(){const F=fun(),bet=F.bet,c=C();setTimeout(funMount,0);
     ${FUN.dice?`<div style="text-align:center;font-size:40px;line-height:1.2">${FUN.dice.d.map(x=>DIE[x]).join(' ')}</div><div style="text-align:center">總和 ${FUN.dice.sum}${FUN.dice.tri?'（豹子）':FUN.dice.sum>=11?'（大）':'（小）'}，你押${FUN.dice.big?'大':'小'}：${FUN.dice.win?`<b class="good">贏了 ${fmt(FUN.dice.coins)} 遊樂幣</b>`:'<span class="bad">輸了</span>'}</div>`:''}`,false)+
    card('遊樂幣兌換',`<div class="tw"><table><thead><tr><th>道具</th><th class="r">遊樂幣</th><th class="r">背包</th><th></th></tr></thead><tbody>${FUNX.map(([k,cost])=>{const it=ITEMS[k];return `<tr><td>${it.n}<div class="note">${itemInfo(k)}</div></td><td class="r">${fmt(cost)}</td><td class="r">${S.inv[k]||0}</td><td class="r"><button type="button" class="sm" data-fun="x" data-k="${k}" ${F.coin<cost?'disabled':''}>換</button></td></tr>`}).join('')}</tbody></table></div>`)+
    card('加成道具（目前角色）',`${Object.entries(BOOSTI).map(([k,b])=>`<div class="row"><b style="min-width:7em">${ITEMS[k].n}</b>${bl(b.k)}<span class="note">背包 ${S.inv[k]||0}</span><button type="button" class="sm" data-a="use" data-k="${k}" ${(S.inv[k]||0)>0?'':'disabled'}>使用</button><label class="chk"><input type="checkbox" data-fun="ba" data-k="${k}" ${(c.boostAuto||{})[k]?'checked':''}> 效果結束自動續用</label></div>`).join('')}
-    <div class="note">效果用遊戲時間計算，離線掛機也會照常倒數；再用一次會重新計時（不會疊加時間）。</div>`)+
+    <div class="row"><b style="min-width:7em">負重增加卷</b><span class="note">已永久增加 ${S.wtPlus||0}　背包 ${S.inv.iwtup||0}</span><button type="button" class="sm" data-a="use" data-k="iwtup" ${(S.inv.iwtup||0)>0?'':'disabled'}>使用</button></div>
+    <div class="note">戰鬥教範、泡泡糖用遊戲時間計算，離線掛機也會照常倒數；再用一次會重新計時（不會疊加時間）。負重增加卷是永久的，每隻角色分開算。</div>`)+
    card('統計',`<div class="kv"><div>總押注<b>${fmt(F.st.bet)}z</b></div><div>總共贏得<b>${fmt(F.st.coin)} 幣</b></div><div>轉轉樂次數<b>${fmt(F.st.spins)}</b></div><div>免費遊戲<b>${fmt(F.st.free)} 次</b></div><div>最大一次<b>${Math.round(F.st.best)} 倍</b></div></div>`,false)}
 
 const TABS=[['main','主控台'],['char','人物'],['job','職業'],['bag','背包'],['shop','商店與 NPC'],['stor','倉庫'],['query','查詢'],
@@ -2176,7 +2177,7 @@ main(){const d=D(),c=C();const notes=[];
   return box(`${esc(S.name)}　${J().n}`,`<div style="display:flex;gap:12px;align-items:center"><canvas id="sprMain" width="80" height="112" aria-label="角色形象" style="flex:none"></canvas><div class="bars" style="flex:1;min-width:0">${barHTML('hp','var(--hp)','HP')}${barHTML('sp','var(--sp)','SP')}${barHTML('bx','var(--xp)','Base')}${barHTML('jx','var(--jx)','Job')}${barHTML('wt','var(--wt)','負重')}</div></div>
    <div class="row"><button type="button" data-a="toggle" class="${S.auto?'on':'pri'}">${S.auto?'⏸ 停止掛機':'▶ 開始掛機'}</button><button type="button" data-a="town">回城整理</button><button type="button" data-a="sit">${sitting?'站起來':'坐下'}</button></div>
    <div class="note" id="tgt" style="min-height:3.2em;line-height:1.6em;white-space:pre-line">目標：—</div><div class="bad" id="lstop" style="display:none;font-size:13px"></div>
-   <div class="kv"><div>地圖<b>${MAPS[c.map].n}</b></div><div>Zeny<b id="zeny">${fmt(S.zeny)}</b></div><div>HP 藥水<b>${c.potList.reduce((s,k)=>s+(S.inv[k]||0),0)}</b></div><div>蒼蠅翅膀<b>免費</b></div>${[['exp','經驗 +50%'],['drop','掉寶 ×2'],['wt','負重 +2000']].filter(([k])=>boostOn(k)).map(([k,n])=>`<div>${n}<b class="good">${Math.ceil((S.boost[k]-S.clock)/60000)} 分</b></div>`).join('')}${needAmmo(wcls())?`<div>${needAmmo(wcls())==='bullet'?'子彈':'箭矢'}<b id="ammoN">${S.ammo.id&&ITEMS[S.ammo.id]&&S.ammo.n>0?ITEMS[S.ammo.id].n+' ':''}${fmt(S.ammo.n||0)}</b></div>`:''}</div>
+   <div class="kv"><div>地圖<b>${MAPS[c.map].n}</b></div><div>Zeny<b id="zeny">${fmt(S.zeny)}</b></div><div>HP 藥水<b>${c.potList.reduce((s,k)=>s+(S.inv[k]||0),0)}</b></div><div>蒼蠅翅膀<b>免費</b></div>${[['exp','經驗 +50%'],['drop','掉寶 ×2']].filter(([k])=>boostOn(k)).map(([k,n])=>`<div>${n}<b class="good">${Math.ceil((S.boost[k]-S.clock)/60000)} 分</b></div>`).join('')}${needAmmo(wcls())?`<div>${needAmmo(wcls())==='bullet'?'子彈':'箭矢'}<b id="ammoN">${S.ammo.id&&ITEMS[S.ammo.id]&&S.ammo.n>0?ITEMS[S.ammo.id].n+' ':''}${fmt(S.ammo.n||0)}</b></div>`:''}</div>
    ${buffs?`<div class="chips">${buffs}</div>`:''}
    ${Object.keys(STN_).some(hasS)?`<div class="chips">${Object.keys(STN_).filter(hasS).map(k=>`<span class="chip bad">▼ ${STN_[k]}（剩 ${dur(S.sts[k]-S.clock)}）</span>`).join('')}</div>`:''}
    <div class="note" id="homLine" ${S.hom?'':'hidden'}></div>${grafNote()}
