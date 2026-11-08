@@ -2092,7 +2092,7 @@ function funView(){const F=fun(),bet=F.bet,c=C();setTimeout(funMount,0);
 const TABS=[['main','主控台'],['char','人物'],['job','職業'],['bag','背包'],['shop','商店與 NPC'],['stor','倉庫'],['query','查詢'],
   ['auto','掛機設定'],['stats','統計'],['rank','排行榜'],['party','隊伍'],['guild','公會'],['trade','交易'],['cart','手推車與攤位'],['fun','娛樂'],['help','說明']];
 let tab='main',dirty=true,lastTouch=0,armed=null,ui={town:ROOT.ui.town||'普隆德拉',jobTab:null,shopTab:'tool',q:'',mapOpen:{},look:null,dir:0,lookSit:false};
-$('tabs').innerHTML=TABS.map(([k,n])=>`<button type="button" data-t="${k}">${n}</button>`).join('');
+$('tabs').innerHTML=TABS.filter(([k])=>!(GHM&&k==='fun')).map(([k,n])=>`<button type="button" data-t="${k}">${n}</button>`).join('');
 $('tabs').onclick=e=>{const b=e.target.closest('button');if(!b)return;tab=b.dataset.t;armed=null;$('panelWin').classList.remove('min');renderTab();try{window.scrollTo(0,0)}catch(err){}};
 $('panelClose').onclick=()=>{tab='main';renderTab()};
 document.querySelectorAll('[data-min]').forEach(b=>b.onclick=()=>$(b.dataset.min).classList.toggle('min'));
