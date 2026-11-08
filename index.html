@@ -78,7 +78,7 @@ td.r,th.r{text-align:right} td.c,th.c{text-align:center}
 button.pill{padding:4px 10px}
 .dot-ok::before{content:"● ";color:#2c9a4b}
 .dot-off::before{content:"● ";color:#c9452b}
-.stat{display:grid;grid-template-columns:52px 1fr auto auto;gap:6px 10px;align-items:center;font-variant-numeric:tabular-nums}
+.stat{display:grid;grid-template-columns:52px 1fr auto auto auto;gap:6px 10px;align-items:center;font-variant-numeric:tabular-nums}
 .plus{color:var(--good)}
 .sk{border-bottom:1px dotted var(--btn-edge);padding:6px 0;display:grid;grid-template-columns:1fr auto auto;gap:4px 10px;align-items:center}
 .sk .d{grid-column:1/-1;font-size:13px;color:var(--ink-soft);line-height:1.55}
@@ -2214,7 +2214,7 @@ char(){const d=D();const L=C().look;
      <label class="chk">髮色 <select data-look="hc">${hcs.map((h,i)=>`<option value="${i}" ${look.hc===i?'selected':''}>${i+1}</option>`).join('')}</select></label>
      <button type="button" class="pri sm" data-a="savelook">${armed==='look'?'確定？':'儲存（只能一次）'}</button>`}</div>
     <div class="note">性別、髮型、髮色只能設定一次，請先預覽好再儲存。服裝跟著職業變。</div>`);
-  const rows=STN.map(k=>`<div class="stat"><b>${k.toUpperCase()}</b><span>${S.st[k]} <span class="plus">+${d.st[k]-S.st[k]}</span></span><button type="button" class="sm" data-a="st" data-k="${k}" ${S.pts<statCost(S.st[k])||S.st[k]>=99?'disabled':''}>＋</button><span class="note">需 ${statCost(S.st[k])} 點</span></div>`).join('');
+  const rows=STN.map(k=>`<div class="stat"><b>${k.toUpperCase()}</b><span>${S.st[k]} <span class="plus">+${d.st[k]-S.st[k]}</span></span><button type="button" class="sm" data-a="st" data-k="${k}" ${S.pts<statCost(S.st[k])||S.st[k]>=99?'disabled':''}>＋</button><button type="button" class="sm" data-a="st" data-k="${k}" data-n="10" ${S.pts<statCost(S.st[k])||S.st[k]>=99?'disabled':''}>＋10</button><span class="note">需 ${statCost(S.st[k])} 點</span></div>`).join('');
   return sprite+`<div style="height:10px"></div>`+box('基本屬性',`<div class="row" style="margin-bottom:4px"><label class="chk">角色名稱 <input type="text" id="nameIn" value="${esc(S.name)}" maxlength="12" style="width:9em"></label><button type="button" class="sm" data-a="rename">改名</button>${NET.db&&nameTaken(S.name,CUR)?`<span class="bad" style="font-size:13px">⚠ ${nameTaken(S.name,CUR)}，建議改名，免得朋友寄錯人</span>`:''}</div>
     <div style="display:grid;gap:6px">${rows}</div><div class="row" style="justify-content:space-between"><span>剩餘屬性點：<b>${S.pts}</b></span><span>技能點：<b>${S.skp}</b></span></div>`)+
     `<div style="height:10px"></div>`+box('能力值',`<div class="kv"><div>ATK<b>${d.atk}</b></div><div>MATK<b>${d.matkMin}～${d.matkMax}</b></div><div>DEF<b>${d.hard} + ${d.soft}</b></div><div>HIT<b>${d.hit}</b></div><div>FLEE<b>${d.flee}</b></div><div>CRI<b>${d.crit}</b></div><div>ASPD<b>${d.aspd}（${(d.interval/1000).toFixed(2)} 秒）</b></div><div>Max HP<b>${d.maxHp}</b></div><div>Max SP<b>${d.maxSp}</b></div><div>MDEF<b>${d.mdef}</b></div><div>武器屬性<b>${d.wele}</b></div><div>負重<b>${fmt(weight())} / ${fmt(d.maxW)}</b></div></div>`)+
@@ -2859,7 +2859,7 @@ panel.addEventListener('click',e=>{
   case'toggle':S.auto=!S.auto;sitting=false;if(S.auto){log('sys','開始掛機。');mode=S.vend.on?'vend':'search';schedule(step,400)}else{halt();mode='idle';target=null;log('sys','停止掛機。')}break;
   case'town':if(!S.auto){S.auto=true}goTown('手動回城');break;
   case'sit':sitting=!sitting;if(sitting){S.auto=false;halt();mode='idle';target=null;log('sys','坐下休息（停止掛機）。')}else log('sys','站起來了。');break;
-  case'st':{const cost=statCost(S.st[k]);if(S.pts>=cost&&S.st[k]<99){S.pts-=cost;S.st[k]++}}break;
+  case'st':{for(let i=0;i<n;i++){const cost=statCost(S.st[k]);if(S.pts>=cost&&S.st[k]<99){S.pts-=cost;S.st[k]++}else break}}break;
   case'rename':{const v=$('nameIn').value.trim();if(v&&v!==S.name){const bad=nameTaken(v,CUR);if(bad){toast(bad+'，請換一個');rr=false;break}S.name=v;log('sys',`角色名稱改為 ${v}。`);pushRank(true)}}break;
   case'rot':ui.dir=(ui.dir+n+4)%4;break;
   case'lsit':ui.lookSit=!ui.lookSit;break;
