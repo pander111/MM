@@ -1181,7 +1181,7 @@ function step(){
     log('sys',`隊友缺輔助技能，SP 不夠（${Math.floor(S.sp)} / 需要 ${need}），先坐下回 SP。`);return schedule(step,1000)}}
   if(c.supOnly&&partyOn()&&inParty(CUR)&&P().members.some(j=>j!==CUR&&ROOT.chars[j]&&ROOT.chars[j].cfg.map===c.map))return supStep(d,c);
   if((c.assist||c.assistOnly||c.assistMvp!==false)&&partyOn()&&inParty(CUR)){const all=P().members.filter(j=>j!==CUR&&ROOT.chars[j]&&ROOT.chars[j].cfg.map===c.map).map(j=>(RT[j]||{}).target).filter(t=>t&&!t.dead&&t.cur>0);
-    const big=c.assistMvp!==false?all.filter(t=>t.boss||t.mvp):[];
+    const big=c.assistMvp!==false?all.filter(t=>(t.boss||t.mvp)&&!['flee','skip'].includes(c.mc[t.n])):[];
     if(big.length){const t=pick(big);target=t;mode='fight';setState('戰鬥中');log('lvl',`協助隊友圍攻 ${t.mvp?'MVP':'BOSS'}「${t.n}」（HP ${fmt(Math.floor(t.cur))} / ${fmt(t.hp)}）！`);return schedule(step2,500)}
     const ts=c.assist||c.assistOnly?all.filter(t=>!['flee','skip'].includes(c.mc[t.n])):[];
     if(ts.length&&(c.assistOnly||R()<.7)){const t=pick(ts);target=t;mode='fight';setState('戰鬥中');log('battle',`協助隊友攻擊 ${t.n}（HP ${Math.floor(t.cur)} / ${t.hp}）。`);return schedule(step2,500)}}
@@ -2062,11 +2062,11 @@ function vendStep(){
 /* ================= 介面 ================= */
 const SLOT={C:6,Rw:5,
  S:[// key,name,weight,pays [8-9,10-11,12+]
-  ['red','紅色藥水',22,[0.175,0.525,1.4]],['ora','橙色藥水',20,[0.28,0.63,2.8]],['yel','黃色藥水',18,[0.35,0.7,3.5]],['wht','白色藥水',16,[0.56,0.84,5.6]],
-  ['blu','藍色藥水',13,[0.7,1.05,7]],['ore','神之金屬原石',10,[1.05,1.4,8.4]],['gem','藍色魔力礦石',8,[1.4,3.5,10.5]],['box','古老藍箱子',6,[1.75,7,17.5]]],
- scW:1.6,mulW:0.6,mulWF:1.6,
+  ['red','紅色藥水',22,[0.19,0.57,1.5]],['ora','橙色藥水',20,[0.3,0.69,3.1]],['yel','黃色藥水',18,[0.38,0.76,3.8]],['wht','白色藥水',16,[0.61,0.92,6.1]],
+  ['blu','藍色藥水',13,[0.76,1.1,7.6]],['ore','神之金屬原石',10,[1.1,1.5,9.2]],['gem','藍色魔力礦石',8,[1.5,3.8,11.4]],['box','古老藍箱子',6,[1.9,7.6,19.1]]],
+ scW:1.4,mulW:0.6,mulWF:1.7,
  MV:[[2,300],[3,200],[4,120],[5,100],[6,60],[8,50],[10,40],[12,25],[15,20],[20,15],[25,10],[50,5],[100,2]],
- cap:5000};
+ cap:500};
 function slPick(r,F){const tot=SLOT.S.reduce((a,s)=>a+s[2],0)+SLOT.scW+(F?SLOT.mulWF:SLOT.mulW);let x=r()*tot;
  for(let i=0;i<SLOT.S.length;i++){x-=SLOT.S[i][2];if(x<0)return{s:i}}x-=SLOT.scW;if(x<0)return{s:'sc'};
  const mt=SLOT.MV.reduce((a,m)=>a+m[1],0);let y=r()*mt;for(const [v,w] of SLOT.MV){y-=w;if(y<0)return{s:'m',v}}return{s:'m',v:2}}
@@ -2082,13 +2082,15 @@ function slSpin(r,F,acc){const {C,Rw}=SLOT;let g=[];for(let c=0;c<C;c++){g.push(
  return{frames,base:win,M,mul,win:Math.min(SLOT.cap,win*mul),sc,acc}}
 function slRound(r,buy){let tot=0,sc=0;let first=null;const spins=[];
  if(!buy){const s=slSpin(r,false,0);spins.push(s);tot+=s.win;sc=s.sc;first=s;if(sc>=4)tot+=sc>=6?100:sc>=5?5:3}
- let fs=(buy||sc>=4)?15:0,acc=0,n=0;while(fs>0&&n<200){fs--;n++;const s=slSpin(r,true,acc);s.free=1;spins.push(s);acc=s.acc;tot+=s.win;if(s.sc>=3)fs+=5}
+ if(buy){tot+=3;sc=4}let fs=(buy||sc>=4)?10:0,acc=0,n=0;while(fs>0&&n<200){fs--;n++;const s=slSpin(r,true,acc);s.free=1;spins.push(s);acc=s.acc;tot+=s.win;if(s.sc>=3)fs+=5}
  return{tot:Math.min(SLOT.cap,tot),first,free:n,spins,sc}}
 
 
 /* ================= 娛樂：仙境轉轉樂（6×5 消除）＋骰子比大小；贏的是遊樂幣，可換道具 ================= */
 const FUNX=[['i607',150],['i608',60],['i12208',300],['iexp2',600],['i12210',400],['idrop2',800],['iwtup',1000]];
-const FUNBETS=[10000,100000,1000000],COINZ=10000,BUYX=85,FUN_SLOT=false;/* 轉轉樂先關閉，目前只開骰子比大小 */
+const FUNBETS=[10000,100000,1000000],COINZ=10000,BUYX=50,FUN_SLOT=!GHM;
+/* 娛樂只在每週一、週四開放（台灣時間） */
+const twDay=()=>new Date(Date.now()+8*3600e3).getUTCDay(),funOpen=()=>[1,4].includes(twDay());/* 轉轉樂先關閉，目前只開骰子比大小 */
 const FUN={busy:false,auto:0,cv:null,show:null,hl:null,msg:'',dice:null,fx:[]};
 const fun=()=>{ROOT.fun=ROOT.fun||{coin:0,bet:100000,fast:false,cz:COINZ,st:{bet:0,coin:0,spins:0,best:0,free:0}};const F=ROOT.fun;if(F.cz!==COINZ){const r=(F.cz||1000)/COINZ;F.coin=Math.floor(F.coin*r);F.st.coin=Math.floor(F.st.coin*r);F.cz=COINZ}return F};
 const zShort=z=>z>=1e8?(z/1e8).toFixed(z%1e8?2:0)+' 億':z>=1e4?(z/1e4).toFixed(z%1e4?1:0)+' 萬':fmt(z);
@@ -2118,10 +2120,10 @@ const wait=ms=>new Promise(r=>setTimeout(r,ms));
 async function slPlay(spin,fast){if(fast){FUN.hl=null;FUN.show=spin.frames[spin.frames.length-1].g;return}
   for(let fi=0;fi<spin.frames.length;fi++){const f=spin.frames[fi];FUN.show=f.g;FUN.hl=null;if(fi===0){for(let k=0;k<6;k++){FUN.show.forEach(col=>col.forEach(x=>x._dy=(5-k)*8));await wait(40)}FUN.show.forEach(col=>col.forEach(x=>x._dy=0))}
     else await wait(220);if(!f.wins.length)break;FUN.hl=new Set();f.wins.forEach(w=>w.cells.forEach(([c,i])=>FUN.hl.add(c+','+i)));await wait(450);FUN.hl=null}}
-async function funSpin(buy){const F=fun(),bet=F.bet,cost=buy?bet*BUYX:bet;if(FUN.busy)return;if(S.zeny<cost){toast(`Zeny 不夠，需要 ${fmt(cost)}z`);FUN.auto=0;renderTab();return}
+async function funSpin(buy){const F=fun(),bet=F.bet,cost=buy?bet*BUYX:bet;if(FUN.busy)return;if(!funOpen()){toast('娛樂只在每週一、週四開放');FUN.auto=0;renderTab();return}if(S.zeny<cost){toast(`Zeny 不夠，需要 ${fmt(cost)}z`);FUN.auto=0;renderTab();return}
   FUN.busy=true;S.zeny-=cost;zOut('娛樂',cost);F.st.bet+=cost;F.st.spins++;FUN.big='';
   const res=slRound(R,buy);let shown=0;
-  for(const sp of res.spins){if(sp.free&&!shown){FUN.big='免費遊戲 15 次！';await wait(F.fast?300:900);FUN.big=''}shown++;await slPlay(sp,F.fast);
+  for(const sp of res.spins){if(sp.free&&!shown){FUN.big=buy?'買下免費遊戲：4 個星星，送 10 次！':'免費遊戲 10 次！';await wait(F.fast?300:900);FUN.big=''}shown++;await slPlay(sp,F.fast);
     if(sp.win>0&&!F.fast){FUN.msg=`${sp.free?'免費遊戲：':''}贏 ${(sp.base).toFixed(2)} 倍${sp.mul>1?` × 乘數 ${sp.mul}`:''}`;renderFunMsg();await wait(350)}}
   const coins=Math.round(res.tot*bet/COINZ);F.coin+=coins;F.st.coin+=coins;if(res.free)F.st.free++;if(res.tot>F.st.best)F.st.best=res.tot;
   FUN.msg=coins?`押 ${zShort(cost)}，贏 <b>${fmt(coins)}</b> 遊樂幣（${res.tot.toFixed(1)} 倍${res.free?`，免費遊戲 ${res.free} 次`:''}）`:`押 ${zShort(cost)}，沒有中獎`;
@@ -2129,7 +2131,7 @@ async function funSpin(buy){const F=fun(),bet=F.bet,cost=buy?bet*BUYX:bet;if(FUN
   dirty=true;FUN.busy=false;renderTab();if(FUN.big){const bg=FUN.big;setTimeout(()=>{if(FUN.big===bg)FUN.big=''},2500)}
   if(FUN.auto>0){FUN.auto--;if(res.tot>=100||res.free){FUN.auto=0;FUN.msg+='（中大獎或免費遊戲，自動轉已停止）';renderTab();return}await wait(F.fast?250:700);if(FUN.auto>0&&tab==='fun')funSpin(false);else FUN.auto=0}}
 function renderFunMsg(){const el=document.getElementById('funMsg');if(el)el.innerHTML=FUN.msg}
-function funDice(big){if(FUN.rolling)return;const F=fun(),bet=F.bet;if(S.zeny<bet){toast(`Zeny 不夠，需要 ${fmt(bet)}z`);return}S.zeny-=bet;zOut('娛樂',bet);F.st.bet+=bet;
+function funDice(big){if(FUN.rolling)return;if(!funOpen()){toast('娛樂只在每週一、週四開放');return}const F=fun(),bet=F.bet;if(S.zeny<bet){toast(`Zeny 不夠，需要 ${fmt(bet)}z`);return}S.zeny-=bet;zOut('娛樂',bet);F.st.bet+=bet;
   const d=[rnd(1,6),rnd(1,6),rnd(1,6)],sum=d[0]+d[1]+d[2],tri=d[0]===d[1]&&d[1]===d[2],isBig=sum>=11,win=!tri&&isBig===big;const coins=win?Math.round(bet*2/COINZ):0;F.coin+=coins;F.st.coin+=coins;
   const res={d,sum,tri,win,coins,big};dirty=true;
   if(F.diceSkip){FUN.dice=res;renderTab();return}
@@ -2143,13 +2145,14 @@ const DIE=['','⚀','⚁','⚂','⚃','⚄','⚅'];
 function funView(){const F=fun(),bet=F.bet,c=C();setTimeout(funMount,0);
   const bets=FUNBETS.map(b=>`<button type="button" class="sm ${b===bet?'on':''}" data-fun="bet" data-k="${b}">${zShort(b)}</button>`).join('');
   const bl=k=>{const b=S.boost&&S.boost[k];return b>S.clock?`<span class="good">剩 ${Math.ceil((b-S.clock)/60000)} 分鐘</span>`:'<span class="note">未使用</span>'};
-  return box(`遊樂幣：${fmt(F.coin)}`,`<div class="note">用 Zeny 下注，贏的是<b>遊樂幣</b>（1 遊樂幣 = ${fmt(COINZ)}z 的獎金），遊樂幣只能拿來換下面的道具。遊樂幣是整個帳號共用，換到的道具會放進目前角色「${esc(S.name)}」的背包。</div>
+  const days=['日','一','二','三','四','五','六'],od=funOpen(),nx=(()=>{for(let k=1;k<8;k++){const w=(twDay()+k)%7;if(w===1||w===4)return `週${days[w]}`}})();
+  return (od?'':`<div class="card"><div class="cb"><b>今天（週${days[twDay()]}）娛樂沒開。</b><span class="note">開放時間：每週一、週四（台灣時間），下次是${nx}。遊樂幣兌換和加成道具照常可以用。</span></div></div>`)+box(`遊樂幣：${fmt(F.coin)}`,`<div class="note">用 Zeny 下注，贏的是<b>遊樂幣</b>（1 遊樂幣 = ${fmt(COINZ)}z 的獎金），遊樂幣只能拿來換下面的道具。遊樂幣是整個帳號共用，換到的道具會放進目前角色「${esc(S.name)}」的背包。</div>
     <div class="row"><b>押注</b>${bets}<label class="chk"><input type="checkbox" data-fun="fast" ${F.fast?'checked':''}> 快速</label></div><div class="note">身上 ${fmt(S.zeny)}z</div>`)+
    (!FUN_SLOT?'':card('仙境轉轉樂',`<div id="slotSlot"></div><div id="funMsg" class="note" style="text-align:center;font-size:15px;min-height:22px">${FUN.msg||'同一種圖案在盤面上 8 個以上就得分，得分的圖案會消掉、上面的掉下來再算一次。'}</div>
     <div class="row" style="justify-content:center"><button type="button" class="pri" data-fun="spin" ${FUN.busy?'disabled':''}>轉（${zShort(bet)}）</button><button type="button" data-fun="buy" ${FUN.busy?'disabled':''}>買免費遊戲（${zShort(bet*BUYX)}）</button></div>
     <div class="row" style="justify-content:center">${FUN.auto>0?`<button type="button" data-fun="autostop">停止自動（還剩 ${FUN.auto} 次）</button>`:[10,50,100].map(n=>`<button type="button" class="sm" data-fun="auto" data-k="${n}" ${FUN.busy?'disabled':''}>自動 ${n} 次</button>`).join('')}</div>
-    <details class="note"><summary>規則與賠率</summary><div>・盤面 6×5，同一種圖案 8 個以上就得分（位置不限），得分圖案消掉後會掉新的下來，可以連續得分。<br>・<b>紫色球 ×N</b>：轉完時有得分，就把盤面上所有乘數加起來，乘上這一轉的獎金。<br>・<b>金色星星「免費」</b>：出現 4 個以上送 15 次免費遊戲（4／5／6 個另外送 3／5／100 倍）；免費遊戲中再出 3 個加 5 次，而且乘數會一路累加。<br>・也可以直接花 ${BUYX} 倍押注買免費遊戲。單次最多贏 ${fmt(SLOT.cap)} 倍。<br>
-    ${SLOT.S.map(s=>`${s[1]}：8–9 個 ${s[3][0]} 倍、10–11 個 ${s[3][1]} 倍、12 個以上 ${s[3][2]} 倍`).join('<br>')}<br>・長期平均大約拿回押注的 93%，請當作娛樂。</div></details>`))+
+    <details class="note"><summary>規則與賠率</summary><div>・盤面 6×5，同一種圖案 8 個以上就得分（位置不限），得分圖案消掉後會掉新的下來，可以連續得分。<br>・<b>紫色球 ×N</b>：轉完時有得分，就把盤面上所有乘數加起來，乘上這一轉的獎金。<br>・<b>金色星星「免費」</b>：出現 4 個以上送 10 次免費遊戲（4／5／6 個另外送 3／5／100 倍）；免費遊戲中再出 3 個加 5 次，而且乘數會一路累加。<br>・也可以直接花 ${BUYX} 倍押注買免費遊戲（固定 4 個星星，送 3 倍＋10 次免費遊戲）。單次最多贏 ${fmt(SLOT.cap)} 倍。<br>
+    ${SLOT.S.map(s=>`${s[1]}：8–9 個 ${s[3][0]} 倍、10–11 個 ${s[3][1]} 倍、12 個以上 ${s[3][2]} 倍`).join('<br>')}<br>・長期平均大約拿回押注的 93%（買免費遊戲也差不多），請當作娛樂。<br>・娛樂只在<b>每週一、週四</b>（台灣時間）開放。</div></details>`))+
    card('骰子比大小',`<div class="note">擲 3 顆骰子：總和 11–17 是「大」、4–10 是「小」；三顆一樣（豹子）算莊家贏。猜中拿回 2 倍押注的遊樂幣。</div>
     <div class="row" style="justify-content:center"><button type="button" class="pri" data-fun="dice" data-k="big" ${FUN.rolling?'disabled':''}>押大</button><button type="button" class="pri" data-fun="dice" data-k="small" ${FUN.rolling?'disabled':''}>押小</button><label class="chk" style="margin-left:auto"><input type="checkbox" data-fun="dskip" ${F.diceSkip?'checked':''}> 跳過動畫</label></div>
     <div id="diceBox" style="text-align:center;font-size:44px;line-height:1.3;min-height:60px">${FUN.rolling?[1,2,3].map(()=>`<span class="die">${DIE[rnd(1,6)]}</span>`).join(''):FUN.dice?FUN.dice.d.map(x=>`<span class="die">${DIE[x]}</span>`).join(''):''}</div>
