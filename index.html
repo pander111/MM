@@ -828,6 +828,8 @@ function fieldWanted(s,t){const f=s.f,F=t.fld;
   if(f==='pn')return t.rng>=4&&!(F.pn>S.clock);
   if(f==='fog')return t.rng>=4&&!(F.fog>S.clock);
   if(!t.chase&&TRAPF.includes(f)&&springOk())return !F[f]&&!(t.tries['tr_'+f]>=2);
+  /* 定位陷阱：近戰怪已貼身、沒被定住時，弓手後退一步再在牠腳前放陷阱（官方獵人常用打法） */
+  if(f==='snare'&&t.chase&&t.rng<=3&&t.dist<=t.rng+.5&&!(t.stop>0)&&!(t.frozen>0)&&!F.snare&&wRange()>=3)return true;
   return t.chase&&!(t.stop>0)&&!(t.frozen>0)&&t.dist>Math.max(2.5,t.rng+1)&&!F[f]&&!(f==='iw'&&F.iw>0)}
 function applyDebuff(t,s,L){const st=s.st;t.deb=t.deb||{};
   if((t.boss||t.mvp)&&['stone','provoke','stun','freeze','slow'].includes(st))return false;
@@ -1540,6 +1542,7 @@ function fight(d){
     else if(sk.k==='field'){const ct=castT(sk,L,d),v=sk.val(L);
       if(sk.f==='pn'||sk.f==='fog')t.fld[sk.f]=S.clock+ct+v;else t.fld[sk.f]=v;
       log('skill',`${ct>0?'詠唱':'施放'} ${sk.n} Lv ${L}${ct>0?`（${(ct/1000).toFixed(1)} 秒）`:''}。`);el=ct+600;
+      if(sk.f==='snare'&&t.chase&&t.rng<=3&&t.dist<=t.rng+.5){t.dist=Math.max(2,t.rng)+1.5;t.monAcc=0;log('skill',`往後退開，在 ${t.n} 腳前設下陷阱。`)}
       if(!t.chase&&TRAPF.includes(sk.f)&&springOk()&&t.fld[sk.f]){t.tries['tr_'+sk.f]=(t.tries['tr_'+sk.f]||0)+1;t.fld[sk.f]=0;log('skill',`爆破陷阱：獵鷹把陷阱丟到 ${t.n} 腳下引爆！`);trapFire(t,sk.f,d)}}
     else if(sk.k==='debuff'){const ct=castT(sk,L,d);t.tries[r.sk]=(t.tries[r.sk]||0)+1;
       const ok=applyDebuff(t,sk,L);log('skill',`${ct>0?'詠唱':'施放'} ${sk.n} Lv ${L}，${ok?`${t.n} 陷入「${DEBN[sk.st]}」！`:`對 ${t.n} 沒有生效。`}`);el=ct+600}
@@ -1615,7 +1618,8 @@ function fight(d){
       const nd=t.dist-tm/ws, F=t.fld;
       if(F.sb&&t.dist>2&&nd<=2){F.sb=0;tm-=(t.dist-2)*ws;const v=magDmg(d,t,1,'火');hitT(t,v);const kb=!(t.boss||t.mvp);t.dist=kb?5:2;log('skill',`${t.n} 碰到火狩芽，受到 ${v} 點傷害${kb?'並被彈開':''}。`);if(t.cur<=0)return win(d);continue}
       const trap=TRAPF.find(k=>F[k]);
-      if((F.fw>0||trap)&&t.dist>2&&nd<=2){tm-=(t.dist-2)*ws;t.dist=2;
+      const td=(trap&&!(F.fw>0))?Math.max(2,Math.min(3,t.rng)):2;
+      if((F.fw>0||trap)&&t.dist>td&&nd<=td){tm-=(t.dist-td)*ws;t.dist=td;
         if(F.fw>0){F.fw--;const v=magDmg(d,t,.5,'火');hitT(t,v);const kb=!(t.boss||t.mvp);if(kb)t.dist=4;
           log('skill',`${t.n} 撞上火焰之壁，受到 ${v} 點傷害${kb?'並被彈開':''}（火牆剩 ${F.fw} 次）。`);if(t.cur<=0)return win(d);if(!kb){F.fw=0}continue}
         F[trap]=0;if(trapFire(t,trap,d))return win(d);
