@@ -324,6 +324,7 @@ const JOBS={
 const PARENT={};Object.entries(JOBS).forEach(([k,j])=>j.next.forEach(n=>PARENT[n]=k));
 /* 輔助技能對象：每個隊友可勾選，預設全部 */
 const bKey=n=>String(n).replace(/\./g,'_');
+const RELE=[['','所有屬性'],...['無','水','地','火','風','毒','聖','暗','幽靈','不死'].map(e=>[e,e+'屬性'])];
 const buffTo=(b,o)=>(b.only||{})[bKey(o.name)]!==false;
 function btoUI(k,b){const ms=P().members.filter(j=>j!==CUR&&ROOT.chars[j]),f=ROOT.ui.fold||{},op=f['bto_'+k];
   const on=ms.filter(j=>buffTo(b,ROOT.chars[j])),sum=on.length===ms.length?'全部隊友':on.length?on.map(j=>esc(ROOT.chars[j].name)).join('、'):'不幫任何隊友';
@@ -1491,7 +1492,7 @@ function fight(d){
   let rangeWant=0;
   if(!acted&&!sil&&!t.plant){for(const r of c.atk.rules){
     const sk=SK[r.sk],L=Math.min(r.lv||1,SL(r.sk));if(!sk||!L)continue;
-    if(r.mon&&r.mon!==t.n)continue; if(r.once&&t.used[r.sk])continue; if(r.minMob>1&&pileOf(t).length<r.minMob)continue; if(r.cond&&!condOk(r.cond,t))continue;
+    if(r.mon&&r.mon!==t.n)continue; if(r.once&&t.used[r.sk])continue; if(r.minMob>1&&pileOf(t).length<r.minMob)continue; if(r.ele&&eleOf(t.ele)!==r.ele)continue; if(r.cond&&!condOk(r.cond,t))continue;
     if(!needOk(sk))continue;
     if(sk.vs&&!sk.vs(t))continue;
     if((t.dist||0)>skRange(sk,L)+.01){if(S.sp>=spc(sk,L)&&!(sk.k==='field'&&!fieldWanted(sk,t)))rangeWant=Math.max(rangeWant,skRange(sk,L));continue}
@@ -2794,7 +2795,7 @@ function autoView(){
   const learned=Object.keys(SK).filter(k=>SL(k));
   const atkSk=learned.filter(k=>['atk','magic','steal','asura','field','debuff','counter','random','stealz','tarot'].includes(SK[k].k));
   const buffSk=learned.filter(k=>SK[k].k==='buff');
-  const rules=c.atk.rules.map((r,i)=>`<div class="row" style="border-bottom:1px dotted var(--btn-edge);padding-bottom:6px"><b>${i+1}. ${SK[r.sk]?.n||r.sk}</b><span>Lv ${r.lv}</span><span>對 ${r.mon||'所有怪物'}</span><span>${r.once?'每隻一次':'持續施放'}</span>${r.spPct?`<span>SP ≥ ${r.spPct}%</span>`:''}${r.cond?`<span class="good">${RCN[r.cond]||r.cond}</span>`:''}<label class="chk">怪物 ≥ ${cS(`atk.rules.${i}.minMob`,[[0,'不限'],[2,2],[3,3],[4,4],[5,5],[6,6],[8,8],[10,10],[12,12],[15,15]],true)} 隻才用</label>${SL(r.sk)?'':'<span class="bad">尚未學會</span>'}<span class="btns"><button type="button" class="sm" data-a="rmv" data-k="${i}" data-n="-1">▲</button><button type="button" class="sm" data-a="rmv" data-k="${i}" data-n="1">▼</button><button type="button" class="sm" data-a="rdel" data-k="${i}">✕</button></span></div>`).join('');
+  const rules=c.atk.rules.map((r,i)=>`<div class="row" style="border-bottom:1px dotted var(--btn-edge);padding-bottom:6px"><b>${i+1}. ${SK[r.sk]?.n||r.sk}</b><span>Lv ${r.lv}</span><span>對 ${r.mon||'所有怪物'}</span><span>${r.once?'每隻一次':'持續施放'}</span>${r.spPct?`<span>SP ≥ ${r.spPct}%</span>`:''}${r.cond?`<span class="good">${RCN[r.cond]||r.cond}</span>`:''}<label class="chk">只打 ${cS(`atk.rules.${i}.ele`,RELE)}</label><label class="chk">怪物 ≥ ${cS(`atk.rules.${i}.minMob`,[[0,'不限'],[2,2],[3,3],[4,4],[5,5],[6,6],[8,8],[10,10],[12,12],[15,15]],true)} 隻才用</label>${SL(r.sk)?'':'<span class="bad">尚未學會</span>'}<span class="btns"><button type="button" class="sm" data-a="rmv" data-k="${i}" data-n="-1">▲</button><button type="button" class="sm" data-a="rmv" data-k="${i}" data-n="1">▼</button><button type="button" class="sm" data-a="rdel" data-k="${i}">✕</button></span></div>`).join('');
   const mons=[...new Set(MAPS.flatMap(m=>m.mons.map(x=>x.n)))];
   const buffs=buffSk.map(k=>{const b=c.buffs[k]||(c.buffs[k]={on:false,lv:SL(k),early:0,spMin:0});if((SK[k].sup||SK[k].pw)&&b.party===undefined)b.party=true;return `<div class="row">${cC(`buffs.${k}.on`,SK[k].n)}${SK[k].sup?cC(`buffs.${k}.party`,'也幫隊友放')+(partyOn()&&inParty(CUR)?btoUI(k,b):''):SK[k].pw?cC(`buffs.${k}.party`,'全隊一起（官方效果）'):''}<label class="chk">Lv ${cN(`buffs.${k}.lv`,50)}</label><label class="chk">提前 ${cN(`buffs.${k}.early`,50)} 秒補放</label><label class="chk">SP ≥ ${cN(`buffs.${k}.spMin`,50)}%</label></div>`}).join('');
   // 藥水
@@ -2827,7 +2828,7 @@ function autoView(){
     <div class="row"><select id="crSel"><option value="">— 選擇要自動做的東西 —</option>${CRAFT.filter(craftOk).filter(r=>!(c.craft||[]).some(e=>e.id===r.id)).map(r=>`<option value="${esc(r.id)}">${ITEMS[r.out].n}${r.n>1?`×${r.n}`:''}（${r.mats.map(([k,q])=>ITEMS[k].n+(q>1?q:'')).join('+')||'撿'}）</option>`).join('')}</select><label class="chk">少於 <input type="number" id="crMin" value="0" min="0" style="width:4.5em"> 個才做，做到 <input type="number" id="crTo" value="0" min="0" style="width:4.5em"> 個</label><button type="button" class="sm pri" data-a="cradd">加入</button></div>
     <div class="note">兩個數字填 0 = 有材料就一直做。例如製作箭設「少於 200 個才做，做到 1000 個」，箭用到剩不到 200 支才會補做到 1000 支；裝在身上的箭也算。每分鐘和每次回城檢查一次。設定在這裡的材料不會被自動賣掉；缺的材料（例如空藥瓶、藥碗、鐵鎚）可以在「藥水與補給 → 其他補給」設定回城自動買。</div>`):'')+
   card('掛機技能',syncBtn('掛機技能')+`<b>攻擊技能（依順序）</b>${rules||'<div class="note">沒有選擇：只用普通攻擊。</div>'}
-    ${atkSk.length?`<div class="row"><label class="chk">對 <select id="rMon"><option value="">所有怪物（通用設定）</option>${map.mons.map(m=>`<option>${m.n}</option>`).join('')}</select></label>
+    ${atkSk.length?`<div class="row"><label class="chk">對 <select id="rMon"><option value="">所有怪物（通用設定）</option>${map.mons.map(m=>`<option>${m.n}</option>`).join('')}</select></label><label class="chk">屬性 <select id="rEle">${RELE.map(([v,l])=>`<option value="${v}">${l}</option>`).join('')}</select></label>
       <select id="rSk"><option value="">— 選擇攻擊技能 —</option>${atkSk.map(k=>`<option value="${k}">${SK[k].n}（Lv ${SL(k)}）</option>`).join('')}</select>
       <label class="chk">施放 Lv <input type="number" id="rLv" value="10" style="width:52px"></label><select id="rOnce"><option value="0">持續施放</option><option value="1">每隻一次</option></select><label class="chk">SP ≥ <input type="number" id="rSp" value="0" style="width:52px">%</label><select id="rCond">${RCOND.map(([v,n])=>`<option value="${v}">${n}</option>`).join('')}</select><button type="button" class="sm pri" data-a="radd">＋ 新增規則</button><span class="note">選好技能後要按「新增規則」才會存進上面的清單。</span></div><div class="note">連招：用「條件」讓技能接著放，例如巫師：①雷鳴術「怪物冰凍中才放」②冰凍術「怪物沒冰凍才放」——沒凍住就一直放冰凍術，凍住後接雷鳴術（冰凍的怪會變水屬性，風屬性魔法 1.75 倍，也不會走過來打斷你）。</div>`:'<div class="note">還沒有學會攻擊技能。</div>'}
     <div class="note">依順序選第一條符合的設定；專用規則放前面，通用規則放最後。</div>
@@ -3095,7 +3096,7 @@ panel.addEventListener('click',e=>{
   case'pnew':ROOT.parties.push({name:'',members:[],expMode:'dmg'});ui.pv=ROOT.parties.length-1;break;
   case'pdisband':if(armed!=='pdisband'){armed='pdisband';keepArm=true;break}{const q=ROOT.parties[ui.pv];if(q){for(const j of q.members)if(j!==CUR)withChar(j,()=>{halt();mode='idle';target=null});ROOT.parties.splice(ui.pv,1);ui.pv=0;log('sys',`解散隊伍「${pnameOf(q)}」。`)}}break;
   case'wdel':c.white.splice(+k,1);break;
-  case'radd':{const sk=$('rSk').value;if(!sk){toast('先選一個技能');rr=false;break}c.atk.rules.push({sk,lv:Math.max(1,Math.min(SL(sk),Number($('rLv').value)||SL(sk))),mon:$('rMon').value,once:$('rOnce').value==='1',spPct:Number($('rSp').value)||0,cond:($('rCond')||{}).value||''})}break;
+  case'radd':{const sk=$('rSk').value;if(!sk){toast('先選一個技能');rr=false;break}c.atk.rules.push({sk,lv:Math.max(1,Math.min(SL(sk),Number($('rLv').value)||SL(sk))),mon:$('rMon').value,once:$('rOnce').value==='1',spPct:Number($('rSp').value)||0,cond:($('rCond')||{}).value||'',ele:($('rEle')||{}).value||''})}break;
   case'rdel':c.atk.rules.splice(+k,1);break;
   case'rmv':mv(c.atk.rules,+k,n);break;
   case'pmv':mv(c[b.dataset.p||'potList'],+k,n);break;
