@@ -284,6 +284,21 @@ const eleOf=s=>String(s).replace(/\d/g,'');
 const eMul=(a,d)=>{const m=String(d||'無').match(/^(\D+)(\d)?$/)||[0,'無'];const lv=Math.min(4,Math.max(1,+(m[2]||1)));const r=(ELT[lv][a||'無']||{})[m[1]];return r==null?1:r/100};
 
 /* 怪物與地圖（資料來源：rAthena 經典版怪物分布、數值與掉落表） */
+/* 別西卜：官方 1873 蒼蠅型態（無經驗、無掉落）被擊倒後變身為 1874 真身（MVP） */
+(()=>{const I=GD.items,ALLJ=['sword','mage','archer','acolyte','merch','thief','knight','priest','wizard','smith','hunter','assassin','crusader','monk','sage','rogue','alchemist','bard','dancer','ninja','gunslinger'];
+  const add=(k,o)=>{if(!I[k])I[k]=o};
+  add('i7754',{n:'破碎的王冠',w:1,sell:1125,t:'etc',buy:2250,d:'別西卜頭上戴著的王冠碎片。'});
+  add('i6223',{n:'卡紐',w:1,sell:750,t:'etc',buy:1500,d:'精煉用的稀有礦石。'});
+  add('i2423',{n:'變異鞋',w:30,sell:10,t:'eq',slot:'shoes',slots:0,def:2,eff:{},jobs:ALLJ,lv:0,d:'沾染了別西卜氣息的鞋子。\nMaxHP、MaxSP +(20 − 精煉值)%，DEF + 精煉值/2。\n裝備: 初學者以外的全職業',buy:20});
+  add('i1565',{n:'死亡筆記',w:60,sell:10,t:'eq',slot:'weapon',slots:2,wc:'book',atk:120,wl:4,eff:{},jobs:['priest','monk','sage'],lv:70,d:'記載死者名字的書。\nMATK +15%，STR +3，INT +3，LUK −20，攻擊時有機率讓人形怪物昏迷（Coma），攻速依精煉值上升。賢者裝備時攻擊有機率自動施放地獄審判 Lv5。\n裝備: 祭司系／賢者',buy:20});
+  add('i2000',{n:'毀滅之杖',w:300,sell:10,t:'eq',slot:'weapon',slots:1,wc:'staff',atk:40,wl:4,two:1,eff:{},jobs:['wizard','sage'],lv:70,d:'雙手杖。\nMATK +(25 + 精煉值/2)%，INT +3，AGI +10，SP 消耗量 +(精煉值×2)%，被攻擊時有機率自動施放雷鳴術 Lv5。\n裝備: 巫師／賢者',buy:20});
+  add('i2702',{n:'野牛角',w:10,sell:10,t:'eq',slot:'acc',slots:1,def:0,eff:{},jobs:ALLJ,lv:0,d:'AGI +2。\n裝備: 初學者以外的全職業',buy:20});
+  add('card_4145',{n:'別西卜卡片',w:1,sell:10,t:'card',ctype:'acc',eff:{castP:-30},d:'詠唱時間 −30%。',buy:20});
+  const fly=GD.mobs['1873'];
+  if(fly){fly.morph=1874;
+    if(!GD.mobs['1874'])GD.mobs['1874']={...fly,n:'別西卜（真身）',hp:4444444,size:'大',exp:6666666,jexp:6666666,morph:undefined,boss:undefined,mvp:1,
+      drops:[['i7754',45],['i2423',10],['i1565',10],['i2000',10],['i2702',10],['i6223',5],['card_4145',0.01],['i617',55],['i607',50]],
+      sk:[['NPC_HELLJUDGEMENT',5,100],['NPC_DARKBREATH',5,10]]}}})();
 const MON={};for(const id in GD.mobs){const o=GD.mobs[id];MON[id]={...o,id:+id,boss:!!o.boss,mvp:!!o.mvp}}
 /* 卡片回收價：一般怪 50 萬、小王 150 萬、MVP 1000 萬（看掉這張卡的怪是哪一級，取最高） */
 {const CARDZ={n:500000,b:1500000,m:10000000};const tier={};for(const id in MON){const m=MON[id],t=m.mvp?'m':m.boss?'b':'n';for(const [k] of (m.drops||[]))if(String(k).startsWith('card_')&&(!tier[k]||CARDZ[t]>CARDZ[tier[k]]))tier[k]=t}
@@ -1709,6 +1724,9 @@ function supportMates(d){
       S.sp-=cost;o.buffs[id]={lv,until:o.clock+sk.dur(lv)*1000,by:CUR};if(sk.onCast)withChar(j,()=>sk.onCast(lv,D()));log('skill',`對 ${o.name} 施放 ${sk.n} Lv ${lv}。`);return true}}
   return false}
 function win(d){
+  if(target&&target.morph&&MON[target.morph]){const t0=target,keep={owner:t0.owner,dist:t0.dist,pack:t0.pack};const nt=mkMob(MON[t0.morph],true);
+    for(const k of Object.keys(t0))delete t0[k];Object.assign(t0,nt,keep,{dead:false});log('lvl',`「${MON[nt.id].n.replace(/（.*）/,'')}」倒下後……現出了真身！`);toast('別西卜現出真身！');
+    mode='fight';setState('戰鬥中');if(S.auto)schedule(step2,600);return}
   const t0=target,t={...t0};target=null;t0.dead=true;t0.killer=CUR;t.dead=true;t.killer=CUR;const bd=[];winReward(d,t,bd);
   bossLog(t,'擊殺',bd);
   t0.dead=false;
