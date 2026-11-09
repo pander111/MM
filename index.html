@@ -95,6 +95,7 @@ button.pill{padding:4px 10px}
 .toast{position:fixed;left:50%;top:calc(env(safe-area-inset-top,0px) + 70px);transform:translateX(-50%);background:#2a1033;color:#ff9fe0;border:2px solid #fff;padding:8px 16px;font-weight:700;border-radius:3px;z-index:50;pointer-events:none;max-width:90vw;text-align:center}
 .spr{display:flex;flex-direction:column;align-items:center;gap:8px;padding:6px 0}
 canvas{image-rendering:pixelated}
+.die{display:inline-block;margin:0 4px;transition:transform .06s}
 .hp-low{color:var(--bad);font-weight:700}
 [hidden]{display:none!important}
 .ovl{position:fixed;inset:0;background:rgba(10,14,24,.55);z-index:60;display:grid;place-items:center;padding:max(16px,env(safe-area-inset-left,0px))}
@@ -171,11 +172,14 @@ const slotType=s=>s.startsWith('acc')?'acc':s;
 /* 道具（資料來源：rAthena 經典版道具表＋台服道具名稱與說明） */
 const BASE=GD.items;
 /* 遊樂幣兌換的加成道具與天地樹果實／芽 */
-const BOOSTI={i12208:{k:'exp',dur:1800000},i12210:{k:'drop',dur:1800000}};
+const BOOSTI={i12208:{k:'exp',dur:1800000},iexp2:{k:'exp2',dur:1800000},i12210:{k:'drop',dur:1800000},idrop2:{k:'drop2',dur:1800000}};
+const EXPB=()=>boostOn('exp2')?2:boostOn('exp')?1.5:1,DROPX=()=>boostOn('drop2')?4:boostOn('drop')?2:1;
 function boostOn(k){return !!(typeof S!=='undefined'&&S&&S.boost&&S.boost[k]>S.clock)}
 {BASE.i12208=BASE.i12208||{n:'戰鬥教範',w:1,sell:0,t:'boost',d:'使用後 30 分鐘內，打怪得到的 Base／Job 經驗 +50%。'};
  BASE.i12210=BASE.i12210||{n:'泡泡糖',w:1,sell:0,t:'boost',d:'使用後 30 分鐘內，怪物掉寶機率 ×2。'};
- BASE.iwtup={n:'負重增加卷',w:0,sell:0,t:'boost',perm:1,d:'使用後這隻角色的負重上限永久 +100。'};
+ BASE.iexp2={n:'強化戰鬥教範',w:1,sell:0,t:'boost',d:'使用後 30 分鐘內，打怪得到的 Base／Job 經驗 +100%（和戰鬥教範不疊加，取效果高的）。'};
+ BASE.idrop2={n:'美味的泡泡糖',w:1,sell:0,t:'boost',d:'使用後 30 分鐘內，怪物掉寶機率 ×4（和泡泡糖不疊加，取效果高的）。'};
+ BASE.iwtup={n:'負重增加卷',w:0,sell:0,t:'boost',perm:1,d:'使用後這隻角色的負重上限永久 +100（每隻角色暫定最多 20 次）。'};
  for(const [k,p] of [['i607',100],['i608',50]])if(BASE[k])Object.assign(BASE[k],{t:'hp',php:p,psp:p,keep:1})}
 /* 忍者公會商店（官方開在忍者／槍手公會內，這裡放在天津）：飛鏢＋手臂護腕 */
 {const SH=[['i13250','飛鏢',4,10,1],['i13251','雨雲飛鏢',10,30,20],['i13252','閃光飛鏢',20,45,40],['i13253','銳葉飛鏢',40,70,60],['i13254','刺針飛鏢',100,100,80]];
@@ -1175,6 +1179,7 @@ function step(){
   if(supportMates(d))return schedule(step,1000);
   {const need=supNeed(d);if(need&&c.supRest!==false&&wp<50){sitting=true;mode='rest';setState('坐下休息');S.restSup=Math.min(d.maxSp,need*3);
     log('sys',`隊友缺輔助技能，SP 不夠（${Math.floor(S.sp)} / 需要 ${need}），先坐下回 SP。`);return schedule(step,1000)}}
+  if(c.supOnly&&partyOn()&&inParty(CUR)&&P().members.some(j=>j!==CUR&&ROOT.chars[j]&&ROOT.chars[j].cfg.map===c.map))return supStep(d,c);
   if((c.assist||c.assistMvp!==false)&&partyOn()&&inParty(CUR)){const all=P().members.filter(j=>j!==CUR&&ROOT.chars[j]&&ROOT.chars[j].cfg.map===c.map).map(j=>(RT[j]||{}).target).filter(t=>t&&!t.dead&&t.cur>0);
     const big=c.assistMvp!==false?all.filter(t=>t.boss||t.mvp):[];
     if(big.length){const t=pick(big);target=t;mode='fight';setState('戰鬥中');log('lvl',`協助隊友圍攻 ${t.mvp?'MVP':'BOSS'}「${t.n}」（HP ${fmt(Math.floor(t.cur))} / ${fmt(t.hp)}）！`);return schedule(step2,500)}
@@ -1197,6 +1202,15 @@ function step(){
     log('skill',`連續 ${noTarget} 秒找不到目標，使用 ${c.esc.noTargetAct==='fly'?(SL('tele')&&S.sp>=10&&!hasS('silence')?'瞬間移動':'蒼蠅翅膀'):'蝴蝶翅膀'}。`);noTarget=0;return escape(c.esc.noTargetAct,true)}
   schedule(step,1000)
 }
+/* 純輔助：不找怪，平常坐著回 SP，隊友要補血／輔助時才站起來 */
+function supStep(d,c){
+  const busy=()=>{sitting=false;return healMates(d)||maintainBuffs(d)||careRes(d)||supportMates(d)};
+  if(busy()){S.supSit=0;setState('輔助隊友');return schedule(step,1000)}
+  sitting=true;if(!S.supSit){S.supSit=1;log('sys',S.sp<d.maxSp?'沒有需要幫忙的，坐下等 SP。':'待命中，坐著等隊友需要補血或輔助。')}
+  setState(S.sp<d.maxSp||S.hp<d.maxHp?'坐下等 SP':'待命（坐著）');
+  const ag=MAPS[c.map].mons.filter(m=>m.beh==='主動'&&!m.mvp);
+  if(ag.length&&R()<.03&&!SLC('RG_GANGSTER')){const m=pick(ag);sitting=false;S.supSit=0;log('warn',`${m.n} Lv.${m.lv} 衝過來打擾，先應戰（隊友會來協助）。`);return engage(m,true)}
+  return schedule(step,1000)}
 function weighted(list){let t=list.reduce((s,m)=>s+m.count,0),r=R()*t;for(const m of list){r-=m.count;if(r<=0)return m}return list[0]}
 const MHIDE={"1056": 500, "1086": 1000, "1119": 2000, "1120": 2000, "1127": 2000, "1145": 2000, "1159": 2000, "1165": 2000, "1179": 2000, "1207": 2000, "1256": 2000, "1380": 2000, "1386": 2000, "1387": 2000, "1389": 2000, "1401": 500, "1614": 500, "1615": 500, "1628": 2000, "1630": 2000, "1635": 2000, "1641": 2000, "1706": 500, "1711": 500, "1752": 2000, "1761": 2000};
 function revealHid(d,t){if(!(t.hid>S.clock))return 0;
@@ -1282,7 +1296,8 @@ function potGain(k,d){const it=ITEMS[k],pm=1+(d.E.potP||0)/100;let hp=0,sp=0;
   else{hp=it.heal*(1+d.st.vit*.02)*(1+.05*SL('lpotion'))*pm*(.9+R()*.2);if(it.sp)sp=it.sp*(1+d.st.int*.02)*pm}
   hp=Math.round(hp);sp=Math.round(sp);S.hp=Math.min(d.maxHp,S.hp+hp);S.sp=Math.min(d.maxSp,S.sp+sp);
   return [hp?`${hp} HP`:'',sp?`${sp} SP`:''].filter(Boolean).join('、')}
-function useBoost(k){if(ITEMS[k]&&ITEMS[k].perm&&S.inv[k]>0){S.inv[k]--;if(!S.inv[k])delete S.inv[k];S.wtPlus=(S.wtPlus||0)+100;EBV++;dirty=true;log('skill',`使用 ${ITEMS[k].n}：負重上限永久 +100（累計 +${S.wtPlus}）。`);return true}const b=BOOSTI[k];if(!b||!(S.inv[k]>0))return false;S.inv[k]--;if(!S.inv[k])delete S.inv[k];S.boost=S.boost||{};S.boost[b.k]=S.clock+b.dur;EBV++;dirty=true;log('skill',`使用 ${ITEMS[k].n}：${ITEMS[k].d}`);return true}
+const WTMAX=20;/* 負重增加卷每隻角色暫定最多 20 次（+2000），之後再看要不要開放 */
+function useBoost(k){if(ITEMS[k]&&ITEMS[k].perm&&S.inv[k]>0){if((S.wtPlus||0)>=WTMAX*100){toast(`這隻角色已用滿 ${WTMAX} 次，目前上限 +${WTMAX*100}`);return false}S.inv[k]--;if(!S.inv[k])delete S.inv[k];S.wtPlus=(S.wtPlus||0)+100;EBV++;dirty=true;log('skill',`使用 ${ITEMS[k].n}：負重上限永久 +100（累計 +${S.wtPlus}）。`);return true}const b=BOOSTI[k];if(!b||!(S.inv[k]>0))return false;S.inv[k]--;if(!S.inv[k])delete S.inv[k];S.boost=S.boost||{};S.boost[b.k]=S.clock+b.dur;EBV++;dirty=true;log('skill',`使用 ${ITEMS[k].n}：${ITEMS[k].d}`);return true}
 function usePotions(d){
   const c=C();if(c.boostAuto)for(const k in c.boostAuto)if(c.boostAuto[k]&&BOOSTI[k]&&(S.inv[k]||0)>0&&!boostOn(BOOSTI[k].k))useBoost(k);
   if(c.hpPot.on&&S.hp<d.maxHp*c.hpPot.pct/100){
@@ -1581,7 +1596,7 @@ function die(t){
 function addItem(k,n){S.inv[k]=(S.inv[k]||0)+n;S.stats.items[k]=(S.stats.items[k]||0)+n;dirty=true}
 function giveExp(t,ratio){
   const gap=S.lv-t.lv,pen=gap>10?Math.max(.1,1-(gap-10)*.06):1;
-  const rate=(1+((((D().E.expRace)||{})[t.race]||0)+(D().E.expAll||0))/100)*(boostOn('exp')?1.5:1),be=Math.max(1,Math.round(t.exp*pen*ratio*rate)),je=Math.max(1,Math.round(t.jexp*pen*ratio*rate));
+  const rate=(1+((((D().E.expRace)||{})[t.race]||0)+(D().E.expAll||0))/100)*EXPB(),be=Math.max(1,Math.round(t.exp*pen*ratio*rate)),je=Math.max(1,Math.round(t.jexp*pen*ratio*rate));
   if(pen<1&&!S.penWarn){S.penWarn=1;log('warn','怪物比你低 10 級以上，經驗值會打折。建議到「掛機設定 → 掛機地圖」換張圖。')}
   if(pen===1)S.penWarn=0;
   const bp=S.lv>=99?'MAX':(be/nextBase(S.lv)*100).toFixed(2)+'%',jp=S.jlv>=J().max?'MAX':(je/nextJob(S.jlv)*100).toFixed(2)+'%';
@@ -2023,10 +2038,10 @@ function slRound(r,buy){let tot=0,sc=0;let first=null;const spins=[];
 
 
 /* ================= 娛樂：仙境轉轉樂（6×5 消除）＋骰子比大小；贏的是遊樂幣，可換道具 ================= */
-const FUNX=[['i607',150],['i608',60],['i12208',300],['i12210',400],['iwtup',1000]];
-const FUNBETS=[10000,100000,1000000],COINZ=1000,BUYX=85;
+const FUNX=[['i607',150],['i608',60],['i12208',300],['iexp2',600],['i12210',400],['idrop2',800],['iwtup',1000]];
+const FUNBETS=[10000,100000,1000000],COINZ=10000,BUYX=85;
 const FUN={busy:false,auto:0,cv:null,show:null,hl:null,msg:'',dice:null,fx:[]};
-const fun=()=>{ROOT.fun=ROOT.fun||{coin:0,bet:100000,fast:false,st:{bet:0,coin:0,spins:0,best:0,free:0}};return ROOT.fun};
+const fun=()=>{ROOT.fun=ROOT.fun||{coin:0,bet:100000,fast:false,cz:COINZ,st:{bet:0,coin:0,spins:0,best:0,free:0}};const F=ROOT.fun;if(F.cz!==COINZ){const r=(F.cz||1000)/COINZ;F.coin=Math.floor(F.coin*r);F.st.coin=Math.floor(F.st.coin*r);F.cz=COINZ}return F};
 const zShort=z=>z>=1e8?(z/1e8).toFixed(z%1e8?2:0)+' 億':z>=1e4?(z/1e4).toFixed(z%1e4?1:0)+' 萬':fmt(z);
 function slIcon(g,x,y,sz,cell,t){const s=sz/40;g.save();g.translate(x+sz/2,y+sz/2);g.scale(s,s);
   const flask=(c1,c2)=>{g.fillStyle='rgba(0,0,0,.25)';g.beginPath();g.ellipse(0,15,11,3,0,0,7);g.fill();g.fillStyle=c1;g.beginPath();g.arc(0,4,11,0,7);g.fill();g.fillStyle=c2;g.beginPath();g.arc(-3,1,4,0,7);g.fill();
@@ -2065,9 +2080,15 @@ async function funSpin(buy){const F=fun(),bet=F.bet,cost=buy?bet*BUYX:bet;if(FUN
   dirty=true;FUN.busy=false;renderTab();if(FUN.big){const bg=FUN.big;setTimeout(()=>{if(FUN.big===bg)FUN.big=''},2500)}
   if(FUN.auto>0){FUN.auto--;if(res.tot>=100||res.free){FUN.auto=0;FUN.msg+='（中大獎或免費遊戲，自動轉已停止）';renderTab();return}await wait(F.fast?250:700);if(FUN.auto>0&&tab==='fun')funSpin(false);else FUN.auto=0}}
 function renderFunMsg(){const el=document.getElementById('funMsg');if(el)el.innerHTML=FUN.msg}
-function funDice(big){const F=fun(),bet=F.bet;if(S.zeny<bet){toast(`Zeny 不夠，需要 ${fmt(bet)}z`);return}S.zeny-=bet;zOut('娛樂',bet);F.st.bet+=bet;
+function funDice(big){if(FUN.rolling)return;const F=fun(),bet=F.bet;if(S.zeny<bet){toast(`Zeny 不夠，需要 ${fmt(bet)}z`);return}S.zeny-=bet;zOut('娛樂',bet);F.st.bet+=bet;
   const d=[rnd(1,6),rnd(1,6),rnd(1,6)],sum=d[0]+d[1]+d[2],tri=d[0]===d[1]&&d[1]===d[2],isBig=sum>=11,win=!tri&&isBig===big;const coins=win?Math.round(bet*2/COINZ):0;F.coin+=coins;F.st.coin+=coins;
-  FUN.dice={d,sum,tri,win,coins,big};dirty=true;renderTab()}
+  const res={d,sum,tri,win,coins,big};dirty=true;
+  if(F.diceSkip){FUN.dice=res;renderTab();return}
+  FUN.rolling=true;FUN.dice=null;renderTab();const t0=performance.now();
+  const tick=()=>{const el=document.getElementById('diceBox'),k=(performance.now()-t0)/1200;
+    if(k>=1){FUN.rolling=false;FUN.dice=res;renderTab();return}
+    if(el){el.innerHTML=[0,1,2].map(i=>`<span class="die" style="transform:translateY(${-Math.abs(Math.sin(k*9+i*1.3))*14*(1-k)}px) rotate(${(R()-.5)*80*(1-k)}deg)">${DIE[rnd(1,6)]}</span>`).join('')}
+    setTimeout(tick,60+k*90)};tick()}
 function funBuyX(k,cost){const F=fun();if(F.coin<cost){toast('遊樂幣不夠');return}F.coin-=cost;S.inv[k]=(S.inv[k]||0)+1;dirty=true;log('drop',`用 ${cost} 遊樂幣換到 ${ITEMS[k].n}。`);toast(`換到 ${ITEMS[k].n}！`);renderTab()}
 const DIE=['','⚀','⚁','⚂','⚃','⚄','⚅'];
 function funView(){const F=fun(),bet=F.bet,c=C();setTimeout(funMount,0);
@@ -2081,12 +2102,13 @@ function funView(){const F=fun(),bet=F.bet,c=C();setTimeout(funMount,0);
     <details class="note"><summary>規則與賠率</summary><div>・盤面 6×5，同一種圖案 8 個以上就得分（位置不限），得分圖案消掉後會掉新的下來，可以連續得分。<br>・<b>紫色球 ×N</b>：轉完時有得分，就把盤面上所有乘數加起來，乘上這一轉的獎金。<br>・<b>金色星星「免費」</b>：出現 4 個以上送 15 次免費遊戲（4／5／6 個另外送 3／5／100 倍）；免費遊戲中再出 3 個加 5 次，而且乘數會一路累加。<br>・也可以直接花 ${BUYX} 倍押注買免費遊戲。單次最多贏 ${fmt(SLOT.cap)} 倍。<br>
     ${SLOT.S.map(s=>`${s[1]}：8–9 個 ${s[3][0]} 倍、10–11 個 ${s[3][1]} 倍、12 個以上 ${s[3][2]} 倍`).join('<br>')}<br>・長期平均大約拿回押注的 93%，請當作娛樂。</div></details>`)+
    card('骰子比大小',`<div class="note">擲 3 顆骰子：總和 11–17 是「大」、4–10 是「小」；三顆一樣（豹子）算莊家贏。猜中拿回 2 倍押注的遊樂幣。</div>
-    <div class="row" style="justify-content:center"><button type="button" class="pri" data-fun="dice" data-k="big">押大</button><button type="button" class="pri" data-fun="dice" data-k="small">押小</button></div>
-    ${FUN.dice?`<div style="text-align:center;font-size:40px;line-height:1.2">${FUN.dice.d.map(x=>DIE[x]).join(' ')}</div><div style="text-align:center">總和 ${FUN.dice.sum}${FUN.dice.tri?'（豹子）':FUN.dice.sum>=11?'（大）':'（小）'}，你押${FUN.dice.big?'大':'小'}：${FUN.dice.win?`<b class="good">贏了 ${fmt(FUN.dice.coins)} 遊樂幣</b>`:'<span class="bad">輸了</span>'}</div>`:''}`,false)+
+    <div class="row" style="justify-content:center"><button type="button" class="pri" data-fun="dice" data-k="big" ${FUN.rolling?'disabled':''}>押大</button><button type="button" class="pri" data-fun="dice" data-k="small" ${FUN.rolling?'disabled':''}>押小</button><label class="chk" style="margin-left:auto"><input type="checkbox" data-fun="dskip" ${F.diceSkip?'checked':''}> 跳過動畫</label></div>
+    <div id="diceBox" style="text-align:center;font-size:44px;line-height:1.3;min-height:60px">${FUN.rolling?[1,2,3].map(()=>`<span class="die">${DIE[rnd(1,6)]}</span>`).join(''):FUN.dice?FUN.dice.d.map(x=>`<span class="die">${DIE[x]}</span>`).join(''):''}</div>
+    ${FUN.rolling?'<div class="note" style="text-align:center">擲骰中…</div>':''}${FUN.dice?`<div style="text-align:center">總和 ${FUN.dice.sum}${FUN.dice.tri?'（豹子）':FUN.dice.sum>=11?'（大）':'（小）'}，你押${FUN.dice.big?'大':'小'}：${FUN.dice.win?`<b class="good">贏了 ${fmt(FUN.dice.coins)} 遊樂幣</b>`:'<span class="bad">輸了</span>'}</div>`:''}`)+
    card('遊樂幣兌換',`<div class="tw"><table><thead><tr><th>道具</th><th class="r">遊樂幣</th><th class="r">背包</th><th></th></tr></thead><tbody>${FUNX.map(([k,cost])=>{const it=ITEMS[k];return `<tr><td>${it.n}<div class="note">${itemInfo(k)}</div></td><td class="r">${fmt(cost)}</td><td class="r">${S.inv[k]||0}</td><td class="r"><button type="button" class="sm" data-fun="x" data-k="${k}" ${F.coin<cost?'disabled':''}>換</button></td></tr>`}).join('')}</tbody></table></div>`)+
    card('加成道具（目前角色）',`${Object.entries(BOOSTI).map(([k,b])=>`<div class="row"><b style="min-width:7em">${ITEMS[k].n}</b>${bl(b.k)}<span class="note">背包 ${S.inv[k]||0}</span><button type="button" class="sm" data-a="use" data-k="${k}" ${(S.inv[k]||0)>0?'':'disabled'}>使用</button><label class="chk"><input type="checkbox" data-fun="ba" data-k="${k}" ${(c.boostAuto||{})[k]?'checked':''}> 效果結束自動續用</label></div>`).join('')}
-    <div class="row"><b style="min-width:7em">負重增加卷</b><span class="note">已永久增加 ${S.wtPlus||0}　背包 ${S.inv.iwtup||0}</span><button type="button" class="sm" data-a="use" data-k="iwtup" ${(S.inv.iwtup||0)>0?'':'disabled'}>使用</button></div>
-    <div class="note">戰鬥教範、泡泡糖用遊戲時間計算，離線掛機也會照常倒數；再用一次會重新計時（不會疊加時間）。負重增加卷是永久的，每隻角色分開算。</div>`)+
+    <div class="row"><b style="min-width:7em">負重增加卷</b><span class="note">已使用 ${(S.wtPlus||0)/100}／${WTMAX} 次（+${S.wtPlus||0}）　背包 ${S.inv.iwtup||0}</span><button type="button" class="sm" data-a="use" data-k="iwtup" ${(S.inv.iwtup||0)>0&&(S.wtPlus||0)<WTMAX*100?'':'disabled'}>使用</button></div>
+    <div class="note">戰鬥教範、泡泡糖用遊戲時間計算，離線掛機也會照常倒數；再用一次會重新計時（不會疊加時間）。負重增加卷是永久的，每隻角色分開算，<b>暫定每隻最多 20 次（+2000）</b>，之後會再看情況開放。</div>`)+
    card('統計',`<div class="kv"><div>總押注<b>${fmt(F.st.bet)}z</b></div><div>總共贏得<b>${fmt(F.st.coin)} 幣</b></div><div>轉轉樂次數<b>${fmt(F.st.spins)}</b></div><div>免費遊戲<b>${fmt(F.st.free)} 次</b></div><div>最大一次<b>${Math.round(F.st.best)} 倍</b></div></div>`,false)}
 
 const TABS=[['main','主控台'],['char','人物'],['job','職業'],['bag','背包'],['shop','商店與 NPC'],['stor','倉庫'],['query','查詢'],
@@ -2100,7 +2122,7 @@ const panel=$('panel');
 panel.addEventListener('click',e=>{const b=e.target.closest('[data-fun]');if(!b||b.type==='checkbox')return;const a=b.dataset.fun,k=b.dataset.k,F=fun();
   if(a==='bet'){F.bet=+k;renderTab()}else if(a==='spin')funSpin(false);else if(a==='buy'){if(armed!=='funbuy'){armed='funbuy';b.textContent=`再按一次確認（${zShort(F.bet*BUYX)}）`;return}armed=null;funSpin(true)}
   else if(a==='auto'){FUN.auto=+k-1;funSpin(false)}else if(a==='autostop'){FUN.auto=0;renderTab()}else if(a==='dice')funDice(k==='big');else if(a==='x'){const x=FUNX.find(q=>q[0]===k);if(x)funBuyX(k,x[1])}});
-panel.addEventListener('change',e=>{const el=e.target;const a=el.dataset&&el.dataset.fun;if(!a)return;if(a==='fast'){fun().fast=el.checked;dirty=true}else if(a==='ba'){const c=C();c.boostAuto=c.boostAuto||{};c.boostAuto[el.dataset.k]=el.checked;dirty=true}});
+panel.addEventListener('change',e=>{const el=e.target;const a=el.dataset&&el.dataset.fun;if(!a)return;if(a==='fast'){fun().fast=el.checked;dirty=true}else if(a==='dskip'){fun().diceSkip=el.checked;dirty=true}else if(a==='ba'){const c=C();c.boostAuto=c.boostAuto||{};c.boostAuto[el.dataset.k]=el.checked;dirty=true}});
 
 panel.addEventListener('pointerdown',()=>lastTouch=Date.now());
 panel.addEventListener('focusin',()=>lastTouch=Date.now());
@@ -2178,7 +2200,7 @@ main(){const d=D(),c=C();const notes=[];
   return box(`${esc(S.name)}　${J().n}`,`<div style="display:flex;gap:12px;align-items:center"><canvas id="sprMain" width="80" height="112" aria-label="角色形象" style="flex:none"></canvas><div class="bars" style="flex:1;min-width:0">${barHTML('hp','var(--hp)','HP')}${barHTML('sp','var(--sp)','SP')}${barHTML('bx','var(--xp)','Base')}${barHTML('jx','var(--jx)','Job')}${barHTML('wt','var(--wt)','負重')}</div></div>
    <div class="row"><button type="button" data-a="toggle" class="${S.auto?'on':'pri'}">${S.auto?'⏸ 停止掛機':'▶ 開始掛機'}</button><button type="button" data-a="town">回城整理</button><button type="button" data-a="sit">${sitting?'站起來':'坐下'}</button></div>
    <div class="note" id="tgt" style="min-height:3.2em;line-height:1.6em;white-space:pre-line">目標：—</div><div class="bad" id="lstop" style="display:none;font-size:13px"></div>
-   <div class="kv"><div>地圖<b>${MAPS[c.map].n}</b></div><div>Zeny<b id="zeny">${fmt(S.zeny)}</b></div><div>HP 藥水<b>${c.potList.reduce((s,k)=>s+(S.inv[k]||0),0)}</b></div><div>蒼蠅翅膀<b>免費</b></div>${[['exp','經驗 +50%'],['drop','掉寶 ×2']].filter(([k])=>boostOn(k)).map(([k,n])=>`<div>${n}<b class="good">${Math.ceil((S.boost[k]-S.clock)/60000)} 分</b></div>`).join('')}${needAmmo(wcls())?`<div>${needAmmo(wcls())==='bullet'?'子彈':'箭矢'}<b id="ammoN">${S.ammo.id&&ITEMS[S.ammo.id]&&S.ammo.n>0?ITEMS[S.ammo.id].n+' ':''}${fmt(S.ammo.n||0)}</b></div>`:''}</div>
+   <div class="kv"><div>地圖<b>${MAPS[c.map].n}</b></div><div>Zeny<b id="zeny">${fmt(S.zeny)}</b></div><div>HP 藥水<b>${c.potList.reduce((s,k)=>s+(S.inv[k]||0),0)}</b></div><div>蒼蠅翅膀<b>免費</b></div>${[['exp2','經驗 +100%'],['exp','經驗 +50%'],['drop2','掉寶 ×4'],['drop','掉寶 ×2']].filter(([k])=>boostOn(k)).map(([k,n])=>`<div>${n}<b class="good">${Math.ceil((S.boost[k]-S.clock)/60000)} 分</b></div>`).join('')}${needAmmo(wcls())?`<div>${needAmmo(wcls())==='bullet'?'子彈':'箭矢'}<b id="ammoN">${S.ammo.id&&ITEMS[S.ammo.id]&&S.ammo.n>0?ITEMS[S.ammo.id].n+' ':''}${fmt(S.ammo.n||0)}</b></div>`:''}</div>
    ${buffs?`<div class="chips">${buffs}</div>`:''}
    ${Object.keys(STN_).some(hasS)?`<div class="chips">${Object.keys(STN_).filter(hasS).map(k=>`<span class="chip bad">▼ ${STN_[k]}（剩 ${dur(S.sts[k]-S.clock)}）</span>`).join('')}</div>`:''}
    <div class="note" id="homLine" ${S.hom?'':'hidden'}></div>${grafNote()}
@@ -2518,7 +2540,7 @@ async function xRecv(d){if(!NET.ok||NET.xseen.has(d.id))return;NET.xseen.add(d.i
   for(const [mi,mm] of Object.entries(v.m)){const js=RUNNERS().filter(j=>ROOT.chars[j]&&ROOT.chars[j].auto&&ROOT.chars[j].cfg.map===+mi&&ROOT.chars[j].hp>0);if(!js.length)continue;
     for(const j of js)withChar(j,()=>{let be=0,je=0;for(const [id,r] of Object.entries(mm)){const t=MONID[id];if(!t)continue;const gap=S.lv-t.lv,pen=gap>10?Math.max(.1,1-(gap-10)*.06):1;
         const rate=1+((((D().E.expRace)||{})[t.race]||0)+(D().E.expAll||0))/100;be+=t.exp*pen*r*rate/js.length;je+=t.jexp*pen*r*rate/js.length}
-      if(boostOn('exp')){be*=1.5;je*=1.5}be=Math.round(be);je=Math.round(je);if(be<1&&je<1)return;log('exp',`隊友 ${v.fn||'玩家'} 打怪分到經驗：Base +${fmt(be)} / Job +${fmt(je)}。`);gainExp(be,je);if(homOut())homGain(Math.max(1,Math.round(be*.1)));tb+=be;tj+=je})}
+      {const xb=EXPB();be*=xb;je*=xb}be=Math.round(be);je=Math.round(je);if(be<1&&je<1)return;log('exp',`隊友 ${v.fn||'玩家'} 打怪分到經驗：Base +${fmt(be)} / Job +${fmt(je)}。`);gainExp(be,je);if(homOut())homGain(Math.max(1,Math.round(be*.1)));tb+=be;tj+=je})}
   NET.xin.be+=tb;NET.xin.je+=tj;NET.xin.n++;dirty=true}
 function xpBox(){if(!NET.db)return box('跨玩家組隊','<div class="note">這個功能需要連線（在 Claude 裡開啟分享的遊戲頁面才有）。</div>');
   const x=myXP();const rule='<div class="note">和其他玩家組隊後，<b>雙方都開著遊戲</b>、而且有角色在<b>同一張地圖</b>掛機（等級差 15 以內）時，打怪的經驗會平均分給在場的隊友，每多 1 人總經驗 +10%（跟官方平均分配一樣）。掉落物不分享。一方關掉遊戲或離線計算時不會分享。</div>';
@@ -2645,7 +2667,7 @@ function swapJobs(){const j=JOBS[S.job];if(!j||j.ext||(j.tier!==1&&j.tier!==2))r
   const all=Object.keys(JOBS).filter(k=>k!==S.job&&!k.startsWith('t_')&&JOBS[k].tier===j.tier&&!JOBS[k].ext);
   return all.sort((a,b)=>(PARENT[b]===pa)-(PARENT[a]===pa))}
 const sameLine=k=>PARENT[k]===PARENT[S.job];
-const DROPM=()=>GHM?1:(ROOT.ui.drop||1);const DROPB=()=>DROPM()*(boostOn('drop')?2:1);const freeTier=()=>(JOBS[S.job]||{}).tier<=1;
+const DROPM=()=>GHM?1:(ROOT.ui.drop||1);const DROPB=()=>DROPM()*DROPX();const freeTier=()=>(JOBS[S.job]||{}).tier<=1;
 const swapCost=()=>!GHM||freeTier()?0:1e6*((S.swapN||0)+1);const resetCost=()=>!GHM||freeTier()?0:1e6;
 const payNote=z=>z?`（費用 ${fmt(z)}z${S.zeny<z?'，<span class="bad">Zeny 不夠</span>':''}）`:'';
 function jobReady(){const j=J();if(!transNext(j).length)return false;return S.jlv>=(j.tier===0?10:40)&&S.skp===0&&(j.tier>0||SL('basic')>=9)}
@@ -2730,7 +2752,7 @@ function autoView(){
     <div class="note">坐下時 HP、SP 的自然回復速度變成 2 倍（RO 原版規則；學了 HP／SP 回復力增加會再更快）。兩個條件可以分開開關，只在沒有交戰時坐下；地圖上有主動怪時可能被打斷而起身應戰。負重 50% 以上不會自然回復，所以不會坐下。</div>`)+
   card('解除異常狀態（技能）',(()=>{const ls=CURE_SK.filter(([id])=>SL(id));if(!ls.length)return '<div class="note">還沒有學會解除異常的技能（服事的治療術、祭司的狀態恢復、盜賊的解毒；天使之賜福可以解詛咒、石化）。</div>';
     return ls.map(([id,cs])=>`<div class="row" style="border-bottom:1px dotted var(--btn-edge);padding-bottom:6px"><b style="min-width:6em">${SK[id].n}</b><span class="note">解除 ${cs.map(k=>STN_[k]||k).join('、')}・SP ${spc(SK[id],1)}</span>${cC(`cureSk.${id}.self`,'自己用')}${cC(`cureSk.${id}.party`,'幫隊友解')}</div>`).join('')+'<div class="note">勾選後掛機時自動施放：自己中了就幫自己解；組隊時（「組隊行為」要開「對隊友施放輔助」）同地圖的隊友中了也會幫忙解。也可以在「藥水與補給」設定用道具自己解。</div>'})())+
-  card('組隊行為',`${cC('assist','協助隊友打怪（一般小怪也幫）')}${cC('assistMvp','協助隊友打 MVP／BOSS（隊友先開打才加入）')}${cC('partySupport','對隊友施放輔助 / 回復技能')}${cC('supRest','隊友缺輔助技能、自己 SP 不夠時，先坐下回 SP 再幫忙上')}<div class="note">「協助打 MVP／BOSS」跟「協助打怪」分開：只勾前者時，平常各打各的小怪，隊友一打 MVP／BOSS 就會過去圍攻；自己碰到 MVP 仍照「看到就逃／危險怪」設定逃走。關閉協助仍會自己尋怪；關閉隊友輔助只照顧自己。補血門檻沿用「掛機技能 → 回復技能」，輔助沿用勾選的輔助技能。</div>`)+
+  card('組隊行為',`${cC('assist','協助隊友打怪（一般小怪也幫）')}${cC('assistMvp','協助隊友打 MVP／BOSS（隊友先開打才加入）')}${cC('partySupport','對隊友施放輔助 / 回復技能')}${cC('supRest','隊友缺輔助技能、自己 SP 不夠時，先坐下回 SP 再幫忙上')}${cC('supOnly','<b>純輔助模式</b>：不自己找怪，平常坐下回 SP；隊友需要補血、放輔助時才起身，放完再坐下')}<div class="note">「協助打 MVP／BOSS」跟「協助打怪」分開：只勾前者時，平常各打各的小怪，隊友一打 MVP／BOSS 就會過去圍攻；自己碰到 MVP 仍照「看到就逃／危險怪」設定逃走。關閉協助仍會自己尋怪；關閉隊友輔助只照顧自己。純輔助模式要在隊伍裡、而且同地圖有隊友才會生效（不會因為看到怪就瞬移跑掉；主動怪衝過來會先應戰，隊友會來幫忙）。補血門檻沿用「掛機技能 → 回復技能」，輔助沿用勾選的輔助技能。</div>`)+
   card('撿取與負重',`${cC('loot.on','自動撿取掉落物（個別道具在「回城處理」設定撿不撿）')}${cC('stop90','負重達 90% 時停止掛機')}`)+
   card('逃生（瞬移與回城）',`<div class="row">交戰中 HP 低於 ${cN('esc.hp',56)}% ${cS('esc.hpAct',escOpts)}</div>
     <div class="row">偵測到危險怪（主動且比我高 ${cN('esc.dangerLv',50)} 級以上，0 = 不判斷）${cS('esc.dangerAct',escOpts)}</div>
@@ -3519,7 +3541,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden){AR.gAt=0;
   const gap=ROOT.ui.lastSeen?Date.now()-ROOT.ui.lastSeen:0;if(gap>60000)offlineRun(gap);
 })();
 cloudInit();netInit();
-window.__ro={unpackSave,packSave,progScore,CLOUD,arChar,arMon,arWeapon,AR,arHero,arSpell,arField,arMonState,spfxKind,SKBY,drawSprite,SESS,CLOUD,woundPick,cardCtx,cardEff,get S(){return S},withChar,engage,bump:()=>EBV++,offlineRun,itemInfo,eMul,homD,homGain,homCall,homTick,HOMC,twilight,grafWrite,berserkPitch,get ROOT(){return ROOT},SK,JOBS,ih,protectedItem,wPct,step,D,P,MAPS,ITEMS,BASE,MON,effText,EQUIPS,SHOP,GD};
+window.__ro={RT,unpackSave,packSave,progScore,CLOUD,arChar,arMon,arWeapon,AR,arHero,arSpell,arField,arMonState,spfxKind,SKBY,drawSprite,SESS,CLOUD,woundPick,cardCtx,cardEff,get S(){return S},withChar,engage,bump:()=>EBV++,offlineRun,itemInfo,eMul,homD,homGain,homCall,homTick,HOMC,twilight,grafWrite,berserkPitch,get ROOT(){return ROOT},SK,JOBS,ih,protectedItem,wPct,step,D,P,MAPS,ITEMS,BASE,MON,effText,EQUIPS,SHOP,GD};
 })();
 </script>
 
