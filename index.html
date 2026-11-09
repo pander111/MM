@@ -96,6 +96,8 @@ button.pill{padding:4px 10px}
 .spr{display:flex;flex-direction:column;align-items:center;gap:8px;padding:6px 0}
 canvas{image-rendering:pixelated}
 .die{display:inline-block;margin:0 4px;transition:transform .06s}
+.buffbar{display:flex;gap:5px;overflow-x:auto;overflow-y:hidden;white-space:nowrap;height:32px;align-items:center;-webkit-overflow-scrolling:touch;scrollbar-width:thin}
+.buffbar .chip{flex:none}
 .hp-low{color:var(--bad);font-weight:700}
 [hidden]{display:none!important}
 .ovl{position:fixed;inset:0;background:rgba(10,14,24,.55);z-index:60;display:grid;place-items:center;padding:max(16px,env(safe-area-inset-left,0px))}
@@ -2271,10 +2273,9 @@ main(){const d=D(),c=C();const notes=[];
   const buffs=Object.keys(S.buffs).filter(buffOn).map(k=>`<span class="chip">▲ ${SK[k]?`${SK[k].n} Lv ${S.buffs[k].lv}`:k.startsWith('food_')?`${S.buffs[k].n} ${k.slice(5).toUpperCase()} +${S.buffs[k].lv}`:S.buffs[k].txt?`${S.buffs[k].n} Lv ${S.buffs[k].lv}`:`${S.buffs[k].n||k} 攻速 +${S.buffs[k].lv}%`}（剩 ${dur(S.buffs[k].until-S.clock)}）</span>`).join('');
   return box(`${esc(S.name)}　${J().n}`,`<div style="display:flex;gap:12px;align-items:center"><canvas id="sprMain" width="80" height="112" aria-label="角色形象" style="flex:none"></canvas><div class="bars" style="flex:1;min-width:0">${barHTML('hp','var(--hp)','HP')}${barHTML('sp','var(--sp)','SP')}${barHTML('bx','var(--xp)','Base')}${barHTML('jx','var(--jx)','Job')}${barHTML('wt','var(--wt)','負重')}</div></div>
    <div class="row"><button type="button" data-a="toggle" class="${S.auto?'on':'pri'}">${S.auto?'⏸ 停止掛機':'▶ 開始掛機'}</button><button type="button" data-a="town">回城整理</button><button type="button" data-a="sit">${sitting?'站起來':'坐下'}</button></div>
-   <div class="note" id="tgt" style="min-height:3.2em;line-height:1.6em;white-space:pre-line">目標：—</div><div class="bad" id="lstop" style="display:none;font-size:13px"></div>
-   <div class="kv"><div>地圖<b>${MAPS[c.map].n}</b></div><div>Zeny<b id="zeny">${fmt(S.zeny)}</b></div><div>HP 藥水<b>${c.potList.reduce((s,k)=>s+(S.inv[k]||0),0)}</b></div><div>蒼蠅翅膀<b>免費</b></div>${[['exp2','經驗 +100%'],['exp','經驗 +50%'],['drop2','掉寶 ×4'],['drop','掉寶 ×2']].filter(([k])=>boostOn(k)).map(([k,n])=>`<div>${n}<b class="good">${Math.ceil((S.boost[k]-S.clock)/60000)} 分</b></div>`).join('')}${needAmmo(wcls())?`<div>${needAmmo(wcls())==='bullet'?'子彈':'箭矢'}<b id="ammoN">${S.ammo.id&&ITEMS[S.ammo.id]&&S.ammo.n>0?ITEMS[S.ammo.id].n+' ':''}${fmt(S.ammo.n||0)}</b></div>`:''}</div>
-   ${buffs?`<div class="chips">${buffs}</div>`:''}
-   ${Object.keys(STN_).some(hasS)?`<div class="chips">${Object.keys(STN_).filter(hasS).map(k=>`<span class="chip bad">▼ ${STN_[k]}（剩 ${dur(S.sts[k]-S.clock)}）</span>`).join('')}</div>`:''}
+   <div class="note" id="tgt" style="height:4.8em;overflow:hidden;line-height:1.6em;white-space:pre-line">目標：—</div><div class="bad" id="lstop" style="display:none;font-size:13px"></div>
+   <div class="kv"><div>地圖<b>${MAPS[c.map].n}</b></div><div>Zeny<b id="zeny">${fmt(S.zeny)}</b></div><div>HP 藥水<b>${c.potList.reduce((s,k)=>s+(S.inv[k]||0),0)}</b></div><div>蒼蠅翅膀<b>免費</b></div>${needAmmo(wcls())?`<div>${needAmmo(wcls())==='bullet'?'子彈':'箭矢'}<b id="ammoN">${S.ammo.id&&ITEMS[S.ammo.id]&&S.ammo.n>0?ITEMS[S.ammo.id].n+' ':''}${fmt(S.ammo.n||0)}</b></div>`:''}</div>
+   <div class="buffbar">${(Object.keys(STN_).filter(hasS).map(k=>`<span class="chip bad">▼ ${STN_[k]}（剩 ${dur(S.sts[k]-S.clock)}）</span>`).join('')+[['exp2','經驗 +100%'],['exp','經驗 +50%'],['drop2','掉寶 ×4'],['drop','掉寶 ×2']].filter(([k])=>boostOn(k)).map(([k,n])=>`<span class="chip good">★ ${n}（剩 ${Math.ceil((S.boost[k]-S.clock)/60000)} 分）</span>`).join('')+buffs)||'<span class="note">目前沒有增益或異常狀態</span>'}</div>
    <div class="note" id="homLine" ${S.hom?'':'hidden'}></div>${grafNote()}
    ${notes.length?`<div class="note">${notes.join('　')}</div>`:''}`)+
   `<div style="height:10px"></div>`+box('觀戰畫面',`<label class="chk"><input type="checkbox" data-a2="arena" ${ROOT.ui.arena!==false?'checked':''}> 顯示即時戰鬥畫面</label>${ROOT.ui.arena!==false?`<div id="arenaSlot"></div><div class="note">畫面是用原創的簡易圖案把目前的掛機戰鬥畫出來（怪物照名稱畫成對應的動物或生物，腳下圓環顏色＝屬性，皇冠＝BOSS／MVP）。戰鬥結果跟文字紀錄完全一樣，關掉這個畫面也不影響掛機。</div>`:''}`)+
