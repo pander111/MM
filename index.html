@@ -2243,6 +2243,8 @@ function updQ(){const box=$('qRes');if(!box||tab!=='query')return;const tmp=docu
 
 const card=(title,body,open=true,cls='')=>`<details class="card ${cls}" ${open?'open':''}><summary>${title}</summary><div class="cb">${body}</div></details>`;
 const box=(title,body)=>`<section class="card"><h3>${title}</h3><div class="cb">${body}</div></section>`;
+/* 可以縮小的區塊（記住狀態） */
+const fbox=(id,title,body)=>{const f=!!((ROOT.ui.fold||{})[id]);return `<section class="card"><h3 style="display:flex;align-items:center;gap:8px"><span style="flex:1">${title}</span><button type="button" class="wbtn" data-a="fold" data-k="${id}" aria-label="${f?'展開':'縮小'}">${f?'□':'_'}</button></h3>${f?'':`<div class="cb">${body}</div>`}</section>`};
 function barHTML(id,col,label){return `<span>${label}</span><div class="bar"><i id="${id}f" style="background:${col}"></i><span id="${id}t"></span></div>`}
 
 function mOptHtml(){const q=(ui.mQ||'').trim().toLowerCase();const L=(NET.mOpts||[]).filter(([u,n])=>!q||n.toLowerCase().includes(q));
@@ -2250,7 +2252,8 @@ function mOptHtml(){const q=(ui.mQ||'').trim().toLowerCase();const L=(NET.mOpts|
 function craftFx(k){const it=ITEMS[k];if(!it)return'';try{if(it.t==='food')return `${it.fst.toUpperCase()} +${it.fv}（持續 ${Math.round(it.dur/60)} 分鐘，同種素質只取最高的一道）`;
   const t=String(itemInfo(k)||'').replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim();return t.length>90?t.slice(0,90)+'…':t}catch(e){return''}}
 function storFilter(){const q=(ui.storQ||'').trim().toLowerCase();panel.querySelectorAll('tr[data-sn]').forEach(tr=>{tr.hidden=!!q&&!tr.dataset.sn.toLowerCase().includes(q)})}
-function lockH(){const pn=panel;if(tab!=='main'){if(pn.style.minHeight)pn.style.minHeight='';return}const h=pn.scrollHeight;if(h>(ui.mainH||0))ui.mainH=h;pn.style.boxSizing='border-box';pn.style.minHeight=ui.mainH+'px'}
+function lockH(){const pn=panel;if(tab!=='main'){if(pn.style.minHeight)pn.style.minHeight='';return}
+  const sig=[ROOT.ui.arena!==false,partyOn()?P().members.length:0,JSON.stringify(ROOT.ui.fold||{}),ROOT.cur,!!S.hom].join('|');if(sig!==ui.mainSig){ui.mainSig=sig;ui.mainH=0;pn.style.minHeight=''}const h=pn.scrollHeight;if(h>(ui.mainH||0))ui.mainH=h;pn.style.boxSizing='border-box';pn.style.minHeight=ui.mainH+'px'}
 function renderTab(){EBV++;
   dirty=false;
   [...$('tabs').children].forEach(b=>b.classList.toggle('on',b.dataset.t===tab));
@@ -2285,7 +2288,7 @@ main(){const d=D(),c=C();const notes=[];
    <div class="note" id="homLine" ${S.hom?'':'hidden'}></div>${grafNote()}
    ${notes.length?`<div class="note">${notes.join('　')}</div>`:''}`)+
   `<div style="height:10px"></div>`+box('觀戰畫面',`<label class="chk"><input type="checkbox" data-a2="arena" ${ROOT.ui.arena!==false?'checked':''}> 顯示即時戰鬥畫面</label>${ROOT.ui.arena!==false?`<div id="arenaSlot"></div><div class="note">畫面是用原創的簡易圖案把目前的掛機戰鬥畫出來（怪物照名稱畫成對應的動物或生物，腳下圓環顏色＝屬性，皇冠＝BOSS／MVP）。戰鬥結果跟文字紀錄完全一樣，關掉這個畫面也不影響掛機。</div>`:''}`)+
-  (partyOn()?`<div style="height:10px"></div>`+box(`隊伍（${P().members.length} 人）`,`<div style="display:grid;gap:6px">${P().members.map(j=>{const o=ROOT.chars[j];return `<div style="display:grid;grid-template-columns:minmax(0,9em) 1fr 6.5em;gap:8px;align-items:center;height:22px"><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${j===P().members[0]?'★':''}${esc(o.name)} <small class="note">${jobName(o)} ${o.lv}</small></span><div class="bar"><i id="pb${j}f" style="background:var(--hp)"></i><span id="pb${j}t"></span></div><span class="note" id="ps${j}" style="text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:22px"></span></div>`}).join('')}</div>`):'')
+  (partyOn()?`<div style="height:10px"></div>`+fbox('party',`隊伍（${P().members.length} 人）`,`<div style="display:grid;gap:6px">${P().members.map(j=>{const o=ROOT.chars[j];return `<div style="display:grid;grid-template-columns:minmax(0,9em) 1fr 6.5em;gap:8px;align-items:center;height:22px"><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${j===P().members[0]?'★':''}${esc(o.name)} <small class="note">${jobName(o)} ${o.lv}</small></span><div class="bar"><i id="pb${j}f" style="background:var(--hp)"></i><span id="pb${j}t"></span></div><span class="note" id="ps${j}" style="text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:22px"></span></div>`}).join('')}</div>`):'')
 },
 char(){const d=D();const L=C().look;
   const petBox=()=>{const p=S.pet,c=C();let h='';
@@ -3079,6 +3082,7 @@ panel.addEventListener('click',e=>{
     if(a==='zdep'){const v=Math.min(amt,Math.floor(S.zeny));if(v<1){toast('身上的錢不夠');break}S.zeny-=v;ROOT.storZ=(ROOT.storZ||0)+v;log('sys',`存入倉庫 ${fmt(v)} Zeny。`)}
     else{const v=Math.min(amt,ROOT.storZ||0);if(v<1){toast('倉庫的錢不夠');break}ROOT.storZ-=v;S.zeny+=v;log('sys',`從倉庫取出 ${fmt(v)} Zeny。`)}ui.formClear=true}break;
   case'cfgsync':if(armed==='sync'+k){cfgSync(k,b)}else{armed='sync'+k;keepArm=true}break;
+  case'fold':ROOT.ui.fold=ROOT.ui.fold||{};ROOT.ui.fold[k]=!ROOT.ui.fold[k];ui.mainH=0;break;
   case'mcparty':{const src=JSON.parse(JSON.stringify(c.mc||{}));for(const j of P().members)if(j!==CUR)ROOT.chars[j].cfg.mc=JSON.parse(JSON.stringify(src));toast('已套用到全隊');log('sys','怪物控制已套用到全隊。')}break;
   case'pnew':ROOT.parties.push({name:'',members:[],expMode:'dmg'});ui.pv=ROOT.parties.length-1;break;
   case'pdisband':if(armed!=='pdisband'){armed='pdisband';keepArm=true;break}{const q=ROOT.parties[ui.pv];if(q){for(const j of q.members)if(j!==CUR)withChar(j,()=>{halt();mode='idle';target=null});ROOT.parties.splice(ui.pv,1);ui.pv=0;log('sys',`解散隊伍「${pnameOf(q)}」。`)}}break;
