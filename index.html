@@ -285,6 +285,9 @@ const eMul=(a,d)=>{const m=String(d||'無').match(/^(\D+)(\d)?$/)||[0,'無'];con
 
 /* 怪物與地圖（資料來源：rAthena 經典版怪物分布、數值與掉落表） */
 const MON={};for(const id in GD.mobs){const o=GD.mobs[id];MON[id]={...o,id:+id,boss:!!o.boss,mvp:!!o.mvp}}
+/* 卡片回收價：一般怪 50 萬、小王 150 萬、MVP 1000 萬（看掉這張卡的怪是哪一級，取最高） */
+{const CARDZ={n:500000,b:1500000,m:10000000};const tier={};for(const id in MON){const m=MON[id],t=m.mvp?'m':m.boss?'b':'n';for(const [k] of (m.drops||[]))if(String(k).startsWith('card_')&&(!tier[k]||CARDZ[t]>CARDZ[tier[k]]))tier[k]=t}
+ for(const k in BASE)if(BASE[k].t==='card')BASE[k].sell=CARDZ[tier[k]||'n']}
 const MAPS=GD.maps.map(m=>({r:m.r,n:m.n,c:m.c,mons:m.m.filter(([id])=>MON[id]).map(([id,c])=>({...MON[id],count:c}))}));
 const ALLMON=[];MAPS.forEach((m,i)=>m.mons.forEach(x=>{let a=ALLMON.find(y=>y.id===x.id);if(!a){a={...x,maps:[]};ALLMON.push(a)}a.maps.push(i)}));
 const POP=MAPS.map(m=>{let h=0;for(const ch of m.c)h=(h*31+ch.charCodeAt(0))%9973;const t=30+h%2400;return[t,Math.max(1,Math.round(t/(7+h%6)))]});
