@@ -345,6 +345,20 @@ function devoUI(){const L=SLC('CR_DEVOTION');if(!L||!partyOn()||!inParty(CUR))re
   const ms=P().members.filter(j=>j!==CUR&&ROOT.chars[j]),prot=ms.filter(j=>!any||pk[bKey(ROOT.chars[j].name)]===true).slice(0,L);const op=(ROOT.ui.fold||{}).devo;
   const sum=prot.length?prot.map(j=>esc(ROOT.chars[j].name)).join('、'):'沒有人';
   return `<div class="row" style="margin-top:4px"><b>犧牲 Lv ${L}</b><button type="button" class="sm" data-a="fold" data-k="devo">保護：${sum} ${op?'▴':'▾'}</button></div>`+(op?`<div class="row" style="padding-left:1em">${ms.map(j=>{const o=ROOT.chars[j];return `<label class="chk"><input type="checkbox" data-c="devoPick.${bKey(o.name)}" ${pk[bKey(o.name)]===true?'checked':''}> ${esc(o.name)}<span class="note">（${JOBS[o.job]?JOBS[o.job].n:o.job}）</span></label>`}).join('')}</div><div class="note" style="padding-left:1em">最多保護 ${L} 人（技能等級）。都不勾＝照隊伍順序保護前 ${L} 位；勾超過 ${L} 人時只保護名單前面的 ${L} 位。</div>`:'')}
+/* 暗之障壁：放在輔助技能，可勾選對象（含自己） */
+const swOn=o=>(o.sw||0)>0&&(o.swUntil||0)>o.clock;
+function swallStep(d){const c=C(),w=c.swall,L0=SLC('MG_SAFETYWALL');if(!w||!w.on||!L0||hasS('silence')||incap())return 0;
+  const id=[].concat(SKBY.MG_SAFETYWALL)[0],sk=SK[id],L=Math.max(1,Math.min(w.lv||L0,L0));if(S.sp<spc(sk,L)||skItemMiss(sk,L))return 0;
+  const melee=j=>{const r=rtOf(j),t=r.target;return r.mode==='fight'&&t&&!t.dead&&t.cur>0&&t.rng<=3&&(t.dist||0)<=t.rng+3};
+  const cand=[];if(w.self!==false&&melee(CUR)&&!swOn(S))cand.push(CUR);
+  if(partyOn()&&inParty(CUR))for(const j of P().members){if(j===CUR)continue;const o=ROOT.chars[j];if(!o||o.hp<=0||o.cfg.map!==c.map||!buffTo(w,o)||swOn(o))continue;if(melee(j))cand.push(j)}
+  if(!cand.length)return 0;const j=cand[0],o=ROOT.chars[j],ct=castT(sk,L,d);S.sp-=spc(sk,L);skItemUse(sk,L);o.sw=L+1;o.swUntil=o.clock+ct+5000*L;
+  log('skill',`${ct>0?'詠唱':'施放'} 暗之障壁 Lv ${L}${ct>0?`（${(ct/1000).toFixed(1)} 秒）`:''}${j===CUR?'':`，放在 ${o.name} 腳下`}，可擋 ${L+1} 次近身攻擊。`);return ct+600}
+function toUI(path,fk,b){const ms=P().members.filter(j=>j!==CUR&&ROOT.chars[j]),op=(ROOT.ui.fold||{})[fk];
+  const on=ms.filter(j=>buffTo(b,ROOT.chars[j])),sum=on.length===ms.length?'全部隊友':on.length?on.map(j=>esc(ROOT.chars[j].name)).join('、'):'不幫任何隊友';
+  return `<button type="button" class="sm" data-a="fold" data-k="${fk}">對象：${sum} ${op?'▴':'▾'}</button>`+(op?`<div class="row" style="flex-basis:100%;padding-left:1em">${ms.map(j=>{const o=ROOT.chars[j],key=bKey(o.name);return `<label class="chk"><input type="checkbox" data-c="${path}.only.${key}" ${buffTo(b,o)?'checked':''}> ${esc(o.name)}<span class="note">（${JOBS[o.job]?JOBS[o.job].n:o.job}）</span></label>`}).join('')}</div>`:'')}
+function swallUI(){const L=SLC('MG_SAFETYWALL');if(!L)return '';const w=C().swall||{},pty=partyOn()&&inParty(CUR);
+  return `<div class="row">${cC('swall.on','暗之障壁')}<label class="chk">Lv ${cN('swall.lv',50)}</label><label class="chk"><input type="checkbox" data-c="swall.self" ${w.self!==false?'checked':''}> 包含自己</label>${pty?toUI('swall','bto_swall',w):''}</div><div class="note">近戰怪正在打的人（自己或勾選的隊友）腳下沒有障壁時就放，擋 Lv+1 次近身物理攻擊、持續 Lv×5 秒；每次用 1 顆藍色魔力礦石。</div>`}
 function btoUI(k,b){const ms=P().members.filter(j=>j!==CUR&&ROOT.chars[j]),f=ROOT.ui.fold||{},op=f['bto_'+k];
   const on=ms.filter(j=>buffTo(b,ROOT.chars[j])),sum=on.length===ms.length?'全部隊友':on.length?on.map(j=>esc(ROOT.chars[j].name)).join('、'):'不幫任何隊友';
   return `<button type="button" class="sm" data-a="fold" data-k="bto_${k}">對象：${sum} ${op?'▴':'▾'}</button>`+(op?`<div class="row" style="flex-basis:100%;padding-left:1em">${ms.map(j=>{const o=ROOT.chars[j],key=bKey(o.name);return `<label class="chk"><input type="checkbox" data-c="buffs.${k}.only.${key}" ${buffTo(b,o)?'checked':''}> ${esc(o.name)}<span class="note">（${JOBS[o.job]?JOBS[o.job].n:o.job}）</span></label>`}).join('')}</div>`:'')}
@@ -828,7 +842,7 @@ function trapFire(t,trap,d){
 const TRAPF=['snare','skid','sleep','ftrap','shock'];
 const springOk=()=>SLC('HT_SPRINGTRAP')>0&&SLC('HT_FALCON')>0;
 function fieldWanted(s,t){const f=s.f,F=t.fld;
-  if(f==='sw')return t.rng<=3&&!(F.sw>0);
+  if(f==='sw')return t.rng<=3&&!swOn(S);
   if(f==='pn')return t.rng>=4&&!(F.pn>S.clock);
   if(f==='fog')return t.rng>=4&&!(F.fog>S.clock);
   if(!t.chase&&TRAPF.includes(f)&&springOk())return !F[f]&&!(t.tries['tr_'+f]>=2);
@@ -1241,7 +1255,7 @@ function step(){
 }
 /* 純輔助：不找怪，平常坐著回 SP，隊友要補血／輔助時才站起來 */
 function supStep(d,c){
-  const busy=()=>{sitting=false;return healMates(d)||maintainBuffs(d)||careRes(d)||supportMates(d)};
+  const busy=()=>{sitting=false;return healMates(d)||!!swallStep(d)||maintainBuffs(d)||careRes(d)||supportMates(d)};
   if(busy()){S.supSit=0;setState('輔助隊友');return schedule(step,1000)}
   sitting=true;if(!S.supSit){S.supSit=1;log('sys',S.sp<d.maxSp?'沒有需要幫忙的，坐下等 SP。':'待命中，坐著等隊友需要補血或輔助。')}
   setState(S.sp<d.maxSp||S.hp<d.maxHp?'坐下等 SP':'待命（坐著）');
@@ -1299,7 +1313,7 @@ function packAttack(d,t,el){if(!t.pack||!t.pack.length)return false;
   for(const o of t.pack){if(o.dead||o.cur<=0)continue;if(o.frozen>0){o.frozen=Math.max(0,o.frozen-el);continue}if(o.stop>0){o.stop=Math.max(0,o.stop-el);if(o.stop<=0)o.stopK=null;continue}
     o.monAcc+=el;while(o.monAcc>=o.aspd){o.monAcc-=o.aspd;if(kiteMiss(d,o))continue;
       const hitc=clamp(80+o.hit-d.flee,5,95);if(!incap()&&R()*100>=hitc)continue;if(!incap()&&R()*100<1+d.st.luk/10+(d.E.pd||0))continue;
-      if(o.rng<=3&&t.fld.sw>0){t.fld.sw--;continue}if(o.rng>=4&&t.fld.pn>S.clock)continue;
+      if(o.rng<=3&&swOn(S)){S.sw--;continue}if(o.rng>=4&&t.fld.pn>S.clock)continue;
       let dmg=Math.max(1,Math.round((o.atk*(.8+R()*.4)*(100-d.hard)/100-d.soft)*resMul(d,o)));
       if(S.kyrie&&S.kyrie.n>0&&buffOnC('PR_KYRIE')){const ab=Math.min(dmg,S.kyrie.hp);S.kyrie.hp-=ab;S.kyrie.n--;dmg-=ab;if(S.kyrie.n<=0||S.kyrie.hp<=0){S.kyrie=null;for(const id of SKBY.PR_KYRIE||[])delete S.buffs[id]}if(dmg<=0)continue}
       if(buffOnC('HP_ASSUMPTIO'))dmg=Math.max(1,Math.round(dmg/2));
@@ -1504,6 +1518,7 @@ function fight(d){
   if(!acted&&!inc&&healMates(d)){acted=true;el=1000}
   if(!acted&&maintainBuffs(d)){acted=true;el=1000}
   if(!acted&&careRes(d)){acted=true;el=800}
+  if(!acted){const w=swallStep(d);if(w){acted=true;el=w}}
   if(!acted&&supportMates(d)){acted=true;el=1000}
   if(!acted&&berserkPitch()){acted=true;el=1000}
   if(!acted&&t.hid>S.clock){const rv=revealHid(d,t);acted=true;el=rv===1?1000:800}
@@ -1544,7 +1559,7 @@ function fight(d){
       hitT(t,tot);log('skill',`詠唱 ${sk.n} Lv ${L}${ct>0?`（${(ct/1000).toFixed(1)} 秒）`:''}，對 ${t.n} 造成 ${tot} 點傷害。`);aoeSplash(d,t,sk,L,'magic',smul);el=ct+600;
       if(sk.freeze&&t.cur>0&&eleOf(t.ele)!=='不死'&&t.race!=='不死'&&!(t.boss||t.mvp)&&!(t.frozen>0)&&R()*100<freezeRate(sk.freeze(L),t)){t.frozen=sk.c==='MG_FROSTDIVER'?3000*L:sk.c==='WZ_FROSTNOVA'?1500*L:3000;stEle(t);log('skill',`${t.n} 被冰凍了！（${t.frozen/1000} 秒，變成水屬性）`)}}
     else if(sk.k==='field'){const ct=castT(sk,L,d),v=sk.val(L);
-      if(sk.f==='pn'||sk.f==='fog')t.fld[sk.f]=S.clock+ct+v;else t.fld[sk.f]=v;
+      if(sk.f==='pn'||sk.f==='fog')t.fld[sk.f]=S.clock+ct+v;else if(sk.f==='sw'){S.sw=v;S.swUntil=S.clock+ct+5000*L}else t.fld[sk.f]=v;
       log('skill',`${ct>0?'詠唱':'施放'} ${sk.n} Lv ${L}${ct>0?`（${(ct/1000).toFixed(1)} 秒）`:''}。`);el=ct+600;
       if(sk.f==='snare'&&t.chase&&t.rng<=3&&t.dist<=t.rng+.5){t.dist=Math.max(2,t.rng)+1.5;t.monAcc=0;log('skill',`往後退開，在 ${t.n} 腳前設下陷阱。`)}
       if(!t.chase&&TRAPF.includes(sk.f)&&springOk()&&t.fld[sk.f]){t.tries['tr_'+sk.f]=(t.tries['tr_'+sk.f]||0)+1;t.fld[sk.f]=0;log('skill',`爆破陷阱：獵鷹把陷阱丟到 ${t.n} 腳下引爆！`);trapFire(t,sk.f,d)}}
@@ -1635,7 +1650,7 @@ function fight(d){
   while(t.monAcc>=t.aspd){t.monAcc-=t.aspd;if(kiteMiss(d,t))continue;
     if(t.hid>S.clock)continue;
     if(t.hideR&&(t.hidN||0)<2&&t.cur<t.hp*.8&&!(t.boss||t.mvp)&&R()*10000<t.hideR/2){t.hidN=(t.hidN||0)+1;t.hid=S.clock+5000;t.hidLog=0;log('battle',`${t.n} 躲起來了！`);continue}
-    if(t.rng<=3&&t.fld.sw>0){t.fld.sw--;log('skill',`暗之障壁擋下了 ${t.n} 的攻擊（剩 ${t.fld.sw} 次）。`);continue}
+    if(t.rng<=3&&swOn(S)){S.sw--;log('skill',`暗之障壁擋下了 ${t.n} 的攻擊（剩 ${S.sw} 次）。`);continue}
     if(t.rng>=4&&t.fld.pn>S.clock){log('skill',`光之障壁擋下了 ${t.n} 的遠距離攻擊。`);continue}
     let ms=null;if(t.sk&&!t.deb.silence&&!buffOnC('BD_ROKISWEIL'))for(const [code,L,rate] of t.sk){if(MSK[code]&&R()*100<rate){ms=[code,L];break}}
     if(ms){if(monSkill(t,ms[0],ms[1],d))return die(t);if(t.cur<=0)return win(d);continue}
@@ -2819,7 +2834,7 @@ function autoView(){
   const monT=`<div class="tw"><table><thead><tr><th>怪物</th><th>Lv</th><th class="r">HP</th><th>屬性</th><th>種族</th><th>體型</th><th>行為</th><th class="r">數量</th></tr></thead><tbody>${map.mons.map(m=>`<tr><td>${m.n}</td><td>${m.lv}</td><td class="r">${fmt(m.hp)}</td><td>${m.ele}</td><td>${m.race}</td><td>${m.size}型</td><td class="${m.beh==='主動'?'bad':''}">${m.beh}</td><td class="r">${m.count}</td></tr>`).join('')}</tbody></table></div>`;
   // 技能
   const learned=Object.keys(SK).filter(k=>SL(k));
-  const atkSk=learned.filter(k=>['atk','magic','steal','asura','field','debuff','counter','random','stealz','tarot'].includes(SK[k].k));
+  const atkSk=learned.filter(k=>SK[k].f!=='sw'&&['atk','magic','steal','asura','field','debuff','counter','random','stealz','tarot'].includes(SK[k].k));
   const buffSk=learned.filter(k=>SK[k].k==='buff');
   const rules=c.atk.rules.map((r,i)=>`<div class="row" style="border-bottom:1px dotted var(--btn-edge);padding-bottom:6px"><b>${i+1}. ${SK[r.sk]?.n||r.sk}</b><span>Lv ${r.lv}</span><span>對 ${r.mon||'所有怪物'}</span><span>${r.once?'每隻一次':'持續施放'}</span>${r.spPct?`<span>SP ≥ ${r.spPct}%</span>`:''}${r.cond?`<span class="good">${RCN[r.cond]||r.cond}</span>`:''}<label class="chk">只打 ${cS(`atk.rules.${i}.ele`,RELE)}</label><label class="chk">怪物 ≥ ${cS(`atk.rules.${i}.minMob`,[[0,'不限'],[2,2],[3,3],[4,4],[5,5],[6,6],[8,8],[10,10],[12,12],[15,15]],true)} 隻才用</label>${SL(r.sk)?'':'<span class="bad">尚未學會</span>'}<span class="btns"><button type="button" class="sm" data-a="rmv" data-k="${i}" data-n="-1">▲</button><button type="button" class="sm" data-a="rmv" data-k="${i}" data-n="1">▼</button><button type="button" class="sm" data-a="rdel" data-k="${i}">✕</button></span></div>`).join('');
   const mons=[...new Set(MAPS.flatMap(m=>m.mons.map(x=>x.n)))];
@@ -2858,7 +2873,7 @@ function autoView(){
       <select id="rSk"><option value="">— 選擇攻擊技能 —</option>${atkSk.map(k=>`<option value="${k}">${SK[k].n}（Lv ${SL(k)}）</option>`).join('')}</select>
       <label class="chk">施放 Lv <input type="number" id="rLv" value="10" style="width:52px"></label><select id="rOnce"><option value="0">持續施放</option><option value="1">每隻一次</option></select><label class="chk">SP ≥ <input type="number" id="rSp" value="0" style="width:52px">%</label><select id="rCond">${RCOND.map(([v,n])=>`<option value="${v}">${n}</option>`).join('')}</select><button type="button" class="sm pri" data-a="radd">＋ 新增規則</button><span class="note">選好技能後要按「新增規則」才會存進上面的清單。</span></div><div class="note">連招：用「條件」讓技能接著放，例如巫師：①雷鳴術「怪物冰凍中才放」②冰凍術「怪物沒冰凍才放」——沒凍住就一直放冰凍術，凍住後接雷鳴術（冰凍的怪會變水屬性，風屬性魔法 1.75 倍，也不會走過來打斷你）。</div>`:'<div class="note">還沒有學會攻擊技能。</div>'}
     <div class="note">依順序選第一條符合的設定；專用規則放前面，通用規則放最後。</div>
-    <b>輔助技能（自動維持）</b>${buffs||'<div class="note">還沒有學會輔助技能。</div>'}
+    <b>輔助技能（自動維持）</b>${buffs||(SLC('MG_SAFETYWALL')?'':'<div class="note">還沒有學會輔助技能。</div>')}${swallUI()}
     <b>回復技能</b>${SL('heal')?`<div class="row">${cC('healSk.on','治癒術')}<label class="chk">HP 低於 ${cN('healSk.pct',56)}% 時施放</label></div>`:'<div class="note">沒有已學會的回復技能。</div>'}
     <div class="note">判斷順序：逃生 → 藥水 → 回復技能 → 輔助 → 攻擊技能（依清單順序）→ 普通攻擊。</div>`)+
   card('藥水與補給',syncBtn('藥水與補給')+`<div class="row">${cC('hpPot.on','HP 低於')} ${cN('hpPot.pct',56)}% 喝 HP 回復道具</div><div class="row">${cC('spPot.on','SP 低於')} ${cN('spPot.pct',56)}% 喝 SP 回復道具</div>
@@ -3338,7 +3353,7 @@ function arField(g,t,me,mo,now){const F=t.fld||{};if(!mo)return;const dx=mo.x-me
     g.globalAlpha=.5+.5*Math.sin(now/200);g.fillStyle='#fff';g.fillRect(tx-1,ty-2,2,2);g.globalAlpha=1}
   if(F.fw>0){for(let i=-2;i<=2;i++){const fx=tx-uy*i*7,fy=ty+ux*i*7,h=10+Math.sin(now/90+i*1.7)*4;const gr=g.createLinearGradient(fx,fy,fx,fy-h);gr.addColorStop(0,'rgba(255,120,30,.9)');gr.addColorStop(1,'rgba(255,230,90,0)');g.fillStyle=gr;g.beginPath();g.moveTo(fx-4,fy);g.quadraticCurveTo(fx,fy-h*1.4,fx+4,fy);g.fill()}}
   if(F.iw>0){for(let i=-2;i<=2;i++){const fx=tx-uy*i*6,fy=ty+ux*i*6;g.fillStyle='rgba(170,220,255,.75)';g.beginPath();g.moveTo(fx-3,fy);g.lineTo(fx,fy-14-(i&1)*3);g.lineTo(fx+3,fy);g.fill()}}
-  if(F.sw>0){g.fillStyle='rgba(255,150,200,.18)';g.strokeStyle='rgba(255,170,220,.7)';g.lineWidth=1;g.fillRect(me.x-11,me.y-46,22,48);g.strokeRect(me.x-11,me.y-46,22,48)}
+  if(swOn(S)){g.fillStyle='rgba(255,150,200,.18)';g.strokeStyle='rgba(255,170,220,.7)';g.lineWidth=1;g.fillRect(me.x-11,me.y-46,22,48);g.strokeRect(me.x-11,me.y-46,22,48)}
   if(F.pn>S.clock){g.fillStyle='rgba(140,200,255,.15)';g.strokeStyle='rgba(160,210,255,.7)';g.beginPath();g.arc(me.x,me.y-6,22,Math.PI,0);g.fill();g.stroke()}
   if(F.qm){g.fillStyle='rgba(90,70,40,.5)';g.beginPath();g.ellipse(mo.x,mo.y+2,18,6,0,0,7);g.fill()}
   if(F.sb){for(let i=0;i<8;i++){const a=i/8*Math.PI*2+now/500;g.fillStyle='rgba(255,150,50,.8)';g.beginPath();g.arc(me.x+Math.cos(a)*16,me.y+Math.sin(a)*6,2.5,0,7);g.fill()}}}
