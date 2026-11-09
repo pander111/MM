@@ -1074,21 +1074,24 @@ const ih=k=>{const it=ITEMS[k];const d=String(k).includes('|')||it.t==='box'||it
 const sellQty=k=>{const h=ih(k);if(h.act!=='sell'||!(S.inv[k]>0))return 0;const r=C().restock[k];return Math.max(0,S.inv[k]-Math.max(h.keep,r&&r.on?r.to:0))};
 
 /* ================= 戰鬥訊息與聊天 ================= */
-const CATS=[['all','全部'],['battle','戰鬥'],['skill','技能'],['exp','經驗值'],['drop','掉寶'],['sys','系統'],['warn','警告']];
+const CATS=[['all','全部'],['battle','戰鬥'],['skill','技能'],['pskill','隊友技能'],['exp','經驗值'],['drop','掉寶'],['sys','系統'],['warn','警告']];
+/* 「隊友技能」分頁：同隊其他角色放的技能，前面標名字；不算在「全部」裡 */
+const mateCh=ch=>ch&&ch!==ROOT.chars[ROOT.cur]&&partyOn()&&P().members.some(j=>ROOT.chars[j]===ch)&&inParty(ROOT.cur);
 const CLS={exp:'c-exp',drop:'c-drop',skill:'c-skill',sys:'c-sys',warn:'c-warn',lvl:'c-lvl'};
 ROOT.ui.incl=ROOT.ui.incl||{battle:true,skill:true,exp:true,drop:true,sys:true,warn:true};
 let logFilter='all',maxLines=300;const logBuf=[];const logEl=$('log');
 const catOf=c=>c==='lvl'?'exp':c;
-const shows=c=>logFilter==='all'?ROOT.ui.incl[catOf(c)]!==false:logFilter===catOf(c);
-function line(e){const d=document.createElement('div');d.innerHTML=`<span class="ts">[${e.t}]</span> <span class="${CLS[e.c]||''}">${e.h}</span>`;return d}
-function log(c,h){if(FF){if(c==='lvl'&&FF.hl.length<40)FF.hl.push(`${partyOn()&&inParty(CUR)?`[${S.name}] `:''}${h.replace(/<[^>]+>/g,'')}`);return}const e={t:now(),c,h,ch:S};logBuf.push(e);if(AR.on)try{arenaEv(c,h)}catch(x){}if(logBuf.length>3000)logBuf.shift();if(S!==ROOT.chars[ROOT.cur]||!shows(c))return;
+const shows=c=>logFilter==='pskill'?false:logFilter==='all'?ROOT.ui.incl[catOf(c)]!==false:logFilter===catOf(c);
+const showE=e=>logFilter==='pskill'?(catOf(e.c)==='skill'&&mateCh(e.ch)):((!e.ch||e.ch===ROOT.chars[ROOT.cur])&&shows(e.c));
+function line(e){const d=document.createElement('div');const who=logFilter==='pskill'&&e.ch?`<span class="who">[${esc(e.ch.name)}]</span> `:'';d.innerHTML=`<span class="ts">[${e.t}]</span> ${who}<span class="${CLS[e.c]||''}">${e.h}</span>`;return d}
+function log(c,h){if(FF){if(c==='lvl'&&FF.hl.length<40)FF.hl.push(`${partyOn()&&inParty(CUR)?`[${S.name}] `:''}${h.replace(/<[^>]+>/g,'')}`);return}const e={t:now(),c,h,ch:S};logBuf.push(e);if(AR.on)try{arenaEv(c,h)}catch(x){}if(logBuf.length>3000)logBuf.shift();if(!showE(e))return;
   const atBot=logEl.scrollHeight-logEl.scrollTop-logEl.clientHeight<40;
   logEl.appendChild(line(e));while(logEl.children.length>maxLines){const f=logEl.firstChild;const h=f.offsetHeight;f.remove();if(!atBot)logEl.scrollTop=Math.max(0,logEl.scrollTop-h)}
   if($('autoScroll').checked&&atBot)logEl.scrollTop=logEl.scrollHeight}
-function redrawLog(){logEl.innerHTML='';logBuf.filter(e=>(!e.ch||e.ch===ROOT.chars[ROOT.cur])&&shows(e.c)).slice(-maxLines).forEach(e=>logEl.appendChild(line(e)));logEl.scrollTop=logEl.scrollHeight}
+function redrawLog(){logEl.innerHTML='';logBuf.filter(showE).slice(-maxLines).forEach(e=>logEl.appendChild(line(e)));logEl.scrollTop=logEl.scrollHeight}
 $('logTabs').innerHTML=CATS.map(([k,n])=>`<button type="button" class="sm ${k==='all'?'on':''}" data-f="${k}">${n}</button>`).join('');
 $('logTabs').onclick=e=>{const b=e.target.closest('button');if(!b)return;logFilter=b.dataset.f;[...$('logTabs').children].forEach(x=>x.classList.toggle('on',x===b));redrawLog()};
-$('incl').innerHTML='全部包含：'+CATS.slice(1).map(([k,n])=>`<label class="chk"><input type="checkbox" data-inc="${k}" ${ROOT.ui.incl[k]!==false?'checked':''}> ${n}</label>`).join('');
+$('incl').innerHTML='全部包含：'+CATS.slice(1).filter(([k])=>k!=='pskill').map(([k,n])=>`<label class="chk"><input type="checkbox" data-inc="${k}" ${ROOT.ui.incl[k]!==false?'checked':''}> ${n}</label>`).join('');
 $('incl').onchange=e=>{const k=e.target.dataset.inc;if(!k)return;ROOT.ui.incl[k]=e.target.checked;save();redrawLog()};
 $('clearBtn').onclick=()=>{const me=ROOT.chars[ROOT.cur];for(let i=logBuf.length-1;i>=0;i--)if(!logBuf[i].ch||logBuf[i].ch===me)logBuf.splice(i,1);logEl.innerHTML=''};
 $('fontSel').onchange=e=>{logEl.style.fontSize=e.target.value;$('chat').style.fontSize=e.target.value};
