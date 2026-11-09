@@ -322,6 +322,12 @@ const JOBS={
  gunslinger:{n:'槍手',tier:1,max:70,ext:1,hpK:.8,spK:2.5,aspd:152,wt:2600,w:['gun'],bonus:{dex:10,agi:6,luk:5,str:2,int:2},next:[],col:'#7a5a3a'}
 };
 const PARENT={};Object.entries(JOBS).forEach(([k,j])=>j.next.forEach(n=>PARENT[n]=k));
+/* 輔助技能對象：每個隊友可勾選，預設全部 */
+const bKey=n=>String(n).replace(/\./g,'_');
+const buffTo=(b,o)=>(b.only||{})[bKey(o.name)]!==false;
+function btoUI(k,b){const ms=P().members.filter(j=>j!==CUR&&ROOT.chars[j]),f=ROOT.ui.fold||{},op=f['bto_'+k];
+  const on=ms.filter(j=>buffTo(b,ROOT.chars[j])),sum=on.length===ms.length?'全部隊友':on.length?on.map(j=>esc(ROOT.chars[j].name)).join('、'):'不幫任何隊友';
+  return `<button type="button" class="sm" data-a="fold" data-k="bto_${k}">對象：${sum} ${op?'▴':'▾'}</button>`+(op?`<div class="row" style="flex-basis:100%;padding-left:1em">${ms.map(j=>{const o=ROOT.chars[j],key=bKey(o.name);return `<label class="chk"><input type="checkbox" data-c="buffs.${k}.only.${key}" ${buffTo(b,o)?'checked':''}> ${esc(o.name)}<span class="note">（${JOBS[o.job]?JOBS[o.job].n:o.job}）</span></label>`}).join('')}</div>`:'')}
 const TNAME={knight:'騎士領主',priest:'神官',wizard:'超魔導士',smith:'神工匠',hunter:'神射手',assassin:'十字刺客',crusader:'聖殿十字軍',monk:'武術宗師',sage:'智者',rogue:'神行太保',alchemist:'創造者',bard:'搞笑藝人',dancer:'冷豔舞姬'};
 for(const k in TNAME)JOBS['t_'+k]=Object.assign({},JOBS[k],{n:TNAME[k],tier:3,max:70,next:[]});
 const TEXP={"tbase":[10,18,28,40,85,123,168,220,278,400,481,613,731,875,1038,1213,1400,1575,1775,2268,2604,2786,3136,3506,4130,4796,5508,6264,9645,12392,14220,16159,18209,21649,24451,27401,30499,33748,47342,58160,64711,71573,78749,90144,99312,108870,118816,129154,174196,213220,238080,264150,291427,329640,363155,398116,434526,472381,610848,731828,806448,884232,965180,1073896,1170382,1270556,1374422,1481976,1850800,3389616,3666333,3953534,4251217,4559382,5129260,5488173,5859059,6241919,7374168,9570662,10458427,11380262,12336168,13326144,14994907,16130400,17304206,18516326,19766760,29216160,34949880,40930560,55017900,71510400,106974000,146061000,174405000,343210000,99999999],"hnovice":[11,20,31,44,100,166,226,295,374,999999999],"hfirst":[60,86,116,152,232,360,440,544,672,1040,1208,1398,1604,1896,2250,3336,3874,4452,6080,7976,11128,12544,14042,18228,28683,38225,42228,46425,58073,70898,91195,99290,107720,131043,156238,195400,210438,226010,269028,314788,384853,479453,510878,620880,715530,965928,1024488,1205230,1273990,999999999],"trans":[288,368,568,696,1206,1774,2192,3196,5080,7352,8580,9892,13358,18984,31925,35860,40013,51605,68585,87770,96443,105515,131770,167428,206720,223860,241673,294553,362303,479053,513362,548856,656197,787507,927154,985696,1046034,1231134,1449220,1678177,1773024,2182221,2534978,3043585,3782865,4461912,4672971,5971896,6250158,6875174,7562691,8318960,9150856,10065942,11877812,14015818,16538665,19515624,23028437,28094693,34275525,41816141,51015692,62239144,79666104,101972614,130524946,167071930,213852071,999999999]};
@@ -892,8 +898,8 @@ function normalize(c){if(!c.mapv){if(c.cfg&&MAPMIG[c.cfg.map]>=0)c.cfg.map=MAPMI
     if(c.ammo&&c.ammo.id)c.ammo.id=migKey(c.ammo.id);c.vend={on:false,list:{}}}
   if(c.cfg.rest.spOn==null){c.cfg.rest.spOn=c.cfg.rest.sp>0;if(!c.cfg.rest.sp){c.cfg.rest.sp=20;c.cfg.rest.spTo=80}}c.cfg.bpot=c.cfg.bpot||{};c.cfg.cure=c.cfg.cure||{green:{on:true},i511:{on:true},i525:{on:true},i523:{on:true}};
   c.eq=Object.assign({weapon:null,shield:null,armor:null,head:null,garment:null,shoes:null,acc1:null,acc2:null},c.eq);for(const k in c.eq)if(c.eq[k]&&!ITEMS[c.eq[k]])c.eq[k]=null;
-  for(const k of ['yellow_herb','honey','white_herb','royal'])if(!c.cfg.potList.includes(k))c.cfg.potList.push(k);
-  if(!c.cfg.spList.includes('blue_herb'))c.cfg.spList.splice(1,0,'blue_herb');
+  if(!c.cfg.potMig){c.cfg.potMig=1;for(const k of ['yellow_herb','honey','white_herb','royal'])if(!c.cfg.potList.includes(k))c.cfg.potList.push(k);
+  if(!c.cfg.spList.includes('blue_herb'))c.cfg.spList.splice(1,0,'blue_herb')}
   if(c.cfg.map>=MAPS.length||c.cfg.map<0)c.cfg.map=mapIdx('prt_fild08');
   c.cfg.cureSk=c.cfg.cureSk||{};for(const k in CURE_DEF)c.cfg.cureSk[k]=Object.assign({},CURE_DEF[k],c.cfg.cureSk[k]||{});
   delete c.cfg.restock.wing;delete c.cfg.restock.bwing;for(const k in c.cfg.restock){const r=c.cfg.restock[k];if(BASE[k]&&BASE[k].t==='bpot'&&r.min===10&&r.to===50){r.min=2;r.to=5}}
@@ -1315,7 +1321,7 @@ function careRes(d){
 function maintainBuffs(d){
   const c=C();if(hasS('silence')||incap())return false;
   for(const id in c.buffs){const b=c.buffs[id];if(!b.on||!SL(id))continue;const sk=SK[id],lv=Math.min(b.lv||SL(id),SL(id));
-    if(!needOk(sk))continue;
+    if(!needOk(sk)||sk.c==='PR_SUFFRAGIUM')continue;
     const left=S.buffs[id]?S.buffs[id].until-S.clock:0;
     if(left>(b.early||0)*1000)continue;
     const cost=spc(sk,lv);if(S.sp<cost||S.sp<d.maxSp*(b.spMin||0)/100)continue;
@@ -1485,7 +1491,7 @@ function fight(d){
   let rangeWant=0;
   if(!acted&&!sil&&!t.plant){for(const r of c.atk.rules){
     const sk=SK[r.sk],L=Math.min(r.lv||1,SL(r.sk));if(!sk||!L)continue;
-    if(r.mon&&r.mon!==t.n)continue; if(r.once&&t.used[r.sk])continue; if(r.cond&&!condOk(r.cond,t))continue;
+    if(r.mon&&r.mon!==t.n)continue; if(r.once&&t.used[r.sk])continue; if(r.minMob>1&&pileOf(t).length<r.minMob)continue; if(r.cond&&!condOk(r.cond,t))continue;
     if(!needOk(sk))continue;
     if(sk.vs&&!sk.vs(t))continue;
     if((t.dist||0)>skRange(sk,L)+.01){if(S.sp>=spc(sk,L)&&!(sk.k==='field'&&!fieldWanted(sk,t)))rangeWant=Math.max(rangeWant,skRange(sk,L));continue}
@@ -1668,7 +1674,7 @@ function supNeed(d){const c=C();if(!c.partySupport||!partyOn()||!inParty(CUR))re
   const mates=P().members.filter(j=>j!==CUR&&ROOT.chars[j]&&ROOT.chars[j].hp>0&&ROOT.chars[j].cfg.map===c.map);
   for(const id of Object.keys(c.buffs)){const b=c.buffs[id],sk=SK[id];if(!b||!b.on||!sk||!(sk.sup||sk.pw)||b.party===false||!SL(id)||!needOk(sk))continue;
     const lv=Math.min(b.lv||SL(id),SL(id)),cost=spc(sk,lv);if(cost>d.maxSp||S.sp>=cost)continue;
-    const lack=(sk.sup?[...mates,CUR]:[CUR]).some(j=>{const o=ROOT.chars[j],cb=o.buffs[id];return !(cb&&cb.until-o.clock>(b.early||0)*1000)});
+    const lack=(sk.sup?(sk.c==='PR_SUFFRAGIUM'?mates:[...mates,CUR]):[CUR]).some(j=>{const o=ROOT.chars[j],cb=o.buffs[id];if(j!==CUR&&!buffTo(b,o))return false;return !(cb&&cb.until-o.clock>(b.early||0)*1000)});
     if(lack)need=Math.max(need,cost)}
   return need}
 function healMates(d){const c=C();if(!c.healSk.on||!c.partySupport||!partyOn()||!inParty(CUR)||!SL('heal')||hasS('silence')||incap())return false;
@@ -1697,7 +1703,7 @@ function supportMates(d){
       if(o.hp<mx*c.healSk.pct/100){S.sp-=cost;const v=Math.floor((S.lv+d.st.int)/8)*(4+8*L);o.hp=Math.min(mx,o.hp+v);log('skill',`對 ${o.name} 施放 治癒術，恢復 ${v} HP。`);return true}}}
   for(const id of Object.keys(c.buffs)){const b=c.buffs[id];if(!b||!b.on||!SK[id]||!SK[id].sup||b.party===false||!SL(id)||!needOk(SK[id]))continue;
     const sk=SK[id],lv=Math.min(b.lv||SL(id),SL(id)),cost=spc(sk,lv);if(S.sp<cost||S.sp<d.maxSp*(b.spMin||0)/100)continue;
-    for(const j of mates){const o=ROOT.chars[j],cb=o.buffs[id];if(cb&&cb.until-o.clock>(b.early||0)*1000)continue;
+    for(const j of mates){const o=ROOT.chars[j],cb=o.buffs[id];if(!buffTo(b,o))continue;if(cb&&cb.until-o.clock>(b.early||0)*1000)continue;
       {const mi=skItemMiss(sk,lv);if(mi){skItemWarn(sk,mi[0]);break}}skItemUse(sk,lv);
       S.sp-=cost;o.buffs[id]={lv,until:o.clock+sk.dur(lv)*1000,by:CUR};if(sk.onCast)withChar(j,()=>sk.onCast(lv,D()));log('skill',`對 ${o.name} 施放 ${sk.n} Lv ${lv}。`);return true}}
   return false}
@@ -2788,9 +2794,9 @@ function autoView(){
   const learned=Object.keys(SK).filter(k=>SL(k));
   const atkSk=learned.filter(k=>['atk','magic','steal','asura','field','debuff','counter','random','stealz','tarot'].includes(SK[k].k));
   const buffSk=learned.filter(k=>SK[k].k==='buff');
-  const rules=c.atk.rules.map((r,i)=>`<div class="row" style="border-bottom:1px dotted var(--btn-edge);padding-bottom:6px"><b>${i+1}. ${SK[r.sk]?.n||r.sk}</b><span>Lv ${r.lv}</span><span>對 ${r.mon||'所有怪物'}</span><span>${r.once?'每隻一次':'持續施放'}</span>${r.spPct?`<span>SP ≥ ${r.spPct}%</span>`:''}${r.cond?`<span class="good">${RCN[r.cond]||r.cond}</span>`:''}${SL(r.sk)?'':'<span class="bad">尚未學會</span>'}<span class="btns"><button type="button" class="sm" data-a="rmv" data-k="${i}" data-n="-1">▲</button><button type="button" class="sm" data-a="rmv" data-k="${i}" data-n="1">▼</button><button type="button" class="sm" data-a="rdel" data-k="${i}">✕</button></span></div>`).join('');
+  const rules=c.atk.rules.map((r,i)=>`<div class="row" style="border-bottom:1px dotted var(--btn-edge);padding-bottom:6px"><b>${i+1}. ${SK[r.sk]?.n||r.sk}</b><span>Lv ${r.lv}</span><span>對 ${r.mon||'所有怪物'}</span><span>${r.once?'每隻一次':'持續施放'}</span>${r.spPct?`<span>SP ≥ ${r.spPct}%</span>`:''}${r.cond?`<span class="good">${RCN[r.cond]||r.cond}</span>`:''}<label class="chk">怪物 ≥ ${cS(`atk.rules.${i}.minMob`,[[0,'不限'],[2,2],[3,3],[4,4],[5,5],[6,6],[8,8],[10,10],[12,12],[15,15]],true)} 隻才用</label>${SL(r.sk)?'':'<span class="bad">尚未學會</span>'}<span class="btns"><button type="button" class="sm" data-a="rmv" data-k="${i}" data-n="-1">▲</button><button type="button" class="sm" data-a="rmv" data-k="${i}" data-n="1">▼</button><button type="button" class="sm" data-a="rdel" data-k="${i}">✕</button></span></div>`).join('');
   const mons=[...new Set(MAPS.flatMap(m=>m.mons.map(x=>x.n)))];
-  const buffs=buffSk.map(k=>{const b=c.buffs[k]||(c.buffs[k]={on:false,lv:SL(k),early:0,spMin:0});if((SK[k].sup||SK[k].pw)&&b.party===undefined)b.party=true;return `<div class="row">${cC(`buffs.${k}.on`,SK[k].n)}${SK[k].sup?cC(`buffs.${k}.party`,'也幫隊友放'):SK[k].pw?cC(`buffs.${k}.party`,'全隊一起（官方效果）'):''}<label class="chk">Lv ${cN(`buffs.${k}.lv`,50)}</label><label class="chk">提前 ${cN(`buffs.${k}.early`,50)} 秒補放</label><label class="chk">SP ≥ ${cN(`buffs.${k}.spMin`,50)}%</label></div>`}).join('');
+  const buffs=buffSk.map(k=>{const b=c.buffs[k]||(c.buffs[k]={on:false,lv:SL(k),early:0,spMin:0});if((SK[k].sup||SK[k].pw)&&b.party===undefined)b.party=true;return `<div class="row">${cC(`buffs.${k}.on`,SK[k].n)}${SK[k].sup?cC(`buffs.${k}.party`,'也幫隊友放')+(partyOn()&&inParty(CUR)?btoUI(k,b):''):SK[k].pw?cC(`buffs.${k}.party`,'全隊一起（官方效果）'):''}<label class="chk">Lv ${cN(`buffs.${k}.lv`,50)}</label><label class="chk">提前 ${cN(`buffs.${k}.early`,50)} 秒補放</label><label class="chk">SP ≥ ${cN(`buffs.${k}.spMin`,50)}%</label></div>`}).join('');
   // 藥水
   const canRs=k=>SHOP.tool.includes(k);
   const rsCtl=k=>{const r=c.restock[k];return canRs(k)?`<label class="chk"><input type="checkbox" data-a2="rs" data-k="${k}" ${r&&r.on?'checked':''}> 回城補</label>${r&&r.on?`<label class="chk">少於 ${cN(`restock.${k}.min`,56)} 個就買到 ${cN(`restock.${k}.to`,56)} 個</label>`:''}`:'<span class="note">（商店不賣）</span>'};
