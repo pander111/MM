@@ -1209,7 +1209,9 @@ function supStep(d,c){
   sitting=true;if(!S.supSit){S.supSit=1;log('sys',S.sp<d.maxSp?'沒有需要幫忙的，坐下等 SP。':'待命中，坐著等隊友需要補血或輔助。')}
   setState(S.sp<d.maxSp||S.hp<d.maxHp?'坐下等 SP':'待命（坐著）');
   const ag=MAPS[c.map].mons.filter(m=>m.beh==='主動'&&!m.mvp);
-  if(ag.length&&R()<.03&&!SLC('RG_GANGSTER')){const m=pick(ag);sitting=false;S.supSit=0;log('warn',`${m.n} Lv.${m.lv} 衝過來打擾，先應戰（隊友會來協助）。`);return engage(m,true)}
+  if(ag.length&&R()<.03&&!SLC('RG_GANGSTER')){const m=pick(ag);sitting=false;S.supSit=0;const act=c.mc[m.n]||'normal';
+    if(act==='flee'||(c.esc.dangerLv>0&&m.lv>=S.lv+c.esc.dangerLv&&c.esc.dangerAct!=='none')){log('warn',`${m.n} Lv.${m.lv} 衝過來了，照設定逃走保護自己（還在同一張地圖，隊友那邊需要時會繼續幫忙）。`);return escape(act==='flee'?(c.esc.dangerAct==='none'?'fly':c.esc.dangerAct):c.esc.dangerAct)}
+    log('warn',`${m.n} Lv.${m.lv} 衝過來打擾，先應戰（隊友會來協助）。`);return engage(m,true)}
   return schedule(step,1000)}
 function weighted(list){let t=list.reduce((s,m)=>s+m.count,0),r=R()*t;for(const m of list){r-=m.count;if(r<=0)return m}return list[0]}
 const MHIDE={"1056": 500, "1086": 1000, "1119": 2000, "1120": 2000, "1127": 2000, "1145": 2000, "1159": 2000, "1165": 2000, "1179": 2000, "1207": 2000, "1256": 2000, "1380": 2000, "1386": 2000, "1387": 2000, "1389": 2000, "1401": 500, "1614": 500, "1615": 500, "1628": 2000, "1630": 2000, "1635": 2000, "1641": 2000, "1706": 500, "1711": 500, "1752": 2000, "1761": 2000};
@@ -2752,7 +2754,7 @@ function autoView(){
     <div class="note">坐下時 HP、SP 的自然回復速度變成 2 倍（RO 原版規則；學了 HP／SP 回復力增加會再更快）。兩個條件可以分開開關，只在沒有交戰時坐下；地圖上有主動怪時可能被打斷而起身應戰。負重 50% 以上不會自然回復，所以不會坐下。</div>`)+
   card('解除異常狀態（技能）',(()=>{const ls=CURE_SK.filter(([id])=>SL(id));if(!ls.length)return '<div class="note">還沒有學會解除異常的技能（服事的治療術、祭司的狀態恢復、盜賊的解毒；天使之賜福可以解詛咒、石化）。</div>';
     return ls.map(([id,cs])=>`<div class="row" style="border-bottom:1px dotted var(--btn-edge);padding-bottom:6px"><b style="min-width:6em">${SK[id].n}</b><span class="note">解除 ${cs.map(k=>STN_[k]||k).join('、')}・SP ${spc(SK[id],1)}</span>${cC(`cureSk.${id}.self`,'自己用')}${cC(`cureSk.${id}.party`,'幫隊友解')}</div>`).join('')+'<div class="note">勾選後掛機時自動施放：自己中了就幫自己解；組隊時（「組隊行為」要開「對隊友施放輔助」）同地圖的隊友中了也會幫忙解。也可以在「藥水與補給」設定用道具自己解。</div>'})())+
-  card('組隊行為',`${cC('assist','協助隊友打怪（一般小怪也幫）')}${cC('assistMvp','協助隊友打 MVP／BOSS（隊友先開打才加入）')}${cC('partySupport','對隊友施放輔助 / 回復技能')}${cC('supRest','隊友缺輔助技能、自己 SP 不夠時，先坐下回 SP 再幫忙上')}${cC('supOnly','<b>純輔助模式</b>：不自己找怪，平常坐下回 SP；隊友需要補血、放輔助時才起身，放完再坐下')}<div class="note">「協助打 MVP／BOSS」跟「協助打怪」分開：只勾前者時，平常各打各的小怪，隊友一打 MVP／BOSS 就會過去圍攻；自己碰到 MVP 仍照「看到就逃／危險怪」設定逃走。關閉協助仍會自己尋怪；關閉隊友輔助只照顧自己。純輔助模式要在隊伍裡、而且同地圖有隊友才會生效（不會因為看到怪就瞬移跑掉；主動怪衝過來會先應戰，隊友會來幫忙）。補血門檻沿用「掛機技能 → 回復技能」，輔助沿用勾選的輔助技能。</div>`)+
+  card('組隊行為',`${cC('assist','協助隊友打怪（一般小怪也幫）')}${cC('assistMvp','協助隊友打 MVP／BOSS（隊友先開打才加入）')}${cC('partySupport','對隊友施放輔助 / 回復技能')}${cC('supRest','隊友缺輔助技能、自己 SP 不夠時，先坐下回 SP 再幫忙上')}${cC('supOnly','<b>純輔助模式</b>：不自己找怪，平常坐下回 SP；隊友需要補血、放輔助時才起身，放完再坐下')}<div class="note">「協助打 MVP／BOSS」跟「協助打怪」分開：只勾前者時，平常各打各的小怪，隊友一打 MVP／BOSS 就會過去圍攻；自己碰到 MVP 仍照「看到就逃／危險怪」設定逃走。關閉協助仍會自己尋怪；關閉隊友輔助只照顧自己。純輔助模式要在隊伍裡、而且同地圖有隊友才會生效：平常不找怪就不會「看到」怪而瞬移；主動怪衝過來時，有設「看到就逃」或達到危險等級就照設定逃走保護自己（還在同地圖、繼續輔助），沒設的話就先應戰，隊友會來幫忙。補血門檻沿用「掛機技能 → 回復技能」，輔助沿用勾選的輔助技能。</div>`)+
   card('撿取與負重',`${cC('loot.on','自動撿取掉落物（個別道具在「回城處理」設定撿不撿）')}${cC('stop90','負重達 90% 時停止掛機')}`)+
   card('逃生（瞬移與回城）',`<div class="row">交戰中 HP 低於 ${cN('esc.hp',56)}% ${cS('esc.hpAct',escOpts)}</div>
     <div class="row">偵測到危險怪（主動且比我高 ${cN('esc.dangerLv',50)} 級以上，0 = 不判斷）${cS('esc.dangerAct',escOpts)}</div>
