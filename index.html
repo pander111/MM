@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#79a75a"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="小黑窗"><meta name="apple-mobile-web-app-status-bar-style" content="default"><style>body{margin:0}</style><script>window.RO_GH=1;window.RO_BUILD="20261110212540";if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))</script></head><body>
+<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#79a75a"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="小黑窗"><meta name="apple-mobile-web-app-status-bar-style" content="default"><style>body{margin:0}</style><script>window.RO_GH=1;window.RO_BUILD="20261111012356";if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))</script></head><body>
 <title>仙境放置小黑窗</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <style>
@@ -98,6 +98,18 @@ canvas{image-rendering:pixelated}
 .die{display:inline-block;margin:0 4px;transition:transform .06s}
 .mj{display:inline-flex;flex-direction:column;align-items:center;justify-content:center;width:40px;height:56px;margin:0 3px;background:#fffdf4;border:1px solid #b9b2a0;border-bottom:5px solid #2e7d4f;border-radius:6px;color:#c62828;font-weight:700;font-size:20px;line-height:1.05;vertical-align:middle;box-shadow:0 1px 2px rgba(0,0,0,.25)}
 .mj small{font-size:12px;color:#1d5fb4}.mj.back{background:linear-gradient(#3a9a63,#2e7d4f);border-color:#24603d}.mj .wb{display:block;width:24px;height:36px;border:2px solid #1d5fb4;border-radius:3px}
+.mt{display:inline-flex;flex-direction:column;align-items:center;justify-content:center;width:21px;height:29px;margin:1px;background:#fffdf4;border:1px solid #b9b2a0;border-bottom:3px solid #2e7d4f;border-radius:4px;color:#222;line-height:1;vertical-align:middle;font-weight:700;box-sizing:border-box}
+.mt b{font-size:12px}.mt i{font-style:normal;font-size:9px;margin-top:1px}.mt.s0{color:#c62828}.mt.s1{color:#1d5fb4}.mt.s2{color:#2e7d4f}.mt.hz b{font-size:14px;color:#222}.mt.hz.r b{color:#c62828}.mt.hz.g b{color:#2e7d4f}
+.mt .wbx{display:block;width:11px;height:16px;border:2px solid #1d5fb4;border-radius:2px}.mt.fl{background:#fff3e0}.mt.fl b{font-size:11px;color:#a0522d}.mt.bk{background:linear-gradient(#3a9a63,#2e7d4f);border-color:#24603d}
+.mt.big{width:34px;height:46px;border-bottom-width:5px}.mt.big b{font-size:17px}.mt.big i{font-size:12px}.mt.big.hz b{font-size:21px}.mt.big .wbx{width:17px;height:25px}.mt.big.fl b{font-size:16px}
+.mt.sel{transform:translateY(-9px);border-color:#e91e63;box-shadow:0 3px 8px rgba(233,30,99,.45)}.mt.lastd{outline:2px solid #f39c12;outline-offset:0}
+.mtb{background:none;border:0;padding:0;margin:0;min-height:0;cursor:pointer}.mtb:disabled{opacity:1;cursor:default}
+.mjtop{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin-bottom:4px}.mjp{border-top:1px dashed var(--line,#ccc);padding:3px 0}.mjp.me{background:rgba(121,167,90,.08)}
+.mjhd{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:13px}.mjm{display:inline-flex;margin-right:4px;padding:1px;border-radius:4px;background:rgba(0,0,0,.06)}.mjfl{display:inline-flex}
+.mjrv{display:flex;flex-wrap:wrap;min-height:31px}.mjhand{display:flex;flex-wrap:wrap;align-items:flex-end;gap:1px;padding:12px 0 4px}.mjhand.sm{padding:2px 0}.mjgap{width:10px}
+.mjact{display:flex;flex-wrap:wrap;gap:6px;align-items:center;min-height:40px}.mjact .mt{width:19px;height:26px}.mjlog{font-size:12px;color:var(--muted,#777);min-height:4.4em;margin-top:4px}
+.mjdice{text-align:center;padding:18px 0}.mjdice .dice3{font-size:54px;line-height:1.1;margin:8px 0}
+.mjres{border:2px solid #f0b429;border-radius:8px;padding:8px;margin:6px 0;background:rgba(240,180,41,.1)}.mjstk{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:6px 0}.mjstk button{padding:8px 4px;line-height:1.35}
 .e8row{display:flex;align-items:center;gap:2px;margin:6px 0}.e8lab{width:3em;font-weight:700}.e8nm{margin-left:10px;font-weight:700}
 .buffbar{display:flex;gap:5px;overflow-x:auto;overflow-y:hidden;white-space:nowrap;height:32px;align-items:center;-webkit-overflow-scrolling:touch;scrollbar-width:thin}
 .buffbar .chip{flex:none}
@@ -2219,7 +2231,7 @@ const wait=ms=>new Promise(r=>setTimeout(r,ms));
 async function slPlay(spin,fast){if(fast){FUN.hl=null;FUN.show=spin.frames[spin.frames.length-1].g;return}
   for(let fi=0;fi<spin.frames.length;fi++){const f=spin.frames[fi];FUN.show=f.g;FUN.hl=null;if(fi===0){for(let k=0;k<6;k++){FUN.show.forEach(col=>col.forEach(x=>x._dy=(5-k)*8));await wait(40)}FUN.show.forEach(col=>col.forEach(x=>x._dy=0))}
     else await wait(220);if(!f.wins.length)break;FUN.hl=new Set();f.wins.forEach(w=>w.cells.forEach(([c,i])=>FUN.hl.add(c+','+i)));await wait(450);FUN.hl=null}}
-async function funSpin(buy){const F=fun(),bet=F.bet,cost=buy?bet*BUYX:bet;if(FUN.busy)return;if(!funOpen()){toast('轉轉樂只在每週一、週三、週五開放');FUN.auto=0;renderTab();return}if(S.zeny<cost){toast(`Zeny 不夠，需要 ${fmt(cost)}z`);FUN.auto=0;renderTab();return}
+async function funSpin(buy){const F=fun(),bet=F.bet,cost=buy?bet*BUYX:bet;if(FUN.busy)return;if(funLocked()){FUN.auto=0;return}if(!funOpen()){toast('轉轉樂只在每週一、週三、週五開放');FUN.auto=0;renderTab();return}if(S.zeny<cost){toast(`Zeny 不夠，需要 ${fmt(cost)}z`);FUN.auto=0;renderTab();return}
   FUN.busy=true;S.zeny-=cost;zOut('娛樂',cost);F.st.bet+=cost;F.st.spins++;FUN.big='';
   const res=slRound(R,buy);let shown=0;
   /* 結果先算好並立刻入帳存檔：動畫中途關掉或跳出也不會少拿 */
@@ -2231,7 +2243,7 @@ async function funSpin(buy){const F=fun(),bet=F.bet,cost=buy?bet*BUYX:bet;if(FUN
   dirty=true;FUN.busy=false;renderTab();if(FUN.big){const bg=FUN.big;setTimeout(()=>{if(FUN.big===bg)FUN.big=''},2500)}
   if(FUN.auto>0){FUN.auto--;if(res.tot>=100||res.free){FUN.auto=0;FUN.msg+='（中大獎或免費遊戲，自動轉已停止）';renderTab();return}await wait(F.fast?250:700);if(FUN.auto>0&&tab==='fun')funSpin(false);else FUN.auto=0}}
 function renderFunMsg(){const el=document.getElementById('funMsg');if(el)el.innerHTML=FUN.msg}
-function funDice(big){if(FUN.rolling)return;const F=fun(),bet=F.bet;if(S.zeny<bet){toast(`Zeny 不夠，需要 ${fmt(bet)}z`);return}S.zeny-=bet;zOut('娛樂',bet);F.st.bet+=bet;
+function funDice(big){if(FUN.rolling)return;if(funLocked())return;const F=fun(),bet=F.bet;if(S.zeny<bet){toast(`Zeny 不夠，需要 ${fmt(bet)}z`);return}S.zeny-=bet;zOut('娛樂',bet);F.st.bet+=bet;
   const d=[rnd(1,6),rnd(1,6),rnd(1,6)],sum=d[0]+d[1]+d[2],tri=d[0]===d[1]&&d[1]===d[2],isBig=sum>=11,win=!tri&&isBig===big;const coins=win?coinPay(bet*DICEX):0;F.coin+=coins;F.st.coin+=coins;
   const res={d,sum,tri,win,coins,big};dirty=true;try{save()}catch(e){}
   if(F.diceSkip){FUN.dice=res;renderTab();return}
@@ -2240,7 +2252,7 @@ function funDice(big){if(FUN.rolling)return;const F=fun(),bet=F.bet;if(S.zeny<be
     if(k>=1){FUN.rolling=false;FUN.dice=res;renderTab();return}
     if(el){el.innerHTML=[0,1,2].map(i=>`<span class="die" style="transform:translateY(${-Math.abs(Math.sin(k*9+i*1.3))*14*(1-k)}px) rotate(${(R()-.5)*80*(1-k)}deg)">${DIE[rnd(1,6)]}</span>`).join('')}
     setTimeout(tick,60+k*90)};tick()}
-function funBuyX(k,cost){const F=fun();if(F.coin<cost){toast('遊樂幣不夠');return}F.coin-=cost;S.inv[k]=(S.inv[k]||0)+1;dirty=true;log('drop',`用 ${cost} 遊樂幣換到 ${ITEMS[k].n}。`);toast(`換到 ${ITEMS[k].n}！`);renderTab()}
+function funBuyX(k,cost){if(funLocked())return;const F=fun();if(F.coin<cost){toast('遊樂幣不夠');return}F.coin-=cost;S.inv[k]=(S.inv[k]||0)+1;dirty=true;log('drop',`用 ${cost} 遊樂幣換到 ${ITEMS[k].n}。`);toast(`換到 ${ITEMS[k].n}！`);renderTab()}
 const DIE=['','⚀','⚁','⚂','⚃','⚄','⚅'];
 /* 二八槓：40 張（一～九筒各 4 張＋白板 4 張，白板算半點）。對子＞二八槓＞點數；同大小算莊家贏 */
 const E8CN=['白板','一','二','三','四','五','六','七','八','九'];
@@ -2248,7 +2260,7 @@ const e8pv=t=>t===0?.5:t;
 const e8rank=(a,b)=>a===b?1000+(a===0?10:a):(a+b===10&&(a===2||a===8))?900:((e8pv(a)+e8pv(b))%10)*10;
 const e8name=(a,b)=>{if(a===b)return a===0?'白板對（最大）':`${E8CN[a]}筒對`;if(a+b===10&&(a===2||a===8))return '二八槓';const p=(e8pv(a)+e8pv(b))%10;return p===0?'鱉十（0 點）':p%1?`${p===.5?'':E8CN[Math.floor(p)]}點半`.replace(/^點半/,'半點'):`${E8CN[p]}點`};
 const e8tile=(v,back)=>back?'<span class="mj back"></span>':v===0?'<span class="mj"><i class="wb"></i></span>':`<span class="mj"><b>${E8CN[v]}</b><small>筒</small></span>`;
-function funE8(){if(FUN.e8busy)return;const F=fun(),bet=F.bet;if(S.zeny<bet){toast(`Zeny 不夠，需要 ${fmt(bet)}z`);return}S.zeny-=bet;zOut('娛樂',bet);F.st.bet+=bet;
+function funE8(){if(FUN.e8busy)return;if(funLocked())return;const F=fun(),bet=F.bet;if(S.zeny<bet){toast(`Zeny 不夠，需要 ${fmt(bet)}z`);return}S.zeny-=bet;zOut('娛樂',bet);F.st.bet+=bet;
   const dk=[];for(let v=0;v<=9;v++)for(let k=0;k<4;k++)dk.push(v);for(let i=dk.length-1;i>0;i--){const j=Math.floor(R()*(i+1));[dk[i],dk[j]]=[dk[j],dk[i]]}
   const p=[dk[0],dk[2]],b=[dk[1],dk[3]],rp=e8rank(...p),rb=e8rank(...b),win=rp>rb,sp=win&&rp>=900,coins=win?coinPay(bet*(sp?E8SP:E8X)):0;F.coin+=coins;F.st.coin+=coins;dirty=true;
   const res={p,b,win,sp,coins,tie:rp===rb,show:4};try{save()}catch(e){}
@@ -2256,11 +2268,332 @@ function funE8(){if(FUN.e8busy)return;const F=fun(),bet=F.bet;if(S.zeny<bet){toa
   FUN.e8busy=true;FUN.e8={...res,show:0};renderTab();let k=0;const nx=()=>{k++;FUN.e8.show=k;if(k>=4){FUN.e8busy=false;renderTab();return}const el=document.getElementById('e8Box');if(el)el.innerHTML=e8Board(FUN.e8);setTimeout(nx,450)};setTimeout(nx,450)}
 function e8Board(r){const t=(arr,o)=>arr.map((v,i)=>e8tile(v,r.show<o+i*2+1)).join('');
   return `<div class="e8row"><span class="e8lab">莊家</span>${t(r.b,1)}<span class="e8nm">${r.show>=4?e8name(...r.b):''}</span></div><div class="e8row"><span class="e8lab">你</span>${t(r.p,0)}<span class="e8nm">${r.show>=3?e8name(...r.p):''}</span></div>`}
+/* ================= 台灣 16 張麻將（引擎） =================
+   牌種 k：0-8 萬、9-17 筒、18-26 條、27-33 東南西北中發白、34-41 春夏秋冬梅蘭竹菊
+   座位 0＝玩家，1＝下家，2＝對家，3＝上家；出牌順序 0→1→2→3 */
+const MJ={N:['一','二','三','四','五','六','七','八','九'],HON:['東','南','西','北','中','發','白'],FL:['春','夏','秋','冬','梅','蘭','竹','菊'],
+  STAKES:[{n:'小場',d:100000,t:10000},{n:'中場',d:1000000,t:100000},{n:'大場',d:10000000,t:1000000}],SEATN:['你','下家','對家','上家'],WIND:['東','南','西','北']};
+MJ.name=k=>k<27?MJ.N[k%9]+['萬','筒','條'][Math.floor(k/9)]:k<34?MJ.HON[k-27]:MJ.FL[k-34];
+MJ.isFl=k=>k>=34;
+MJ.suit=k=>k<27?Math.floor(k/9):3;
+MJ.cnt=tiles=>{const c=new Array(34).fill(0);for(const k of tiles)if(k<34)c[k]++;return c};
+/* ---- 向聽數（每門花色分開記憶化） ---- */
+MJ._memo=new Map();
+MJ.suitOpts=function(c,hon){const key=(hon?'h':'s')+c.join('');const m=MJ._memo.get(key);if(m)return m;
+  const out=new Map();const add=(a,b,p)=>{const kk=a*100+b*10+p;out.set(kk,[a,b,p])};
+  const rec=(c,i,a,b,p)=>{while(i<c.length&&!c[i])i++;if(i>=c.length){add(a,b,p);return}
+    if(c[i]>=3){c[i]-=3;rec(c,i,a+1,b,p);c[i]+=3}
+    if(!hon&&i<=6&&c[i+1]&&c[i+2]){c[i]--;c[i+1]--;c[i+2]--;rec(c,i,a+1,b,p);c[i]++;c[i+1]++;c[i+2]++}
+    if(c[i]>=2){c[i]-=2;if(!p)rec(c,i,a,b,1);rec(c,i,a,b+1,p);c[i]+=2}
+    if(!hon&&i<=7&&c[i+1]){c[i]--;c[i+1]--;rec(c,i,a,b+1,p);c[i]++;c[i+1]++}
+    if(!hon&&i<=6&&c[i+2]){c[i]--;c[i+2]--;rec(c,i,a,b+1,p);c[i]++;c[i+2]++}
+    c[i]--;rec(c,i,a,b,p);c[i]++};
+  rec(c.slice(),0,0,0,0);
+  let arr=[...out.values()];arr=arr.filter(x=>!arr.some(y=>y!==x&&y[0]>=x[0]&&y[1]>=x[1]&&y[2]>=x[2]&&(y[0]>x[0]||y[1]>x[1]||y[2]>x[2])));
+  if(MJ._memo.size>200000)MJ._memo.clear();MJ._memo.set(key,arr);return arr};
+MJ.shanten=function(c,need){let st=[[0,0,0]];
+  for(let g=0;g<4;g++){const sub=g<3?c.slice(g*9,g*9+9):c.slice(27,34);const opts=MJ.suitOpts(sub,g===3);const nx=new Map();
+    for(const [a,b,p] of st)for(const [x,y,z] of opts){if(p+z>1)continue;const A=Math.min(a+x,need),B=Math.min(b+y,9),P=p+z;nx.set(A*1000+B*10+P,[A,B,P])}st=[...nx.values()]}
+  let best=99;for(const [a,b,p] of st){const t=Math.min(b,need-a);const s=2*need-2*a-t-p;if(s<best)best=s}return best};
+MJ.isLG=c=>{let pr=0,tr=0,n=0;for(let k=0;k<34;k++){n+=c[k];if(c[k]===2)pr++;else if(c[k]===3)tr++;else if(c[k]===4)pr+=2;else if(c[k]===1)return false}return n===17&&pr===7&&tr===1};
+MJ.need=(st,s)=>5-st.melds[s].length;
+MJ.canWin=(st,s,extra)=>{const h=st.hands[s].concat(extra==null?[]:[extra]);const c=MJ.cnt(h);if(MJ.shanten(c,MJ.need(st,s))===-1)return true;return st.melds[s].length===0&&MJ.isLG(c)};
+/* ---- 開局 ---- */
+MJ.newGame=function(R,stakeIdx,dealer){const wall=[];for(let k=0;k<34;k++)for(let i=0;i<4;i++)wall.push(k);for(let k=34;k<42;k++)wall.push(k);
+  for(let i=wall.length-1;i>0;i--){const j=Math.floor(R()*(i+1));[wall[i],wall[j]]=[wall[j],wall[i]]}
+  const st={v:1,stake:stakeIdx,dealer,wall,wi:0,wb:wall.length-1,hands:[[],[],[],[]],melds:[[],[],[],[]],flowers:[[],[],[],[]],rivers:[[],[],[],[]],
+    turn:dealer,phase:'draw',last:null,drawn:null,kanDraw:false,firstDraw:[true,true,true,true],calls:0,discN:0,auto:false,log:[],result:null,paid:false,pend:null};
+  for(let r=0;r<16;r++)for(let i=0;i<4;i++){const s=(dealer+i)%4;st.hands[s].push(st.wall[st.wi++])}
+  for(let i=0;i<4;i++){const s=(dealer+i)%4;let g=0;while(st.hands[s].some(MJ.isFl)&&g++<20){const f=st.hands[s].filter(MJ.isFl);st.hands[s]=st.hands[s].filter(k=>!MJ.isFl(k));for(const k of f){st.flowers[s].push(k);st.hands[s].push(st.wall[st.wb--])}}}
+  MJ.lg(st,`${MJ.SEATN[dealer]}當莊（東）。`);return st};
+MJ.lg=(st,t)=>{st.log.push(t);st.logN=(st.logN||0)+1;if(st.log.length>40)st.log.shift()};
+MJ.left=st=>st.wb-st.wi+1-16;
+MJ.seatWind=(st,s)=>(s-st.dealer+4)%4;
+/* 看得到的牌（不偷看）：自己的手牌＋所有河＋所有副露 */
+MJ.seen=function(st,s){const v=new Array(34).fill(0);for(const k of st.hands[s])if(k<34)v[k]++;
+  for(let i=0;i<4;i++){for(const r of st.rivers[i])if(!r.t)v[r.k]++;for(const m of st.melds[i])for(const k of m.k)v[k]++}return v};
+/* ---- 摸牌（含補花、八仙過海、七搶一） ---- */
+MJ.draw=function(st,s,fromBack){if(MJ.left(st)<=0){MJ.endDraw(st);return}
+  let k=fromBack?st.wall[st.wb--]:st.wall[st.wi++];
+  while(MJ.isFl(k)){st.flowers[s].push(k);MJ.lg(st,`${MJ.SEATN[s]}補花 ${MJ.name(k)}。`);
+    if(st.flowers[s].length===8){MJ.win(st,s,null,{self:true,special:'八仙過海'});return}
+    if(st.flowers[s].length===1){for(let o=0;o<4;o++)if(o!==s&&st.flowers[o].length===7){st.flowers[o].push(st.flowers[s].pop());MJ.win(st,o,null,{self:false,payer:s,special:'七搶一'});return}}
+    if(st.flowers[s].length===7){const o=[0,1,2,3].find(x=>x!==s&&st.flowers[x].length===1);if(o!=null){st.flowers[s].push(st.flowers[o].pop());MJ.win(st,s,null,{self:false,payer:o,special:'七搶一'});return}}
+    if(MJ.left(st)<=0){MJ.endDraw(st);return}k=st.wall[st.wb--]}
+  st.hands[s].push(k);st.drawn=k;st.turn=s;st.phase='act';st.mustDiscard=false};
+MJ.endDraw=function(st){st.phase='end';st.result={draw:true};MJ.lg(st,'牌摸完了，流局。')};
+/* ---- 動作 ---- */
+MJ.discard=function(st,s,k){const i=st.hands[s].lastIndexOf(k);if(i<0)return false;st.hands[s].splice(i,1);st.rivers[s].push({k});st.last={k,from:s};st.drawn=null;st.kanDraw=false;st.firstDraw[s]=false;st.discN++;
+  MJ.lg(st,`${MJ.SEATN[s]}打出 ${MJ.name(k)}。`);st.phase='claim';return true};
+MJ.rm=(arr,k,n)=>{for(let i=0;i<n;i++){const j=arr.indexOf(k);if(j>=0)arr.splice(j,1)}};
+MJ.takeLast=st=>{const r=st.rivers[st.last.from];r[r.length-1].t=1};
+MJ.pon=function(st,s){const k=st.last.k;MJ.takeLast(st);MJ.rm(st.hands[s],k,2);st.melds[s].push({t:'pon',k:[k,k,k],f:st.last.from});st.calls++;st.firstDraw=[false,false,false,false];
+  MJ.lg(st,`${MJ.SEATN[s]}碰 ${MJ.name(k)}。`);st.turn=s;st.phase='act';st.mustDiscard=true;st.drawn=null;st.last=null};
+MJ.chi=function(st,s,pair){const k=st.last.k;MJ.takeLast(st);MJ.rm(st.hands[s],pair[0],1);MJ.rm(st.hands[s],pair[1],1);const seq=[pair[0],pair[1],k].sort((a,b)=>a-b);
+  st.melds[s].push({t:'chi',k:seq,f:st.last.from,c:k});st.calls++;st.firstDraw=[false,false,false,false];MJ.lg(st,`${MJ.SEATN[s]}吃 ${MJ.name(k)}（${seq.map(MJ.name).join('')}）。`);st.turn=s;st.phase='act';st.mustDiscard=true;st.drawn=null;st.last=null};
+MJ.mkan=function(st,s){const k=st.last.k;MJ.takeLast(st);MJ.rm(st.hands[s],k,3);st.melds[s].push({t:'kan',k:[k,k,k,k],f:st.last.from});st.calls++;st.firstDraw=[false,false,false,false];
+  MJ.lg(st,`${MJ.SEATN[s]}槓 ${MJ.name(k)}。`);st.last=null;st.kanDraw=true;MJ.draw(st,s,true);if(st.phase==='act')st.kanDraw=true};
+MJ.akan=function(st,s,k){MJ.rm(st.hands[s],k,4);st.melds[s].push({t:'akan',k:[k,k,k,k]});MJ.lg(st,`${MJ.SEATN[s]}暗槓。`);st.drawn=null;MJ.draw(st,s,true);if(st.phase==='act')st.kanDraw=true};
+MJ.kakanStart=function(st,s,k){/* 加槓：先看有沒有人搶槓 */const m=st.melds[s].find(m=>m.t==='pon'&&m.k[0]===k);if(!m)return;MJ.rm(st.hands[s],k,1);m.t='kan';m.k.push(k);st.drawn=null;
+  MJ.lg(st,`${MJ.SEATN[s]}加槓 ${MJ.name(k)}。`);st.rob={k,from:s};st.phase='rob'};
+MJ.kakanDone=function(st){const s=st.rob.from;st.rob=null;MJ.draw(st,s,true);if(st.phase==='act')st.kanDraw=true};
+/* 可以做的事 */
+MJ.actOpts=function(st,s){const o={tsumo:false,akan:[],kakan:[]};if(!st.mustDiscard){o.tsumo=MJ.canWin(st,s);
+    const c=MJ.cnt(st.hands[s]);if(MJ.left(st)>0){for(let k=0;k<34;k++)if(c[k]===4)o.akan.push(k);for(const m of st.melds[s])if(m.t==='pon'&&c[m.k[0]]>=1)o.kakan.push(m.k[0])}}return o};
+MJ.claimOpts=function(st,s){const k=st.last.k,from=st.last.from;if(s===from)return null;const c=MJ.cnt(st.hands[s]);const o={ron:MJ.canWin(st,s,k),pon:c[k]>=2,kan:c[k]>=3&&MJ.left(st)>0,chi:[]};
+  if((from+1)%4===s&&k<27){const b=Math.floor(k/9)*9,i=k-b;const ok=(a,bb)=>a>=0&&bb<=8;
+    if(ok(i-2,i)&&c[b+i-2]&&c[b+i-1])o.chi.push([b+i-2,b+i-1]);if(ok(i-1,i+1)&&i>=1&&i<=7&&c[b+i-1]&&c[b+i+1])o.chi.push([b+i-1,b+i+1]);if(i<=6&&c[b+i+1]&&c[b+i+2])o.chi.push([b+i+1,b+i+2])}
+  if(!o.ron&&!o.pon&&!o.kan&&!o.chi.length)return null;return o};
+/* ---- 胡牌與台數 ---- */
+MJ.decomps=function(c,need){const res=[];const cur=[];
+  const rec=(i,pair)=>{while(i<34&&!c[i])i++;if(i>=34){if(pair!=null&&cur.length===need)res.push({pair,sets:cur.map(x=>x.slice())});return}
+    if(c[i]>=3){c[i]-=3;cur.push(['p',i]);rec(i,pair);cur.pop();c[i]+=3}
+    if(i<27&&i%9<=6&&c[i+1]&&c[i+2]){c[i]--;c[i+1]--;c[i+2]--;cur.push(['s',i]);rec(i,pair);cur.pop();c[i]++;c[i+1]++;c[i+2]++}
+    if(pair==null&&c[i]>=2){c[i]-=2;rec(i,i);c[i]+=2}};
+  rec(0,null);return res};
+MJ.waits=function(st,s,handNoWin){const n=MJ.need(st,s);const c=MJ.cnt(handNoWin);const w=[];for(let k=0;k<34;k++){if(c[k]>=4)continue;c[k]++;if(MJ.shanten(c,n)===-1||(st.melds[s].length===0&&MJ.isLG(c)))w.push(k);c[k]--}return w};
+MJ.score=function(st,s,winK,f){const items=[];const add=(n,t)=>items.push([n,t]);const sw=MJ.seatWind(st,s);
+  const fl=st.flowers[s];if(f.special){add(f.special,8)}
+  else{
+  const hand=st.hands[s].slice();const full=winK==null?hand:hand.concat([winK]);const c=MJ.cnt(full);const melds=st.melds[s];const open=melds.some(m=>m.t!=='akan');
+  const handNoWin=winK==null?(()=>{const h=hand.slice();MJ.rm(h,st.lastDrawn!=null?st.lastDrawn:hand[hand.length-1],1);return h})():hand;
+  const wk=winK==null?(st.lastDrawn!=null?st.lastDrawn:hand[hand.length-1]):winK;
+  const ws=MJ.waits(st,s,handNoWin);const single=ws.length===1;
+  const allK=full.concat(...melds.map(m=>m.k));const suits=new Set(allK.filter(k=>k<27).map(MJ.suit));const hasHon=allK.some(k=>k>=27);
+  let best=null;const lg=melds.length===0&&MJ.isLG(c);
+  const ds=MJ.decomps(c.slice(),MJ.need(st,s));
+  const evalD=d=>{const it=[];const A=(n,t)=>it.push([n,t]);
+    const sets=d?d.sets.map(([t,k])=>({t,k,conc:true})):[];
+    if(d&&!f.self){/* 胡別人的牌：用到那張的刻子算明刻（能當順子就當順子） */const inSeq=sets.find(x=>x.t==='s'&&wk>=x.k&&wk<=x.k+2&&MJ.suit(x.k)===MJ.suit(wk));if(!inSeq&&d.pair!==wk){const tr=sets.find(x=>x.t==='p'&&x.k===wk);if(tr)tr.conc=false}}
+    const allSets=sets.concat(melds.map(m=>({t:m.t==='chi'?'s':'p',k:m.k[0],conc:m.t==='akan'})));
+    const trip=allSets.filter(x=>x.t==='p');const pair=d?d.pair:null;
+    const concT=trip.filter(x=>x.conc).length;
+    if(!open&&f.self)A('門清自摸',3);else{if(!open)A('門清',1);if(f.self)A('自摸',1)}
+    if(f.self&&MJ.left(st)<=0)A('海底撈月',1);if(!f.self&&!f.rob&&MJ.left(st)<=0)A('河底撈魚',1);
+    if(f.self&&st.kanDraw)A('槓上開花',1);if(f.rob)A('搶槓',1);
+    if(single&&!lg)A('獨聽',1);
+    if(lg){A('嚦咕嚦咕',8)}
+    else{
+      const drag=trip.filter(x=>x.k>=31).length,dragP=pair!=null&&pair>=31;
+      if(drag===3)A('大三元',8);else if(drag===2&&dragP)A('小三元',4);else for(const x of trip)if(x.k>=31)A(MJ.name(x.k)+'（三元）',1);
+      const wind=trip.filter(x=>x.k>=27&&x.k<=30).length,windP=pair!=null&&pair>=27&&pair<=30;
+      if(wind===4)A('大四喜',16);else if(wind===3&&windP)A('小四喜',8);else{if(trip.some(x=>x.k===27))A('圈風（東）',1);if(trip.some(x=>x.k===27+sw))A(`門風（${MJ.WIND[sw]}）`,1)}
+      if(allSets.every(x=>x.t==='p'))A('碰碰胡',4);
+      if(concT>=5)A('五暗刻',8);else if(concT===4)A('四暗刻',5);else if(concT===3)A('三暗刻',2);
+      if(!hasHon&&!fl.length&&!f.self&&!single&&allSets.every(x=>x.t==='s'))A('平胡',2);
+      if(melds.length===5&&melds.every(m=>m.t!=='akan')&&!f.self&&single)A('全求人',2);
+    }
+    if(suits.size===0)A('字一色',16);else if(suits.size===1)A(hasHon?'混一色':'清一色',hasHon?4:8);
+    if(f.tenhou)A('天胡',24);else if(f.chihou)A('地胡',16);
+    return it};
+  const cands=lg?[null]:ds;for(const d of cands){const it=evalD(d);const t=it.reduce((a,b)=>a+b[1],0);if(!best||t>best.t)best={t,it}}
+  if(best)for(const x of best.it)items.push(x)}
+  /* 花 */
+  if(!f.special){const sets=[[34,35,36,37],[38,39,40,41]];for(const g of sets){if(g.every(k=>fl.includes(k)))add(g[0]===34?'花槓（春夏秋冬）':'花槓（梅蘭竹菊）',2);else for(const k of g)if(fl.includes(k)&&(k-34)%4===sw)add('正花 '+MJ.name(k),1)}}
+  return {tai:items.reduce((a,b)=>a+b[1],0),items}};
+MJ.win=function(st,s,winK,f){const sc=MJ.score(st,s,winK,f);if(winK!=null){st.hands[s].push(winK);if(st.last&&!f.rob)MJ.takeLast(st)}
+  const pay=[];const st2=MJ.STAKES[st.stake];const payers=f.self?[0,1,2,3].filter(x=>x!==s):[f.payer];
+  for(const p of payers){const dl=(s===st.dealer||p===st.dealer)?1:0;pay.push({p,tai:sc.tai+dl,dl,amt:st2.d+(sc.tai+dl)*st2.t})}
+  st.phase='end';st.result={win:s,self:!!f.self,payer:f.self?null:f.payer,winK,tai:sc.tai,items:sc.items,pay,special:f.special||null};
+  MJ.lg(st,`${MJ.SEATN[s]}${f.special?f.special:f.self?'自摸':'胡'}${winK!=null?' '+MJ.name(winK):''}！${sc.tai} 台。`)};
+/* ================= 電腦（不偷看，只用公開資訊） ================= */
+MJ.ai={};
+MJ.ai.valueTile=(st,s,k)=>k>=31||k===27||k===27+MJ.seatWind(st,s);
+MJ.ai.flushPlan=function(st,s){const all=st.hands[s].concat(...st.melds[s].map(m=>m.k));const n=[0,0,0];let h=0;for(const k of all){if(k<27)n[MJ.suit(k)]++;else h++}
+  const best=n.indexOf(Math.max(...n));const other=n.reduce((a,b)=>a+b,0)-n[best];const meldOk=st.melds[s].every(m=>m.k[0]>=27||MJ.suit(m.k[0])===best);
+  if(meldOk&&other<=3&&n[best]+h>=12)return best;return -1};
+MJ.ai.threat=function(st,s){/* 每家的威脅程度 0~1 */const t=[0,0,0,0];const L=MJ.left(st);
+  for(let o=0;o<4;o++){if(o===s)continue;const m=st.melds[o].length;let v=m>=4?.95:m===3?.75:m===2?.5:m===1?.2:.08;if(L<40)v+=.1;if(L<20)v+=.15;
+    const ms=st.melds[o].map(x=>x.k[0]);if(ms.length>=2){const su=new Set(ms.filter(k=>k<27).map(MJ.suit));if(su.size<=1)v+=.15}t[o]=Math.min(1,v)}return t};
+MJ.ai.danger=function(st,s,k,seen){let d=0;const th=MJ.ai.threat(st,s);
+  for(let o=0;o<4;o++){if(o===s||th[o]<.2)continue;const rv=st.rivers[o].map(r=>r.k);if(rv.includes(k))continue;let x;
+    if(k>=27){x=seen[k]>=3?.02:seen[k]===2?.25:.55}else{const i=k%9;x=(i===0||i===8)?.7:(i===1||i===7)?.85:1;
+      if(rv.includes(k-3)&&i>=3||rv.includes(k+3)&&i<=5)x*=.5;if(seen[k]>=3)x*=.4;
+      const ms=st.melds[o].map(m=>m.k[0]);const su=new Set(ms.filter(q=>q<27).map(MJ.suit));if(ms.length>=2&&su.size===1)x*=su.has(MJ.suit(k))?1.6:.35}
+    d+=x*th[o]}return d};
+MJ.ai.evalHand=function(st,s,hand,need,seen){const c=MJ.cnt(hand);const sh=MJ.shanten(c,need);let uk=0;
+  for(let k=0;k<34;k++){const left=4-seen[k]-0;if(left<=0)continue;if(k<27){const b=Math.floor(k/9)*9,i=k-b;let near=false;for(let d=-2;d<=2;d++){const j=i+d;if(j>=0&&j<9&&c[b+j]){near=true;break}}if(!near)continue}else if(!c[k])continue;
+    c[k]++;if(MJ.shanten(c,need)<sh)uk+=left;c[k]--}return {sh,uk}};
+MJ.ai.chooseDiscard=function(st,s){const hand=st.hands[s];const need=MJ.need(st,s);const seen=MJ.seen(st,s);const plan=MJ.ai.flushPlan(st,s);const th=Math.max(...MJ.ai.threat(st,s));
+  const kinds=[...new Set(hand)];const ev=kinds.map(k=>{const h=hand.slice();MJ.rm(h,k,1);const e=MJ.ai.evalHand(st,s,h,need,seen);
+    let pen=0;const c=MJ.cnt(hand);if(MJ.ai.valueTile(st,s,k)&&c[k]>=2)pen+=2;if(plan>=0&&(k>=27||MJ.suit(k)===plan))pen+=1.5;if(plan>=0&&k<27&&MJ.suit(k)!==plan)pen-=1;
+    if(k>=27&&c[k]===1&&!MJ.ai.valueTile(st,s,k))pen-=.6;if(k>=27&&c[k]===1&&MJ.ai.valueTile(st,s,k)&&seen[k]>=3)pen-=.8;
+    return {k,sh:e.sh,uk:e.uk,pen,dg:MJ.ai.danger(st,s,k,seen)}});
+  const smin=Math.min(...ev.map(e=>e.sh));
+  const fold=!MJ.ai.noFold&&((smin>=2&&th>=.8)||(smin>=3&&th>=.6)||(smin>=1&&th>=.95&&MJ.left(st)<20));
+  if(fold){ev.sort((a,b)=>a.dg-b.dg||a.sh-b.sh||b.uk-a.uk);return ev[0].k}
+  const sc=e=>(e.sh-smin)*-100+e.uk*1-e.pen*3-e.dg*(th>=.5?6:2);ev.sort((a,b)=>sc(b)-sc(a));
+  /* 做一色時，允許多一向聽去丟別門 */if(plan>=0){const off=ev.filter(e=>e.k<27&&MJ.suit(e.k)!==plan&&e.sh<=smin+1);if(off.length&&MJ.left(st)>30)return off.sort((a,b)=>a.sh-b.sh||b.uk-a.uk)[0].k}
+  return ev[0].k};
+MJ.ai.bestAfter=function(st,s,hand,need){const seen=MJ.seen(st,s);let best=99;for(const k of new Set(hand)){const h=hand.slice();MJ.rm(h,k,1);const sh=MJ.shanten(MJ.cnt(h),need);if(sh<best)best=sh}return best};
+MJ.ai.claim=function(st,s,o){/* 回傳 {a:'ron'|'kan'|'pon'|'chi',pair} 或 null */if(o.ron)return {a:'ron'};const k=st.last.k;const need=MJ.need(st,s);const hand=st.hands[s];
+  const cur=MJ.shanten(MJ.cnt(hand),need);const plan=MJ.ai.flushPlan(st,s);const open=st.melds[s].some(m=>m.t!=='akan');const th=Math.max(...MJ.ai.threat(st,s));
+  if(cur>=2&&th>=.6&&!MJ.ai.valueTile(st,s,k))return null;
+  if(o.kan&&(open||MJ.ai.valueTile(st,s,k))){const h=hand.slice();MJ.rm(h,k,3);if(MJ.shanten(MJ.cnt(h),need-1)<=cur)return {a:'kan'}}
+  if(o.pon){const h=hand.slice();MJ.rm(h,k,2);const af=MJ.ai.bestAfter(st,s,h,need-1);
+    if(MJ.ai.valueTile(st,s,k)&&af<=cur)return {a:'pon'};
+    if(plan>=0&&(k>=27||MJ.suit(k)===plan)&&af<=cur)return {a:'pon'};
+    if(af<cur&&(open||cur>=3))return {a:'pon'};
+    if(af<cur&&cur>=2&&MJ.left(st)<45)return {a:'pon'}}
+  if(o.chi.length){let bp=null,bs=99;for(const p of o.chi){const h=hand.slice();MJ.rm(h,p[0],1);MJ.rm(h,p[1],1);const af=MJ.ai.bestAfter(st,s,h,need-1);if(af<bs){bs=af;bp=p}}
+    const okSuit=plan<0||MJ.suit(k)===plan;if(bs<cur&&okSuit&&(open||plan>=0||cur>=3||(cur>=2&&MJ.left(st)<45)))return {a:'chi',pair:bp}}
+  return null};
+MJ.ai.act=function(st,s){const o=MJ.actOpts(st,s);if(o.tsumo)return {a:'tsumo'};const need=MJ.need(st,s);const cur=MJ.shanten(MJ.cnt(st.hands[s]),need);
+  for(const k of o.akan){const h=st.hands[s].slice();MJ.rm(h,k,4);if(MJ.ai.bestAfter(st,s,h.concat([k]),need-1)<=cur||MJ.shanten(MJ.cnt(h),need-1)<=cur)return {a:'akan',k}}
+  for(const k of o.kakan){const h=st.hands[s].slice();MJ.rm(h,k,1);if(MJ.shanten(MJ.cnt(h),need)<=cur+0)return {a:'kakan',k}}
+  return {a:'discard',k:MJ.ai.chooseDiscard(st,s)}};
+/* ================= 流程：推進一步 =================
+   回傳 'wait'（等玩家）、'end' 或 'go'（還有下一步） */
+MJ.step=function(st){if(st.phase==='end')return 'end';
+  const human=s=>s===0&&!st.auto;
+  if(st.phase==='draw'){const s=st.turn;MJ.draw(st,s,false);if(st.phase==='act'){st.lastDrawn=st.drawn}return st.phase==='end'?'end':'go'}
+  if(st.phase==='act'){const s=st.turn;if(st.hands[s].length+st.melds[s].length*3<17&&!st.mustDiscard){/* 安全保護 */}
+    if(human(s))return 'wait';const d=MJ.ai.act(st,s);return MJ.doAct(st,s,d)}
+  if(st.phase==='claim'){const res=MJ.collectClaims(st);if(res==='wait')return 'wait';return st.phase==='end'?'end':'go'}
+  if(st.phase==='rob'){if(st.pend&&st.pend.rob&&!st.pend.choice)return 'wait';const k=st.rob.k,from=st.rob.from;const pc=st.pend&&st.pend.choice;
+    for(let i=1;i<4;i++){const s=(from+i)%4;if(!MJ.canWin(st,s,k))continue;
+      if(human(s)&&!pc){st.pend={rob:true,opts:{ron:true,pon:false,kan:false,chi:[]}};return 'wait'}
+      if(human(s)&&pc.a!=='ron')continue;
+      const m=st.melds[from].find(m=>m.t==='kan'&&m.k[0]===k);if(m){m.t='pon';m.k.pop()}st.pend=null;MJ.win(st,s,k,{self:false,payer:from,rob:true});return 'end'}
+    st.pend=null;MJ.kakanDone(st);if(st.phase==='act')st.lastDrawn=st.drawn;return st.phase==='end'?'end':'go'}
+  return 'go'};
+MJ.doAct=function(st,s,d){if(d.a==='tsumo'){const f={self:true};if(st.firstDraw[s]&&st.discN===0&&s===st.dealer)f.tenhou=true;else if(st.firstDraw[s]&&st.calls===0&&s!==st.dealer&&st.discN<4)f.chihou=true;
+    const k=st.drawn!=null?st.drawn:st.hands[s][st.hands[s].length-1];st.lastDrawn=k;MJ.win(st,s,null,f);return 'end'}
+  if(d.a==='akan'){MJ.akan(st,s,d.k);if(st.phase==='act')st.lastDrawn=st.drawn;return st.phase==='end'?'end':'go'}
+  if(d.a==='kakan'){MJ.kakanStart(st,s,d.k);return 'go'}
+  if(d.a==='discard'){MJ.discard(st,s,d.k);return 'go'}return 'go'};
+MJ.collectClaims=function(st){if(st.pend&&!st.pend.choice)return 'wait';const from=st.last.from,k=st.last.k;const human=s=>s===0&&!st.auto;let ask=null;const ai=[];
+  for(let i=1;i<4;i++){const s=(from+i)%4;const o=MJ.claimOpts(st,s);if(!o)continue;if(human(s)){ask={s,o}}else{const c=MJ.ai.claim(st,s,o);if(c)ai.push({s,c,ord:i})}}
+  if(ask&&!st.pend){/* 玩家有選項：若前面已有電腦要胡，且玩家不能胡就不用問 */const aiRon=ai.filter(x=>x.c.a==='ron');const pOrd=(ask.s-from+4)%4;
+    if(!(aiRon.some(x=>x.ord<pOrd))&&!(aiRon.length&&!ask.o.ron)){st.pend={claim:true,opts:ask.o};return 'wait'}}
+  let pick=null;const pr={ron:3,kan:2,pon:2,chi:1};
+  const all=ai.slice();if(st.pend&&st.pend.choice){const c=st.pend.choice;if(c.a!=='pass')all.push({s:0,c,ord:(0-from+4)%4})}st.pend=null;
+  for(const x of all){if(!pick||pr[x.c.a]>pr[pick.c.a]||(pr[x.c.a]===pr[pick.c.a]&&x.ord<pick.ord))pick=x}
+  if(!pick){st.turn=(from+1)%4;st.phase='draw';st.last=st.last;return 'go'}
+  const s=pick.s,c=pick.c;if(c.a==='ron'){MJ.win(st,s,k,{self:false,payer:from});return 'go'}
+  if(c.a==='kan'){MJ.mkan(st,s);if(st.phase==='act')st.lastDrawn=st.drawn;return 'go'}
+  if(c.a==='pon'){MJ.pon(st,s);return 'go'}
+  if(c.a==='chi'){MJ.chi(st,s,c.pair);return 'go'}return 'go'};
+/* ================= 台灣麻將：介面、結算、負債 ================= */
+const funDebt=()=>fun().debt||0;
+const funLocked=()=>{const d=funDebt();if(d>0){toast(`有麻將欠款 ${fmt(d)} 遊樂幣，還清後才能玩娛樂`);return true}return false};
+const MJS={timer:null,sel:null};
+function mjT(k,cls=''){if(k==null)return '';if(k>=34)return `<span class="mt fl ${cls}"><b>${MJ.FL[k-34]}</b></span>`;
+  if(k>=27){const h=MJ.HON[k-27];return `<span class="mt hz ${k===31?'r':k===32?'g':k===33?'w':''} ${cls}">${k===33?'<i class="wbx"></i>':`<b>${h}</b>`}</span>`}
+  const su=Math.floor(k/9);return `<span class="mt s${su} ${cls}"><b>${MJ.N[k%9]}</b><i>${['萬','筒','條'][su]}</i></span>`}
+const mjSort=a=>a.slice().sort((x,y)=>x-y);
+function mjMelds(st,s){return st.melds[s].map(m=>`<span class="mjm">${(m.t==='akan'?[null,m.k[1],m.k[2],null]:m.k).map(k=>k==null?'<span class="mt bk"></span>':mjT(k)).join('')}</span>`).join('')}
+function mjRiver(st,s){const rv=st.rivers[s];const last=st.last&&st.last.from===s?rv.length-1:-1;return rv.map((r,i)=>r.t?'':mjT(r.k,i===last?'lastd':'')).join('')}
+function mjSeatHead(st,s){const w=MJ.WIND[MJ.seatWind(st,s)];return `<b>${MJ.SEATN[s]}</b> <span class="note">${w}${s===st.dealer?'・<b class="bad">莊</b>':''}</span>${st.turn===s&&st.phase!=='end'?' <span class="good">◀</span>':''}`}
+function mjHTML(){const F=fun(),st=F.mj;if(!st)return '';const SK_=MJ.STAKES[st.stake];
+  const opp=[3,2,1].map(s=>`<div class="mjp"><div class="mjhd">${mjSeatHead(st,s)}<span class="note">手牌 ${st.hands[s].length} 張</span>${st.flowers[s].length?`<span class="mjfl">${st.flowers[s].map(k=>mjT(k)).join('')}</span>`:''}${mjMelds(st,s)}</div><div class="mjrv">${mjRiver(st,s)}</div></div>`).join('');
+  const me=0,end=st.phase==='end';const myTurn=st.phase==='act'&&st.turn===0&&!st.auto;
+  let hand=st.hands[0].slice();let drawn=null;if(myTurn&&st.drawn!=null){const i=hand.lastIndexOf(st.drawn);if(i>=0){hand.splice(i,1);drawn=st.drawn}}
+  hand=mjSort(hand);const tile=k=>`<button type="button" class="mtb" data-mj="dis" data-k="${k}" ${myTurn?'':'disabled'}>${mjT(k,'big'+(MJS.sel===k&&myTurn?' sel':''))}</button>`;
+  let acts='';
+  if(!end&&!st.auto){
+    if(myTurn){const o=MJ.actOpts(st,0);if(o.tsumo)acts+=`<button type="button" class="pri" data-mj="tsumo">自摸！</button>`;for(const k of o.akan)acts+=`<button type="button" data-mj="akan" data-k="${k}">暗槓 ${MJ.name(k)}</button>`;for(const k of o.kakan)acts+=`<button type="button" data-mj="kakan" data-k="${k}">加槓 ${MJ.name(k)}</button>`;
+      acts+=`<span class="note">${st.mustDiscard?'吃碰後請打一張牌。':''}點一張牌選起來，再點一次打出。</span>`}
+    else if(st.pend&&!st.pend.choice&&(st.phase==='claim'||st.phase==='rob')){const o=st.pend.opts,k=st.phase==='rob'?st.rob.k:st.last.k;
+      acts+=`<span>${st.phase==='rob'?`${MJ.SEATN[st.rob.from]}加槓 `:`${MJ.SEATN[st.last.from]}打出 `}${mjT(k)}：</span>`;
+      if(o.ron)acts+=`<button type="button" class="pri" data-mj="ron">${st.phase==='rob'?'搶槓胡！':'胡！'}</button>`;if(o.kan)acts+=`<button type="button" data-mj="kan">槓</button>`;if(o.pon)acts+=`<button type="button" data-mj="pon">碰</button>`;
+      (o.chi||[]).forEach((p,i)=>{acts+=`<button type="button" data-mj="chi" data-k="${i}">吃 ${mjSort([p[0],p[1],k]).map(x=>mjT(x)).join('')}</button>`});acts+=`<button type="button" data-mj="pass">過</button>`}
+    else acts+=`<span class="note">${MJ.SEATN[st.turn]}${st.phase==='claim'?'思考中…':'出牌中…'}</span>`}
+  const res=end?mjResultHTML(st):'';
+  return `<div class="mjtop"><span>${SK_.n}・底 ${zShort(SK_.d)}／台 ${zShort(SK_.t)}</span><span>剩 <b>${Math.max(0,MJ.left(st))}</b> 張</span></div>
+   ${opp}
+   <div class="mjp me"><div class="mjhd">${mjSeatHead(st,0)}${st.flowers[0].length?`<span class="mjfl">${st.flowers[0].map(k=>mjT(k)).join('')}</span>`:''}${mjMelds(st,0)}</div><div class="mjrv">${mjRiver(st,0)}</div></div>
+   <div class="mjhand">${hand.map(tile).join('')}${drawn!=null?`<span class="mjgap"></span>${tile(drawn)}`:''}</div>
+   <div class="mjact">${acts}</div>${res}
+   <div class="mjlog">${st.log.slice(-4).map(esc).join('<br>')}</div>`}
+function mjResultHTML(st){const r=st.result;const SK_=MJ.STAKES[st.stake];if(r.draw)return `<div class="mjres"><b>流局</b>：沒有人胡，這局不輸不贏。${mjNextBtns()}</div>`;
+  const w=r.win;let me='';const mine=r.pay.filter(p=>p.p===0);
+  if(w===0)me=`<b class="good">你${r.special||(r.self?'自摸':'胡')}了！共得到 ${fmt(r.pay.reduce((a,p)=>a+p.amt,0)/COINZ)} 遊樂幣。</b>`;
+  else if(mine.length)me=`<b class="bad">你付給${MJ.SEATN[w]} ${fmt(mine[0].amt)}z${st.debtAdd?`（身上不夠，其中 ${fmt(st.debtAdd)} 遊樂幣記為欠款）`:''}。</b>`;
+  else me=`<span class="note">跟你無關，你不用付錢。</span>`;
+  const items=r.items.map(([n,t])=>`${esc(n)} ${t}`).join('、')||'（無）';
+  const payTxt=r.pay.map(p=>`${MJ.SEATN[p.p]} 付 ${p.tai} 台${p.dl?'（含莊家 1 台）':''} = 底 ${zShort(SK_.d)} + ${p.tai}×${zShort(SK_.t)} = <b>${zShort(p.amt)}</b>`).join('<br>');
+  const hand=mjSort(st.hands[w]);
+  return `<div class="mjres"><div><b>${MJ.SEATN[w]}${r.special||(r.self?'自摸':'胡')}</b>${r.winK!=null?` ${mjT(r.winK)}`:''}${r.payer!=null?`（${MJ.SEATN[r.payer]}放槍）`:''}，${r.tai} 台</div>
+    <div class="mjhand sm">${hand.map(k=>mjT(k)).join('')} ${mjMelds(st,w)}</div><div class="note">台數：${items}</div><div class="note">${payTxt}</div><div style="margin-top:4px">${me}</div>${mjNextBtns()}</div>`}
+const mjNextBtns=()=>`<div class="row" style="margin-top:6px"><button type="button" class="pri" data-mj="again">同場再來一局</button><button type="button" data-mj="leave">換場次／離開</button></div>`;
+function mjStakeHTML(){const F=fun(),dbt=funDebt();
+  return `<div class="note">台灣 16 張麻將，你和三家電腦打。<b>每局有人胡就結算、結束</b>（流局不輸不贏）。有花牌、有莊家（莊家胡或莊家放槍多 1 台），沒有連莊拉莊。電腦不偷看牌，只看桌面上看得到的牌。<br>
+    贏了：放槍的人付你「底＋台數×台」（自摸三家都付），全部換成<b>遊樂幣</b>（1 幣＝1 萬）。輸了：從目前角色身上扣 <b>Zeny</b>，不夠扣的部分記成<b>欠款</b>，有欠款時娛樂全部鎖住，還清才能再玩。<br>中途離開也沒關係，每一步都會存檔，下次回來接著打。</div>
+    <div class="mjstk">${MJ.STAKES.map((s,i)=>{const need=s.d+s.t,ok=S.zeny>=need&&!dbt;return `<button type="button" class="${ok?'pri':''}" data-mj="start" data-k="${i}" ${ok?'':'disabled'}><b>${s.n}</b><br>底 ${zShort(s.d)}／台 ${zShort(s.t)}<br><span style="font-size:12px;opacity:.85">需身上 ${zShort(need)}</span></button>`}).join('')}</div>
+    <div class="note">${esc(S.name)} 身上 ${fmt(S.zeny)}z${dbt?`・<b class="bad">有欠款，先還款</b>`:''}</div>`}
+/* 託管按鈕放在不會一直重畫的地方，電腦出牌時也按得到 */
+function mjBar(){const F=fun(),st=F.mj;return `<div class="row" style="justify-content:flex-end;margin:0;gap:6px"><button type="button" class="sm ${F.mjSnd!==false?'on':''}" data-mj="snd">${F.mjSnd!==false?'🔊':'🔇'} 音效</button><button type="button" class="sm ${F.mjVoice!==false?'on':''}" data-mj="voice">${F.mjVoice!==false?'🗣️':'🤐'} 報牌語音</button>${st&&st.phase!=='end'?`<button type="button" class="sm ${st.auto?'on':''}" data-mj="auto">${st.auto?'取消託管':'託管'}</button>`:''}</div>`}
+function mjDraw(){const el=document.getElementById('mjBox');if(!el)return;let bar=document.getElementById('mjBar'),body=document.getElementById('mjBody');
+  if(!bar||!body){el.innerHTML='<div id="mjBar"></div><div id="mjBody"></div>';bar=document.getElementById('mjBar');body=document.getElementById('mjBody')}
+  const bh=mjBar();if(bar.dataset.h!==bh){bar.innerHTML=bh;bar.dataset.h=bh}const st=fun().mj;body.innerHTML=st?(MJS.rolling?mjDiceHTML(st,MJS.rolling):mjHTML()):mjStakeHTML();if(st&&!MJS.rolling)mjEvents(st)}
+const MJDIE=['','⚀','⚁','⚂','⚃','⚄','⚅'];
+function mjDiceHTML(st,d){const sum=d[0]+d[1]+d[2],fin=MJS.rollDone;return `<div class="mjdice"><div class="note">擲骰決定莊家（從你開始數，逆時針：你→下家→對家→上家）</div><div class="dice3">${d.map(x=>`<span class="die">${MJDIE[x]}</span>`).join('')}</div>
+  <div style="font-size:17px;min-height:1.6em">${fin?`${d.join('＋')}＝<b>${sum}</b> 點 → <b class="bad">${MJ.SEATN[st.dealer]}當莊</b>`:'擲骰中…'}</div></div>`}
+/* 把新的牌局紀錄轉成聲音 */
+const MJSAY={'中':'紅中','發':'發財','白':'白板'};
+function mjEvents(st){const n=st.logN||0;if(MJS.heard==null||MJS.heard>n){MJS.heard=n;return}const k=n-MJS.heard;if(k<=0)return;const lines=st.log.slice(-Math.min(k,st.log.length));MJS.heard=n;
+  for(const t of lines){let m;
+    if((m=t.match(/打出 (.+)。/))){mjSnd.clack();const nm=m[1];mjSnd.say(MJSAY[nm]||nm)}
+    else if(/自摸|八仙過海|七搶一/.test(t)){mjSnd.win();mjSnd.say(/八仙/.test(t)?'八仙過海':/七搶一/.test(t)?'七搶一':'自摸')}
+    else if(/胡 /.test(t)||/胡！/.test(t)){mjSnd.win();mjSnd.say('胡')}
+    else if(/加槓|暗槓|槓 /.test(t)){mjSnd.clack(2);mjSnd.say('槓')}
+    else if(/碰 /.test(t)){mjSnd.clack(2);mjSnd.say('碰')}
+    else if(/吃 /.test(t)){mjSnd.clack(2);mjSnd.say('吃')}
+    else if(/補花/.test(t)){mjSnd.clack()}
+    else if(/流局/.test(t)){mjSnd.say('流局')}}}
+/* 音效（Web Audio 合成，不用下載檔案）＋ 語音報牌（瀏覽器內建語音） */
+const mjSnd={ctx:null,unlock(){try{if(!this.ctx){const A=window.AudioContext||window.webkitAudioContext;if(A)this.ctx=new A()}if(this.ctx&&this.ctx.state==='suspended')this.ctx.resume();if(window.speechSynthesis&&!this._v){const u=new SpeechSynthesisUtterance(' ');u.volume=0;speechSynthesis.speak(u);this._v=1}}catch(e){}},
+  on(){return fun().mjSnd!==false&&this.ctx&&this.ctx.state==='running'},
+  clack(n=1){if(!this.on())return;const c=this.ctx;for(let i=0;i<n;i++){const t0=c.currentTime+i*.07;
+    const len=Math.floor(c.sampleRate*.05),buf=c.createBuffer(1,len,c.sampleRate),d=buf.getChannelData(0);for(let j=0;j<len;j++)d[j]=(Math.random()*2-1)*Math.pow(1-j/len,4);
+    const src=c.createBufferSource();src.buffer=buf;const bp=c.createBiquadFilter();bp.type='bandpass';bp.frequency.value=2600;bp.Q.value=1.2;const g=c.createGain();g.gain.value=.9;src.connect(bp).connect(g).connect(c.destination);src.start(t0);
+    const o=c.createOscillator(),og=c.createGain();o.type='triangle';o.frequency.setValueAtTime(1900,t0);o.frequency.exponentialRampToValueAtTime(900,t0+.06);og.gain.setValueAtTime(.18,t0);og.gain.exponentialRampToValueAtTime(.001,t0+.08);o.connect(og).connect(c.destination);o.start(t0);o.stop(t0+.1)}},
+  dice(){if(!this.on())return;for(let i=0;i<7;i++)setTimeout(()=>this.clack(),i*110+Math.random()*40)},
+  win(){if(!this.on())return;const c=this.ctx;[523,659,784,1047].forEach((f,i)=>{const t0=c.currentTime+i*.09,o=c.createOscillator(),g=c.createGain();o.type='square';o.frequency.value=f;g.gain.setValueAtTime(.08,t0);g.gain.exponentialRampToValueAtTime(.001,t0+.35);o.connect(g).connect(c.destination);o.start(t0);o.stop(t0+.4)})},
+  say(t){try{if(fun().mjVoice===false||!window.speechSynthesis)return;const u=new SpeechSynthesisUtterance(t);u.lang='zh-TW';u.rate=fun().fast?1.5:1.15;u.pitch=1;const vs=speechSynthesis.getVoices();const v=vs.find(x=>/zh[-_]TW/i.test(x.lang))||vs.find(x=>/zh/i.test(x.lang));if(v)u.voice=v;
+    if(speechSynthesis.speaking||speechSynthesis.pending)speechSynthesis.cancel();speechSynthesis.speak(u)}catch(e){}}};
+function mjMount(){const el=document.getElementById('mjBox');if(!el)return;const st=fun().mj;if(st&&st.phase==='end'&&!st.paid)mjSettle();mjDraw();if(st&&st.phase!=='end')mjRun()}
+function mjRun(){if(MJS.timer)return;const F=fun(),st=F.mj;if(!st||st.phase==='end'){mjSettle();return}
+  if(st.dice&&!st.diceSeen&&!MJS.rolling){const fin=st.dice;MJS.rolling=[1,1,1];MJS.rollDone=false;mjSnd.dice();let n=0;const roll=()=>{if(!fun().mj){MJS.rolling=null;return}
+      if(n++<(F.fast?4:10)){MJS.rolling=[1+Math.floor(Math.random()*6),1+Math.floor(Math.random()*6),1+Math.floor(Math.random()*6)];mjDraw();MJS.timer=setTimeout(roll,90)}
+      else{MJS.rolling=fin;MJS.rollDone=true;mjDraw();mjSnd.say(`${MJ.SEATN[st.dealer]==='你'?'你':MJ.SEATN[st.dealer]}當莊`);MJS.timer=setTimeout(()=>{MJS.timer=null;MJS.rolling=null;st.diceSeen=true;MJ.lg(st,`擲骰 ${fin.join('＋')}＝${fin[0]+fin[1]+fin[2]}，${MJ.SEATN[st.dealer]}當莊。`);MJS.heard=st.logN;dirty=true;mjDraw();mjRun()},F.fast?700:1600)}};
+    MJS.timer=setTimeout(roll,60);return}
+  const tick=()=>{MJS.timer=null;const st=fun().mj;if(!st)return;if(!document.getElementById('mjBox')){return}
+    let r;try{r=MJ.step(st)}catch(e){console.error(e);r='end';if(!st.result){st.phase='end';st.result={draw:true}}}dirty=true;
+    if(r==='end'||st.phase==='end'){mjSettle();mjDraw();return}
+    if(r==='wait'){MJS.sel=null;mjDraw();try{save()}catch(e){}return}
+    mjDraw();MJS.timer=setTimeout(tick,F.fast?120:(st.phase==='draw'?250:420))};
+  MJS.timer=setTimeout(tick,F.fast?80:200)}
+function mjSettle(){const F=fun(),st=F.mj;if(!st||st.phase!=='end'||st.paid)return;st.paid=true;const r=st.result;
+  if(r&&!r.draw){if(r.win===0){const c=r.pay.reduce((a,p)=>a+p.amt,0)/COINZ;F.coin+=c;F.st.coin+=c;log('lvl',`🀄 麻將${r.special||(r.self?'自摸':'胡牌')} ${r.tai} 台，得到 ${fmt(c)} 遊樂幣！`)}
+    else{const mine=r.pay.find(p=>p.p===0);if(mine){const ch=ROOT.chars[st.ci]||S;const z=Math.min(ch.zeny,mine.amt);ch.zeny-=z;if(ch===S)zOut('娛樂（麻將）',z);const rest=mine.amt-z;
+      if(rest>0){const dc=Math.ceil(rest/COINZ);F.debt=(F.debt||0)+dc;st.debtAdd=dc}log('sys',`🀄 麻將${r.self?`${MJ.SEATN[r.win]}自摸`:'放槍'}，付出 ${fmt(mine.amt)}z${rest>0?`（不夠的 ${fmt(Math.ceil(rest/COINZ))} 遊樂幣記為欠款）`:''}。`)}}}
+  F.mjDealer=(st.dealer+1)%4;dirty=true;try{save()}catch(e){}setTimeout(()=>{if(tab==='fun')renderTab()},0)}
+function mjStart(i){const F=fun();if(F.mj&&F.mj.phase!=='end')return;if(funLocked())return;const s=MJ.STAKES[i];if(!s)return;if(S.zeny<s.d+s.t){toast(`身上要有 ${zShort(s.d+s.t)} 才能坐這一桌`);return}
+  let dealer,dice=null;if(MJS.again&&F.mjDealer!=null){dealer=F.mjDealer}else{dice=[1+Math.floor(R()*6),1+Math.floor(R()*6),1+Math.floor(R()*6)];dealer=(dice[0]+dice[1]+dice[2]-1)%4}MJS.again=false;
+  F.mj=MJ.newGame(R,i,dealer);F.mj.ci=CUR;F.mj.dice=dice;F.mj.diceSeen=!dice;MJS.heard=F.mj.logN||0;MJS.sel=null;mjSnd.unlock();dirty=true;try{save()}catch(e){}mjDraw();mjRun()}
+function mjClick(b){const a=b.dataset.mj,k=b.dataset.k,F=fun(),st=F.mj;
+  if(a==='start'){mjSnd.unlock();mjStart(+k);return}
+  if(a==='snd'||a==='voice'){const key=a==='snd'?'mjSnd':'mjVoice';F[key]=F[key]===false;dirty=true;mjSnd.unlock();if(a==='voice'&&F.mjVoice!==false)mjSnd.say('語音開啟');const bar=document.getElementById('mjBar');if(bar)bar.dataset.h='';mjDraw();return}if(a==='repay'){mjRepay();return}
+  if(!st)return;
+  if(a==='again'){const i=st.stake;F.mj=null;MJS.again=true;mjStart(i);if(!F.mj)mjDraw();return}
+  if(a==='leave'){F.mj=null;dirty=true;mjDraw();renderTab();return}
+  if(a==='auto'){st.auto=!st.auto;if(st.auto&&st.pend&&!st.pend.choice){st.pend.choice=st.phase==='rob'?{a:'ron'}:(MJ.ai.claim(st,0,st.pend.opts)||{a:'pass'})}dirty=true;mjDraw();mjRun();return}
+  if(st.phase==='act'&&st.turn===0&&!st.auto){
+    if(a==='dis'){const kk=+k;if(MJS.sel!==kk){MJS.sel=kk;mjDraw();return}MJS.sel=null;MJ.doAct(st,0,{a:'discard',k:kk});}
+    else if(a==='tsumo'){MJ.doAct(st,0,{a:'tsumo'})}else if(a==='akan'){MJ.doAct(st,0,{a:'akan',k:+k})}else if(a==='kakan'){MJ.doAct(st,0,{a:'kakan',k:+k})}else return;
+    dirty=true;try{save()}catch(e){}mjDraw();if(st.phase==='end'){mjSettle();mjDraw()}else mjRun();return}
+  if(st.pend&&!st.pend.choice){const o=st.pend.opts;let c=null;if(a==='ron'&&o.ron)c={a:'ron'};else if(a==='pon'&&o.pon)c={a:'pon'};else if(a==='kan'&&o.kan)c={a:'kan'};else if(a==='chi'&&o.chi&&o.chi[+k])c={a:'chi',pair:o.chi[+k]};else if(a==='pass')c={a:'pass'};
+    if(!c)return;st.pend.choice=c;dirty=true;try{save()}catch(e){}mjDraw();mjRun()}}
+function mjRepay(){const F=fun(),d=funDebt();if(!d)return;const can=Math.min(d,Math.floor(S.zeny/COINZ));if(can<=0){toast(`${S.name} 身上不到 ${fmt(COINZ)}z，換一隻有錢的角色來還`);return}
+  S.zeny-=can*COINZ;zOut('還麻將欠款',can*COINZ);F.debt=d-can;log('sys',`還了 ${fmt(can)} 遊樂幣的麻將欠款（${fmt(can*COINZ)}z）${F.debt?`，還欠 ${fmt(F.debt)}`:'，已經還清'}。`);toast(F.debt?`還了 ${fmt(can)}，還欠 ${fmt(F.debt)} 遊樂幣`:'麻將欠款已還清！');dirty=true;try{save()}catch(e){}renderTab()}
 function funView(){const F=fun(),bet=F.bet,c=C();setTimeout(funMount,0);
   const bets=FUNBETS.map(b=>`<button type="button" class="sm ${b===bet?'on':''}" data-fun="bet" data-k="${b}">${zShort(b)}</button>`).join('');
   const bl=k=>{const b=S.boost&&S.boost[k];return b>S.clock?`<span class="good">剩 ${Math.ceil((b-S.clock)/60000)} 分鐘</span>`:'<span class="note">未使用</span>'};
   const days=['日','一','二','三','四','五','六'],od=funOpen(),nx=(()=>{for(let k=1;k<8;k++){const w=(twDay()+k)%7;if([1,3,5].includes(w))return `週${days[w]}`}})();
-  return box(`遊樂幣：${fmt(F.coin)}`,`<div class="note">用 Zeny 下注，贏的是<b>遊樂幣</b>（1 遊樂幣 = ${fmt(COINZ)}z 的獎金），遊樂幣只能拿來換下面的道具。遊樂幣是整個帳號共用，換到的道具會放進目前角色「${esc(S.name)}」的背包。</div>
+  setTimeout(mjMount,0);const dbt=funDebt();
+  return (dbt?box('⚠ 麻將欠款',`<div class="bad" style="font-size:16px"><b>目前欠款 ${fmt(dbt)} 遊樂幣</b>（= ${fmt(dbt*COINZ)}z）</div><div class="note">有欠款時娛樂全部鎖住（含遊樂幣兌換）。用目前角色「${esc(S.name)}」身上的 Zeny 還款（1 遊樂幣 = ${fmt(COINZ)}z），錢不夠可以換其他角色來還。</div><div class="row"><button type="button" class="pri" data-mj="repay" ${S.zeny>=COINZ?'':'disabled'}>還款（最多 ${fmt(Math.min(dbt,Math.floor(S.zeny/COINZ)))} 幣）</button><span class="note">身上 ${fmt(S.zeny)}z</span></div>`):'')+box(`遊樂幣：${fmt(F.coin)}`,`<div class="note">用 Zeny 下注，贏的是<b>遊樂幣</b>（1 遊樂幣 = ${fmt(COINZ)}z 的獎金），遊樂幣只能拿來換下面的道具。遊樂幣是整個帳號共用，換到的道具會放進目前角色「${esc(S.name)}」的背包。</div>
     <div class="row"><b>押注</b>${bets}<label class="chk"><input type="checkbox" data-fun="fast" ${F.fast?'checked':''}> 快速</label></div><div class="note">身上 ${fmt(S.zeny)}z</div>`)+
    (!FUN_SLOT?'':!od?card('仙境轉轉樂',`<div class="note" style="font-size:15px"><b>今天（週${days[twDay()]}）轉轉樂沒開。</b><br>開放時間：每週一、週三、週五（台灣時間），下次是 <b>${nx}</b>。<br>骰子比大小、遊樂幣兌換和加成道具每天都可以用。</div>`):card('仙境轉轉樂',`<div id="slotSlot"></div><div id="funMsg" class="note" style="text-align:center;font-size:15px;min-height:22px">${FUN.msg||'同一種圖案在盤面上 8 個以上就得分，得分的圖案會消掉、上面的掉下來再算一次。'}</div>
     <div class="row" style="justify-content:center"><button type="button" class="pri" data-fun="spin" ${FUN.busy?'disabled':''}>轉（${zShort(bet)}）</button><button type="button" data-fun="buy" ${FUN.busy?'disabled':''}>買免費遊戲（${zShort(bet*BUYX)}）</button></div>
@@ -2281,6 +2614,7 @@ ${SLOT.S.slice().reverse().map(x=>`<tr><td><img src="${(SLIMG[x[0]]||{}).src||''
     <div class="row"><b>押注</b>${bets}</div><div class="row" style="justify-content:center"><button type="button" class="pri" data-fun="dice" data-k="big" ${FUN.rolling?'disabled':''}>押大（${zShort(bet)}）</button><button type="button" class="pri" data-fun="dice" data-k="small" ${FUN.rolling?'disabled':''}>押小（${zShort(bet)}）</button><label class="chk" style="margin-left:auto"><input type="checkbox" data-fun="dskip" ${F.diceSkip?'checked':''}> 跳過動畫</label></div>
     <div id="diceBox" style="text-align:center;font-size:44px;line-height:1.3;min-height:60px">${FUN.rolling?[1,2,3].map(()=>`<span class="die">${DIE[rnd(1,6)]}</span>`).join(''):FUN.dice?FUN.dice.d.map(x=>`<span class="die">${DIE[x]}</span>`).join(''):''}</div>
     ${FUN.rolling?'<div class="note" style="text-align:center">擲骰中…</div>':''}${FUN.dice?`<div style="text-align:center">總和 ${FUN.dice.sum}${FUN.dice.tri?'（豹子）':FUN.dice.sum>=11?'（大）':'（小）'}，你押${FUN.dice.big?'大':'小'}：${FUN.dice.win?`<b class="good">贏了 ${fmt(FUN.dice.coins)} 遊樂幣</b>`:'<span class="bad">輸了</span>'}</div>`:''}`)+
+   card('台灣麻將（16 張）',`<div id="mjBox"><div id="mjBar"></div><div id="mjBody">${F.mj?mjHTML():mjStakeHTML()}</div></div>`)+
    (card('二八槓',`<div class="note">用 40 張麻將牌（一～九筒各 4 張、白板 4 張，白板算半點），你和電腦莊家各拿 2 張比大小：<b>對子</b>最大（白板對＞九筒對＞…＞一筒對），其次<b>二八槓</b>（二筒＋八筒），再來比<b>點數</b>（兩張相加取個位數，九點半最大、鱉十 0 點最小）。<b>一樣大算莊家贏</b>。<br>贏了拿回 <b>${E8X} 倍</b>押注的遊樂幣；用<b>對子或二八槓贏</b>拿回 <b>${E8SP} 倍</b>（長期平均約拿回 80%）。</div>
     <div class="row"><b>押注</b>${bets}</div><div class="row" style="justify-content:center"><button type="button" class="pri" data-fun="e8" ${FUN.e8busy?'disabled':''}>下注開牌（${zShort(bet)}）</button><label class="chk" style="margin-left:auto"><input type="checkbox" data-fun="dskip" ${F.diceSkip?'checked':''}> 跳過動畫</label></div>
     <div id="e8Box" style="min-height:132px">${FUN.e8?e8Board(FUN.e8):''}</div>
@@ -2303,7 +2637,7 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-min]');if(
 applyMin();
 document.querySelectorAll('[data-min]').forEach(b=>b.onclick=()=>$(b.dataset.min).classList.toggle('min'));
 const panel=$('panel');
-panel.addEventListener('click',e=>{const b=e.target.closest('[data-fun]');if(!b||b.type==='checkbox')return;const a=b.dataset.fun,k=b.dataset.k,F=fun();
+panel.addEventListener('click',e=>{const mb=e.target.closest('[data-mj]');if(mb){mjClick(mb);return}const b=e.target.closest('[data-fun]');if(!b||b.type==='checkbox')return;const a=b.dataset.fun,k=b.dataset.k,F=fun();
   if(a==='bet'){F.bet=+k;renderTab()}else if(a==='spin')funSpin(false);else if(a==='buy'){if(armed!=='funbuy'){armed='funbuy';b.textContent=`再按一次確認（${zShort(F.bet*BUYX)}）`;return}armed=null;funSpin(true)}
   else if(a==='auto'){FUN.auto=+k-1;funSpin(false)}else if(a==='autostop'){FUN.auto=0;renderTab()}else if(a==='dice')funDice(k==='big');else if(a==='e8')funE8();else if(a==='x'){const x=FUNX.find(q=>q[0]===k);if(x)funBuyX(k,x[1])}});
 panel.addEventListener('change',e=>{const el=e.target;const a=el.dataset&&el.dataset.fun;if(!a)return;if(a==='fast'){fun().fast=el.checked;dirty=true}else if(a==='dskip'){fun().diceSkip=el.checked;dirty=true}else if(a==='ba'){const c=C();c.boostAuto=c.boostAuto||{};c.boostAuto[el.dataset.k]=el.checked;dirty=true}});
