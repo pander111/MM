@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#79a75a"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="小黑窗"><meta name="apple-mobile-web-app-status-bar-style" content="default"><style>body{margin:0}</style><script>window.RO_GH=1;window.RO_BUILD="20261110195918";if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))</script></head><body>
+<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#79a75a"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="小黑窗"><meta name="apple-mobile-web-app-status-bar-style" content="default"><style>body{margin:0}</style><script>window.RO_GH=1;window.RO_BUILD="20261110200047";if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))</script></head><body>
 <title>仙境放置小黑窗</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <style>
@@ -1114,7 +1114,12 @@ const weight=()=>{let w=0;for(const k in S.inv)w+=(ITEMS[k]?.w||0)*S.inv[k];if(S
 const wPct=d=>Math.floor(weight()/(d||D()).maxW*100);
 const canWield=(it,job)=>{job=job||S.job;if(it.lv&&S.lv<it.lv)return false;if(it.sex&&C().look.g!==it.sex)return false;if(it.slot==='weapon'&&(it.wc==='other'||!JOBS[job].w.includes(it.wc)))return false;return !it.jobs||it.jobs.includes(job)};
 const DCP=[0,7,9,11,13,15,17,19,21,23,24];
-const priceBuy=k=>Math.ceil(ITEMS[k].buy*(1-Math.max(DCP[SL('discount')],SLC('RG_COMPULSION')?5+4*SLC('RG_COMPULSION'):0)/100));
+const dcPct=()=>Math.max(DCP[SL('discount')]||0,SLC('RG_COMPULSION')?5+4*SLC('RG_COMPULSION'):0);
+const dcSrc=()=>{const a=DCP[SL('discount')]||0,b=SLC('RG_COMPULSION')?5+4*SLC('RG_COMPULSION'):0;return b>a?`強迫折扣 Lv ${SLC('RG_COMPULSION')}`:`低價買入 Lv ${SL('discount')}`};
+const priceBuy=k=>Math.ceil(ITEMS[k].buy*(1-dcPct()/100));
+/* 低價買入生效時，把「原價 ⇒ 實付」寫出來 */
+const dcZ=(base,pay)=>dcPct()&&pay<base?`${fmt(base)}z ⇒ ${fmt(pay)}z，${dcSrc().replace(/ Lv.*/,'')} −${dcPct()}%`:`${fmt(pay)}z`;
+const dcCell=k=>dcPct()?`<span class="note">${fmt(ITEMS[k].buy)}⇒</span><b class="good">${fmt(priceBuy(k))}z</b>`:`${fmt(priceBuy(k))}z`;
 const priceSell=k=>Math.floor(ITEMS[k].sell*(1+DCP[SL('overcharge')]/100));
 /* 高價賣出生效時，把「原價 ⇒ 實拿」寫出來 */
 const ocPct=()=>DCP[SL('overcharge')]||0;
@@ -2101,7 +2106,7 @@ function ammoPref(t){const c=C(),a=c.arrows||{},m=a.mob||{},need=needAmmo(wcls()
   if(t&&ok(m[t.n]))r.push(m[t.n]);if(ok(a.type))r.push(a.type);for(const k in c.restock)if(c.restock[k].on&&ok(k))r.push(k);return[...new Set(r)]}
 const ammoAvail=k=>(S.inv[k]||0)+(ROOT.stor[k]||0)>0;
 function ammoBuy(k){const a=C().arrows||{};if(!a.on||!SHOP.tool.includes(k)||!ITEMS[k])return false;const n=Math.max(1,a.n||500),cost=priceBuy(k)*n;if(S.zeny<cost)return false;
-  S.zeny-=cost;zOut('箭矢／子彈',cost);S.inv[k]=(S.inv[k]||0)+n;log('sys',`購買 ${ITEMS[k].n} ×${fmt(n)}（${fmt(cost)}z）。`);dirty=true;return true}
+  S.zeny-=cost;zOut('箭矢／子彈',cost);S.inv[k]=(S.inv[k]||0)+n;log('sys',`購買 ${ITEMS[k].n} ×${fmt(n)}（${dcZ(ITEMS[k].buy*n,cost)}）。`);dirty=true;return true}
 function ammoTake(k,why){const fromS=!(S.inv[k]>0);if(S.ammo&&S.ammo.id&&S.ammo.id!==k&&S.ammo.n>0)S.inv[S.ammo.id]=(S.inv[S.ammo.id]||0)+S.ammo.n;
   const base=S.ammo&&S.ammo.id===k?S.ammo.n:0;let n;if(fromS){n=ROOT.stor[k];delete ROOT.stor[k]}else{n=S.inv[k];delete S.inv[k]}
   S.ammo={id:k,n:base+n};if(why!==false)log('sys',`${why||''}${fromS?'從倉庫取出並':''}裝上 ${ITEMS[k].n} ×${fmt(S.ammo.n)}。`);dirty=true}
@@ -2125,7 +2130,7 @@ function townStep(){
   for(const [k,r] of Object.entries(c.restock)){if(!r.on)continue;let need=r.to-craftHave(k);if(need<=0)continue;
     if(ROOT.stor[k]>0){const n=Math.min(need,ROOT.stor[k]);ROOT.stor[k]-=n;S.inv[k]=(S.inv[k]||0)+n;need-=n;log('sys',`從倉庫補給 ${ITEMS[k].n} ×${n}。`)}
     if(need>0&&ITEMS[k].buy){const p=priceBuy(k);const can=Math.max(0,Math.min(need,Math.floor((S.zeny-c.keepZeny)/p)));
-      if(can>0){S.zeny-=can*p;zOut(ITEMS[k].t==='arrow'||ITEMS[k].t==='bullet'||ITEMS[k].t==='shuri'?'箭矢／子彈／飛鏢':'回城補給：'+ITEMS[k].n,can*p);S.inv[k]=(S.inv[k]||0)+can;log('sys',`購買 ${ITEMS[k].n} ×${can}（-${fmt(can*p)}z）。`)}
+      if(can>0){S.zeny-=can*p;zOut(ITEMS[k].t==='arrow'||ITEMS[k].t==='bullet'||ITEMS[k].t==='shuri'?'箭矢／子彈／飛鏢':'回城補給：'+ITEMS[k].n,can*p);S.inv[k]=(S.inv[k]||0)+can;log('sys',`購買 ${ITEMS[k].n} ×${can}（-${dcZ(ITEMS[k].buy*can,can*p)}）。`)}
       if(craftHave(k)<r.min)fail=true}}
   autoCraft();autoAmmo();
   if(fail){S.restockCD=S.clock+600000;log('warn','Zeny 不夠，補給沒有補滿，10 分鐘後再試。')}else S.restockCD=0;
@@ -2493,10 +2498,10 @@ shop(){const refineBox=()=>{const list=refineList();
   if(!cats.some(([c])=>c===ui.shopTab))ui.shopTab=cats[0][0];const st=ui.shopTab;const disc=SL('discount');
   const list=tw.s[st].map(k=>{const it=ITEMS[k],p=priceBuy(k);const info=itemInfo(k)+(it.t==='eq'&&!canWield(it)?' <span class="bad">（目前職業或等級不能用）</span>':'');
     const qs=it.t==='arrow'||it.t==='shuri'?[100,500]:it.t==='eq'?[1]:[1,10];
-    return `<tr><td>${it.n}<div class="note">${info}</div></td><td class="r">${fmt(p)}z</td><td class="r"><span class="btns" style="justify-content:flex-end">${qs.map(q=>`<button type="button" class="sm" data-a="buy" data-k="${k}" data-n="${q}" ${S.zeny<p*q?'disabled':''}>×${q}</button>`).join('')}</span></td></tr>`}).join('');
+    return `<tr><td>${it.n}<div class="note">${info}</div></td><td class="r">${dcCell(k)}</td><td class="r"><span class="btns" style="justify-content:flex-end">${qs.map(q=>`<button type="button" class="sm" data-a="buy" data-k="${k}" data-n="${q}" ${S.zeny<p*q?'disabled':''}>×${q}</button>`).join('')}</span></td></tr>`}).join('');
   return box('商店與 NPC',`<div class="row"><label class="chk">城鎮 <select id="townSel">${towns.map(t=>`<option ${t.n===tw.n?'selected':''}>${t.n}</option>`).join('')}</select></label><span>Zeny <b>${fmt(S.zeny)}</b></span></div>
     <div class="btns">${cats.map(([c,n])=>`<button type="button" class="sm ${st===c?'on':''}" data-a="stab" data-k="${c}">${n}（${tw.s[c].length}）</button>`).join('')}</div>
-    ${disc?`<div class="note">折扣 Lv ${disc}：購買便宜 ${5+2*disc}%</div>`:''}<div class="tw"><table><tbody>${list}</tbody></table></div>
+    ${dcPct()?`<div class="note good">🏷️ ${dcSrc()} 生效中：在 NPC 商店購買便宜 ${dcPct()}%（價錢欄顯示 原價⇒實付）。</div>`:''}<div class="tw"><table><tbody>${list}</tbody></table></div>
     <div class="note">各城鎮商人賣的東西照官方 NPC 商店資料，只能打怪取得的裝備不會出現在商店。掛機時「回城補」會從有賣該道具的城鎮買。</div>`+`<div style="height:10px"></div>`+box('重置 NPC',(()=>{let sp=0;for(const k in S.st)for(let v=1;v<S.st[k];v++)sp+=statCost(v);let kp=0;for(const k in S.sk)if(SK[k]&&!SK[k].quest&&(k!=='basic'||S.job==='novice'))kp+=S.sk[k];
     const rc=resetCost();return `<div class="note">把點錯的點數全部退回來重新分配。${GHM?'初心者和一轉免費；二轉以後每次重置（屬性或技能各算一次）收 1,000,000z。':'免費，可以重複使用。'}</div>
     <div class="row"><button type="button" data-a="resetst" ${sp?'':'disabled'}>${armed==='rst'?'<span class="bad">再按一次確認重置屬性點</span>':'重置屬性點'+payNote(rc)}</button><span class="note">六圍全部回到 1，退回 ${fmt(sp)} 點（重置後共 ${fmt(S.pts+sp)} 點）</span></div>
@@ -3144,7 +3149,7 @@ panel.addEventListener('click',e=>{
     const d=D();S.hp=Math.min(S.hp,d.maxHp);S.sp=Math.min(S.sp,d.maxSp);log('sys',`重置 NPC：屬性點已重置${z?`（花費 ${fmt(z)}z）`:''}，退回 ${sp} 點，目前有 ${S.pts} 點可以分配。`+(off?'（已關閉自動配點）':''));toast('屬性點已重置');tab='char'}else{armed='rst';keepArm=true}break;
   case'resetsk':if(armed==='rsk'){const z=resetCost();if(S.zeny<z){toast(`Zeny 不夠，需要 ${fmt(z)}z`);break}if(z){S.zeny-=z;zOut('重置費用',z)}let kp=0;for(const k of Object.keys(S.sk))if(SK[k]&&!SK[k].quest&&(k!=='basic'||S.job==='novice')){kp+=S.sk[k];delete S.sk[k]}S.skp+=kp;
     const d=D();S.hp=Math.min(S.hp,d.maxHp);S.sp=Math.min(S.sp,d.maxSp);log('sys',`重置 NPC：技能已重置${z?`（花費 ${fmt(z)}z）`:''}，退回 ${kp} 點技能點。`);toast('技能點已重置');tab='job'}else{armed='rsk';keepArm=true}break;
-  case'buy':{const p=priceBuy(k)*n;if(S.zeny>=p){S.zeny-=p;zOut('手動購買',p);S.inv[k]=(S.inv[k]||0)+n;S.restockCD=0;log('sys',`購買 ${ITEMS[k].n} ×${n}（-${fmt(p)}z）。`)}}break;
+  case'buy':{const p=priceBuy(k)*n;if(S.zeny>=p){S.zeny-=p;zOut('手動購買',p);S.inv[k]=(S.inv[k]||0)+n;S.restockCD=0;log('sys',`購買 ${ITEMS[k].n} ×${n}（-${dcZ(ITEMS[k].buy*n,p)}）。`);if(dcPct())toast(`${fmt(ITEMS[k].buy*n)}z ⇒ ${fmt(p)}z（${dcSrc()} −${dcPct()}%）`)}}break;
   case'ssell':{const have=ROOT.stor[k]||0;if(!have||!(ITEMS[k].sell>0))break;let q;if(b.dataset.all){if(armed!=='ss_'+k){armed='ss_'+k;keepArm=true;break}q=have}else{const qi=document.getElementById('sw_'+k);q=qi?Math.floor(Number(qi.value)||0):1;if(q<1){toast('請輸入要賣的數量');rr=false;break}q=Math.min(q,have)}
     const pz=priceSell(k)*q;ROOT.stor[k]-=q;if(!ROOT.stor[k])delete ROOT.stor[k];S.zeny+=pz;zIn('倉庫賣出',pz);if(ocPct())toast(`${fmt(ITEMS[k].sell*q)}z ⇒ ${fmt(pz)}z（高價賣出 +${ocPct()}%）`);log('sys',`從倉庫賣出 ${ITEMS[k].n} ×${q}（+${ocZ(ITEMS[k].sell*q,pz)}）。`)}break;
   case'wd':{const qn=b.dataset.q?Math.floor(Number((document.getElementById('sw_'+k)||{}).value)||0):n;if(qn<1){toast('請輸入數量');rr=false;break}const m=Math.min(qn,ROOT.stor[k]||0);ROOT.stor[k]-=m;if(!ROOT.stor[k])delete ROOT.stor[k];S.inv[k]=(S.inv[k]||0)+m}break;
