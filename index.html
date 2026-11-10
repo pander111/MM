@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#79a75a"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="小黑窗"><meta name="apple-mobile-web-app-status-bar-style" content="default"><style>body{margin:0}</style><script>window.RO_GH=1;window.RO_BUILD="20261110200921";if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))</script></head><body>
+<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#79a75a"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="小黑窗"><meta name="apple-mobile-web-app-status-bar-style" content="default"><style>body{margin:0}</style><script>window.RO_GH=1;window.RO_BUILD="20261110212540";if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))</script></head><body>
 <title>仙境放置小黑窗</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <style>
@@ -2222,9 +2222,10 @@ async function slPlay(spin,fast){if(fast){FUN.hl=null;FUN.show=spin.frames[spin.
 async function funSpin(buy){const F=fun(),bet=F.bet,cost=buy?bet*BUYX:bet;if(FUN.busy)return;if(!funOpen()){toast('轉轉樂只在每週一、週三、週五開放');FUN.auto=0;renderTab();return}if(S.zeny<cost){toast(`Zeny 不夠，需要 ${fmt(cost)}z`);FUN.auto=0;renderTab();return}
   FUN.busy=true;S.zeny-=cost;zOut('娛樂',cost);F.st.bet+=cost;F.st.spins++;FUN.big='';
   const res=slRound(R,buy);let shown=0;
+  /* 結果先算好並立刻入帳存檔：動畫中途關掉或跳出也不會少拿 */
+  const coins=coinPay(res.tot*bet);F.coin+=coins;F.st.coin+=coins;if(res.free)F.st.free++;if(res.tot>F.st.best)F.st.best=res.tot;dirty=true;try{save()}catch(e){}
   for(const sp of res.spins){if(sp.free&&!shown){FUN.big=buy?'買下免費遊戲：4 個星星，送 10 次！':'免費遊戲 10 次！';await wait(F.fast?300:900);FUN.big=''}shown++;await slPlay(sp,F.fast);
     if(sp.win>0&&!F.fast){FUN.msg=`${sp.free?'免費遊戲：':''}贏 ${(sp.base).toFixed(2)} 倍${sp.mul>1?` × 乘數 ${sp.mul}`:''}`;renderFunMsg();await wait(350)}}
-  const coins=coinPay(res.tot*bet);F.coin+=coins;F.st.coin+=coins;if(res.free)F.st.free++;if(res.tot>F.st.best)F.st.best=res.tot;
   FUN.msg=coins?`押 ${zShort(cost)}，贏 <b>${fmt(coins)}</b> 遊樂幣（${res.tot.toFixed(1)} 倍${res.free?`，免費遊戲 ${res.free} 次`:''}）`:`押 ${zShort(cost)}，沒有中獎`;
   if(res.tot>=50){FUN.big=`大獎 ${Math.round(res.tot)} 倍！`;log('lvl',`★ 仙境轉轉樂中了 ${Math.round(res.tot)} 倍，得到 ${fmt(coins)} 遊樂幣！`)}
   dirty=true;FUN.busy=false;renderTab();if(FUN.big){const bg=FUN.big;setTimeout(()=>{if(FUN.big===bg)FUN.big=''},2500)}
@@ -2232,7 +2233,7 @@ async function funSpin(buy){const F=fun(),bet=F.bet,cost=buy?bet*BUYX:bet;if(FUN
 function renderFunMsg(){const el=document.getElementById('funMsg');if(el)el.innerHTML=FUN.msg}
 function funDice(big){if(FUN.rolling)return;const F=fun(),bet=F.bet;if(S.zeny<bet){toast(`Zeny 不夠，需要 ${fmt(bet)}z`);return}S.zeny-=bet;zOut('娛樂',bet);F.st.bet+=bet;
   const d=[rnd(1,6),rnd(1,6),rnd(1,6)],sum=d[0]+d[1]+d[2],tri=d[0]===d[1]&&d[1]===d[2],isBig=sum>=11,win=!tri&&isBig===big;const coins=win?coinPay(bet*DICEX):0;F.coin+=coins;F.st.coin+=coins;
-  const res={d,sum,tri,win,coins,big};dirty=true;
+  const res={d,sum,tri,win,coins,big};dirty=true;try{save()}catch(e){}
   if(F.diceSkip){FUN.dice=res;renderTab();return}
   FUN.rolling=true;FUN.dice=null;renderTab();const t0=performance.now();
   const tick=()=>{const el=document.getElementById('diceBox'),k=(performance.now()-t0)/1200;
@@ -2250,7 +2251,7 @@ const e8tile=(v,back)=>back?'<span class="mj back"></span>':v===0?'<span class="
 function funE8(){if(FUN.e8busy)return;const F=fun(),bet=F.bet;if(S.zeny<bet){toast(`Zeny 不夠，需要 ${fmt(bet)}z`);return}S.zeny-=bet;zOut('娛樂',bet);F.st.bet+=bet;
   const dk=[];for(let v=0;v<=9;v++)for(let k=0;k<4;k++)dk.push(v);for(let i=dk.length-1;i>0;i--){const j=Math.floor(R()*(i+1));[dk[i],dk[j]]=[dk[j],dk[i]]}
   const p=[dk[0],dk[2]],b=[dk[1],dk[3]],rp=e8rank(...p),rb=e8rank(...b),win=rp>rb,sp=win&&rp>=900,coins=win?coinPay(bet*(sp?E8SP:E8X)):0;F.coin+=coins;F.st.coin+=coins;dirty=true;
-  const res={p,b,win,sp,coins,tie:rp===rb,show:4};
+  const res={p,b,win,sp,coins,tie:rp===rb,show:4};try{save()}catch(e){}
   if(F.diceSkip){FUN.e8=res;renderTab();return}
   FUN.e8busy=true;FUN.e8={...res,show:0};renderTab();let k=0;const nx=()=>{k++;FUN.e8.show=k;if(k>=4){FUN.e8busy=false;renderTab();return}const el=document.getElementById('e8Box');if(el)el.innerHTML=e8Board(FUN.e8);setTimeout(nx,450)};setTimeout(nx,450)}
 function e8Board(r){const t=(arr,o)=>arr.map((v,i)=>e8tile(v,r.show<o+i*2+1)).join('');
