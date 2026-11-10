@@ -96,6 +96,9 @@ button.pill{padding:4px 10px}
 .spr{display:flex;flex-direction:column;align-items:center;gap:8px;padding:6px 0}
 canvas{image-rendering:pixelated}
 .die{display:inline-block;margin:0 4px;transition:transform .06s}
+.mj{display:inline-flex;flex-direction:column;align-items:center;justify-content:center;width:40px;height:56px;margin:0 3px;background:#fffdf4;border:1px solid #b9b2a0;border-bottom:5px solid #2e7d4f;border-radius:6px;color:#c62828;font-weight:700;font-size:20px;line-height:1.05;vertical-align:middle;box-shadow:0 1px 2px rgba(0,0,0,.25)}
+.mj small{font-size:12px;color:#1d5fb4}.mj.back{background:linear-gradient(#3a9a63,#2e7d4f);border-color:#24603d}.mj .wb{display:block;width:24px;height:36px;border:2px solid #1d5fb4;border-radius:3px}
+.e8row{display:flex;align-items:center;gap:2px;margin:6px 0}.e8lab{width:3em;font-weight:700}.e8nm{margin-left:10px;font-weight:700}
 .buffbar{display:flex;gap:5px;overflow-x:auto;overflow-y:hidden;white-space:nowrap;height:32px;align-items:center;-webkit-overflow-scrolling:touch;scrollbar-width:thin}
 .buffbar .chip{flex:none}
 .hp-low{color:var(--bad);font-weight:700}
@@ -2141,8 +2144,8 @@ function vendStep(){
 /* ================= 介面 ================= */
 const SLOT={C:6,Rw:5,
  S:[// key,name,weight,pays [8-9,10-11,12+]
-  ['red','紅色藥水',22,[0.19,0.57,1.5]],['ora','橙色藥水',20,[0.3,0.69,3.1]],['yel','黃色藥水',18,[0.38,0.76,3.8]],['wht','白色藥水',16,[0.61,0.92,6.1]],
-  ['blu','藍色藥水',13,[0.76,1.1,7.6]],['ore','神之金屬原石',10,[1.1,1.5,9.2]],['gem','藍色魔力礦石',8,[1.5,3.8,11.4]],['box','古老藍箱子',6,[1.9,7.6,19.1]]],
+  ['red','紅色藥水',22,[0.17,0.5,1.3]],['ora','橙色藥水',20,[0.26,0.6,2.7]],['yel','黃色藥水',18,[0.33,0.66,3.31]],['wht','白色藥水',16,[0.53,0.8,5.31]],
+  ['blu','藍色藥水',13,[0.66,0.96,6.61]],['ore','神之金屬原石',10,[0.96,1.3,8]],['gem','藍色魔力礦石',8,[1.3,3.31,9.92]],['box','古老藍箱子',6,[1.65,6.61,16.62]]],
  scW:1.4,mulW:0.6,mulWF:1.7,
  MV:[[2,300],[3,200],[4,120],[5,100],[6,60],[8,50],[10,40],[12,25],[15,20],[20,15],[25,10],[50,5],[100,2]],
  cap:500};
@@ -2167,7 +2170,9 @@ function slRound(r,buy){let tot=0,sc=0;let first=null;const spins=[];
 
 /* ================= 娛樂：仙境轉轉樂（6×5 消除）＋骰子比大小；贏的是遊樂幣，可換道具 ================= */
 const FUNX=[['i607',150],['i608',60],['i12208',300],['iexp2',600],['i12210',400],['idrop2',800],['iwtup',1000],['i12103',1000]];
-const FUNBETS=[10000,100000,1000000],COINZ=10000,BUYX=50,FUN_SLOT=true;
+const FUNBETS=[10000,100000,1000000],COINZ=10000,BUYX=50,FUN_SLOT=true,DICEX=1.65,E8X=1.5,E8SP=2.5;
+/* 獎金換遊樂幣：小數部分用機率進位，平均剛好等於獎金（長期拿回約 80%） */
+const coinPay=z=>{const x=z/COINZ,f=Math.floor(x);return f+(R()<x-f?1:0)};
 /* 轉轉樂只在每週一、週三、週五開放（台灣時間）；骰子比大小每天都開 */
 const twDay=()=>new Date(Date.now()+8*3600e3).getUTCDay(),funOpen=()=>[1,3,5].includes(twDay());/* 轉轉樂先關閉，目前只開骰子比大小 */
 const FUN={busy:false,auto:0,cv:null,show:null,hl:null,msg:'',dice:null,fx:[]};
@@ -2210,14 +2215,14 @@ async function funSpin(buy){const F=fun(),bet=F.bet,cost=buy?bet*BUYX:bet;if(FUN
   const res=slRound(R,buy);let shown=0;
   for(const sp of res.spins){if(sp.free&&!shown){FUN.big=buy?'買下免費遊戲：4 個星星，送 10 次！':'免費遊戲 10 次！';await wait(F.fast?300:900);FUN.big=''}shown++;await slPlay(sp,F.fast);
     if(sp.win>0&&!F.fast){FUN.msg=`${sp.free?'免費遊戲：':''}贏 ${(sp.base).toFixed(2)} 倍${sp.mul>1?` × 乘數 ${sp.mul}`:''}`;renderFunMsg();await wait(350)}}
-  const coins=Math.round(res.tot*bet/COINZ);F.coin+=coins;F.st.coin+=coins;if(res.free)F.st.free++;if(res.tot>F.st.best)F.st.best=res.tot;
+  const coins=coinPay(res.tot*bet);F.coin+=coins;F.st.coin+=coins;if(res.free)F.st.free++;if(res.tot>F.st.best)F.st.best=res.tot;
   FUN.msg=coins?`押 ${zShort(cost)}，贏 <b>${fmt(coins)}</b> 遊樂幣（${res.tot.toFixed(1)} 倍${res.free?`，免費遊戲 ${res.free} 次`:''}）`:`押 ${zShort(cost)}，沒有中獎`;
   if(res.tot>=50){FUN.big=`大獎 ${Math.round(res.tot)} 倍！`;log('lvl',`★ 仙境轉轉樂中了 ${Math.round(res.tot)} 倍，得到 ${fmt(coins)} 遊樂幣！`)}
   dirty=true;FUN.busy=false;renderTab();if(FUN.big){const bg=FUN.big;setTimeout(()=>{if(FUN.big===bg)FUN.big=''},2500)}
   if(FUN.auto>0){FUN.auto--;if(res.tot>=100||res.free){FUN.auto=0;FUN.msg+='（中大獎或免費遊戲，自動轉已停止）';renderTab();return}await wait(F.fast?250:700);if(FUN.auto>0&&tab==='fun')funSpin(false);else FUN.auto=0}}
 function renderFunMsg(){const el=document.getElementById('funMsg');if(el)el.innerHTML=FUN.msg}
 function funDice(big){if(FUN.rolling)return;const F=fun(),bet=F.bet;if(S.zeny<bet){toast(`Zeny 不夠，需要 ${fmt(bet)}z`);return}S.zeny-=bet;zOut('娛樂',bet);F.st.bet+=bet;
-  const d=[rnd(1,6),rnd(1,6),rnd(1,6)],sum=d[0]+d[1]+d[2],tri=d[0]===d[1]&&d[1]===d[2],isBig=sum>=11,win=!tri&&isBig===big;const coins=win?Math.round(bet*2/COINZ):0;F.coin+=coins;F.st.coin+=coins;
+  const d=[rnd(1,6),rnd(1,6),rnd(1,6)],sum=d[0]+d[1]+d[2],tri=d[0]===d[1]&&d[1]===d[2],isBig=sum>=11,win=!tri&&isBig===big;const coins=win?coinPay(bet*DICEX):0;F.coin+=coins;F.st.coin+=coins;
   const res={d,sum,tri,win,coins,big};dirty=true;
   if(F.diceSkip){FUN.dice=res;renderTab();return}
   FUN.rolling=true;FUN.dice=null;renderTab();const t0=performance.now();
@@ -2227,6 +2232,20 @@ function funDice(big){if(FUN.rolling)return;const F=fun(),bet=F.bet;if(S.zeny<be
     setTimeout(tick,60+k*90)};tick()}
 function funBuyX(k,cost){const F=fun();if(F.coin<cost){toast('遊樂幣不夠');return}F.coin-=cost;S.inv[k]=(S.inv[k]||0)+1;dirty=true;log('drop',`用 ${cost} 遊樂幣換到 ${ITEMS[k].n}。`);toast(`換到 ${ITEMS[k].n}！`);renderTab()}
 const DIE=['','⚀','⚁','⚂','⚃','⚄','⚅'];
+/* 二八槓：40 張（一～九筒各 4 張＋白板 4 張，白板算半點）。對子＞二八槓＞點數；同大小算莊家贏 */
+const E8CN=['白板','一','二','三','四','五','六','七','八','九'];
+const e8pv=t=>t===0?.5:t;
+const e8rank=(a,b)=>a===b?1000+(a===0?10:a):(a+b===10&&(a===2||a===8))?900:((e8pv(a)+e8pv(b))%10)*10;
+const e8name=(a,b)=>{if(a===b)return a===0?'白板對（最大）':`${E8CN[a]}筒對`;if(a+b===10&&(a===2||a===8))return '二八槓';const p=(e8pv(a)+e8pv(b))%10;return p===0?'鱉十（0 點）':p%1?`${p===.5?'':E8CN[Math.floor(p)]}點半`.replace(/^點半/,'半點'):`${E8CN[p]}點`};
+const e8tile=(v,back)=>back?'<span class="mj back"></span>':v===0?'<span class="mj"><i class="wb"></i></span>':`<span class="mj"><b>${E8CN[v]}</b><small>筒</small></span>`;
+function funE8(){if(FUN.e8busy)return;const F=fun(),bet=F.bet;if(S.zeny<bet){toast(`Zeny 不夠，需要 ${fmt(bet)}z`);return}S.zeny-=bet;zOut('娛樂',bet);F.st.bet+=bet;
+  const dk=[];for(let v=0;v<=9;v++)for(let k=0;k<4;k++)dk.push(v);for(let i=dk.length-1;i>0;i--){const j=Math.floor(R()*(i+1));[dk[i],dk[j]]=[dk[j],dk[i]]}
+  const p=[dk[0],dk[2]],b=[dk[1],dk[3]],rp=e8rank(...p),rb=e8rank(...b),win=rp>rb,sp=win&&rp>=900,coins=win?coinPay(bet*(sp?E8SP:E8X)):0;F.coin+=coins;F.st.coin+=coins;dirty=true;
+  const res={p,b,win,sp,coins,tie:rp===rb,show:4};
+  if(F.diceSkip){FUN.e8=res;renderTab();return}
+  FUN.e8busy=true;FUN.e8={...res,show:0};renderTab();let k=0;const nx=()=>{k++;FUN.e8.show=k;if(k>=4){FUN.e8busy=false;renderTab();return}const el=document.getElementById('e8Box');if(el)el.innerHTML=e8Board(FUN.e8);setTimeout(nx,450)};setTimeout(nx,450)}
+function e8Board(r){const t=(arr,o)=>arr.map((v,i)=>e8tile(v,r.show<o+i*2+1)).join('');
+  return `<div class="e8row"><span class="e8lab">莊家</span>${t(r.b,1)}<span class="e8nm">${r.show>=4?e8name(...r.b):''}</span></div><div class="e8row"><span class="e8lab">你</span>${t(r.p,0)}<span class="e8nm">${r.show>=3?e8name(...r.p):''}</span></div>`}
 function funView(){const F=fun(),bet=F.bet,c=C();setTimeout(funMount,0);
   const bets=FUNBETS.map(b=>`<button type="button" class="sm ${b===bet?'on':''}" data-fun="bet" data-k="${b}">${zShort(b)}</button>`).join('');
   const bl=k=>{const b=S.boost&&S.boost[k];return b>S.clock?`<span class="good">剩 ${Math.ceil((b-S.clock)/60000)} 分鐘</span>`:'<span class="note">未使用</span>'};
@@ -2243,15 +2262,19 @@ function funView(){const F=fun(),bet=F.bet,c=C();setTimeout(funMount,0);
 <b>4. 免費遊戲中</b><br>・每一轉照一般方式算得分。<br>・有得分的那一轉，盤面上的倍數球會<b>累加</b>進「累計倍數」，整場不歸零；每一轉的得分都乘上累計倍數。<br>・再出 3 個以上星星就<b>加 5 次</b>（這時星星不另外給獎金）。<br>
 <b>5. 買免費遊戲</b><br>・花押注的 <b>${BUYX} 倍</b>，固定算 4 個星星：先給 3 倍，再送 10 次免費遊戲。<br>
 <b>6. 上限</b><br>・一次下注（含它送的星星獎金和免費遊戲）最多拿回押注的 <b>${fmt(SLOT.cap)} 倍</b>。<br>
-<b>7. 獎金與開放時間</b><br>・獎金換成<b>遊樂幣</b>（1 遊樂幣 = ${fmt(COINZ)} Zeny 的獎金），遊樂幣只能拿來換道具。<br>・長期平均大約拿回押注的 92～93%（買免費遊戲也差不多），請當作娛樂。<br>・轉轉樂只在<b>每週一、週三、週五</b>（台灣時間）開放；骰子比大小每天都開。</div>
+<b>7. 獎金與開放時間</b><br>・獎金換成<b>遊樂幣</b>（1 遊樂幣 = ${fmt(COINZ)} Zeny 的獎金），遊樂幣只能拿來換道具。<br>・長期平均大約拿回押注的 80%（買免費遊戲也差不多），請當作娛樂。<br>・轉轉樂只在<b>每週一、週三、週五</b>（台灣時間）開放；骰子比大小每天都開。</div>
 <div class="tw"><table><thead><tr><th>圖案</th><th class="r">8～9 個</th><th class="r">10～11 個</th><th class="r">12 個以上</th></tr></thead><tbody>
 ${SLOT.S.slice().reverse().map(x=>`<tr><td><img src="${(SLIMG[x[0]]||{}).src||''}" alt="" style="width:26px;height:26px;vertical-align:middle;margin-right:6px">${x[1]}</td><td class="r">${x[3][0]}x</td><td class="r">${x[3][1]}x</td><td class="r">${x[3][2]}x</td></tr>`).join('')}
 <tr><td><img src="${(SLIMG.sc||{}).src||''}" alt="" style="width:26px;height:26px;vertical-align:middle;margin-right:6px">免費星星（4／5／6 個以上）</td><td class="r">3x</td><td class="r">5x</td><td class="r">100x</td></tr>
 <tr><td><img src="${(SLIMG.mul||{}).src||''}" alt="" style="width:26px;height:26px;vertical-align:middle;margin-right:6px">倍數球</td><td class="r" colspan="3">×2～×100，乘上這一轉的得分</td></tr></tbody></table></div>`))+
-   card('骰子比大小',`<div class="note">擲 3 顆骰子：總和 11–17 是「大」、4–10 是「小」；三顆一樣（豹子）算莊家贏。猜中拿回 2 倍押注的遊樂幣。</div>
+   card('骰子比大小',`<div class="note">擲 3 顆骰子：總和 11–17 是「大」、4–10 是「小」；三顆一樣（豹子）算莊家贏。猜中拿回 ${DICEX} 倍押注的遊樂幣（長期平均約拿回 80%）。</div>
     <div class="row" style="justify-content:center"><button type="button" class="pri" data-fun="dice" data-k="big" ${FUN.rolling?'disabled':''}>押大</button><button type="button" class="pri" data-fun="dice" data-k="small" ${FUN.rolling?'disabled':''}>押小</button><label class="chk" style="margin-left:auto"><input type="checkbox" data-fun="dskip" ${F.diceSkip?'checked':''}> 跳過動畫</label></div>
     <div id="diceBox" style="text-align:center;font-size:44px;line-height:1.3;min-height:60px">${FUN.rolling?[1,2,3].map(()=>`<span class="die">${DIE[rnd(1,6)]}</span>`).join(''):FUN.dice?FUN.dice.d.map(x=>`<span class="die">${DIE[x]}</span>`).join(''):''}</div>
     ${FUN.rolling?'<div class="note" style="text-align:center">擲骰中…</div>':''}${FUN.dice?`<div style="text-align:center">總和 ${FUN.dice.sum}${FUN.dice.tri?'（豹子）':FUN.dice.sum>=11?'（大）':'（小）'}，你押${FUN.dice.big?'大':'小'}：${FUN.dice.win?`<b class="good">贏了 ${fmt(FUN.dice.coins)} 遊樂幣</b>`:'<span class="bad">輸了</span>'}</div>`:''}`)+
+   (GHM?'':card('二八槓',`<div class="note">用 40 張麻將牌（一～九筒各 4 張、白板 4 張，白板算半點），你和電腦莊家各拿 2 張比大小：<b>對子</b>最大（白板對＞九筒對＞…＞一筒對），其次<b>二八槓</b>（二筒＋八筒），再來比<b>點數</b>（兩張相加取個位數，九點半最大、鱉十 0 點最小）。<b>一樣大算莊家贏</b>。<br>贏了拿回 <b>${E8X} 倍</b>押注的遊樂幣；用<b>對子或二八槓贏</b>拿回 <b>${E8SP} 倍</b>（長期平均約拿回 80%）。</div>
+    <div class="row" style="justify-content:center"><button type="button" class="pri" data-fun="e8" ${FUN.e8busy?'disabled':''}>下注開牌（${zShort(bet)}）</button><label class="chk" style="margin-left:auto"><input type="checkbox" data-fun="dskip" ${F.diceSkip?'checked':''}> 跳過動畫</label></div>
+    <div id="e8Box" style="min-height:132px">${FUN.e8?e8Board(FUN.e8):''}</div>
+    <div style="text-align:center;min-height:1.6em">${FUN.e8&&FUN.e8.show>=4?(FUN.e8.win?`<b class="good">你贏了！得到 ${fmt(FUN.e8.coins)} 遊樂幣${FUN.e8.sp?`（${e8name(...FUN.e8.p)}，${E8SP} 倍）`:''}</b>`:`<span class="bad">${FUN.e8.tie?'一樣大，莊家贏':'莊家贏'}</span>`):FUN.e8busy?'<span class="note">開牌中…</span>':''}</div>`))+
    card('遊樂幣兌換',`<div class="tw"><table><thead><tr><th>道具</th><th class="r">遊樂幣</th><th class="r">背包</th><th></th></tr></thead><tbody>${FUNX.map(([k,cost])=>{const it=ITEMS[k];return `<tr><td>${it.n}<div class="note">${itemInfo(k)}</div></td><td class="r">${fmt(cost)}</td><td class="r">${S.inv[k]||0}</td><td class="r"><button type="button" class="sm" data-fun="x" data-k="${k}" ${F.coin<cost?'disabled':''}>換</button></td></tr>`}).join('')}</tbody></table></div>`)+
    card('加成道具（目前角色）',`${Object.entries(BOOSTI).map(([k,b])=>`<div class="row"><b style="min-width:7em">${ITEMS[k].n}</b>${bl(b.k)}<span class="note">背包 ${S.inv[k]||0}</span><button type="button" class="sm" data-a="use" data-k="${k}" ${(S.inv[k]||0)>0?'':'disabled'}>使用</button><label class="chk"><input type="checkbox" data-fun="ba" data-k="${k}" ${(c.boostAuto||{})[k]?'checked':''}> 效果結束自動續用</label></div>`).join('')}
     <div class="row"><b style="min-width:7em">負重增加卷</b><span class="note">已使用 ${(S.wtPlus||0)/100}／${WTMAX} 次（+${S.wtPlus||0}）　背包 ${S.inv.iwtup||0}</span><button type="button" class="sm" data-a="use" data-k="iwtup" ${(S.inv.iwtup||0)>0&&(S.wtPlus||0)<WTMAX*100?'':'disabled'}>使用</button></div>
@@ -2272,7 +2295,7 @@ document.querySelectorAll('[data-min]').forEach(b=>b.onclick=()=>$(b.dataset.min
 const panel=$('panel');
 panel.addEventListener('click',e=>{const b=e.target.closest('[data-fun]');if(!b||b.type==='checkbox')return;const a=b.dataset.fun,k=b.dataset.k,F=fun();
   if(a==='bet'){F.bet=+k;renderTab()}else if(a==='spin')funSpin(false);else if(a==='buy'){if(armed!=='funbuy'){armed='funbuy';b.textContent=`再按一次確認（${zShort(F.bet*BUYX)}）`;return}armed=null;funSpin(true)}
-  else if(a==='auto'){FUN.auto=+k-1;funSpin(false)}else if(a==='autostop'){FUN.auto=0;renderTab()}else if(a==='dice')funDice(k==='big');else if(a==='x'){const x=FUNX.find(q=>q[0]===k);if(x)funBuyX(k,x[1])}});
+  else if(a==='auto'){FUN.auto=+k-1;funSpin(false)}else if(a==='autostop'){FUN.auto=0;renderTab()}else if(a==='dice')funDice(k==='big');else if(a==='e8')funE8();else if(a==='x'){const x=FUNX.find(q=>q[0]===k);if(x)funBuyX(k,x[1])}});
 panel.addEventListener('change',e=>{const el=e.target;const a=el.dataset&&el.dataset.fun;if(!a)return;if(a==='fast'){fun().fast=el.checked;dirty=true}else if(a==='dskip'){fun().diceSkip=el.checked;dirty=true}else if(a==='ba'){const c=C();c.boostAuto=c.boostAuto||{};c.boostAuto[el.dataset.k]=el.checked;dirty=true}});
 
 panel.addEventListener('pointerdown',()=>lastTouch=Date.now());
