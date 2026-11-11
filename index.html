@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#79a75a"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="小黑窗"><meta name="apple-mobile-web-app-status-bar-style" content="default"><style>body{margin:0}</style><script>window.RO_GH=1;window.RO_BUILD="20261111173221";if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))</script></head><body>
+<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#79a75a"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="小黑窗"><meta name="apple-mobile-web-app-status-bar-style" content="default"><style>body{margin:0}</style><script>window.RO_GH=1;window.RO_BUILD="20261111173909";if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))</script></head><body>
 <title>仙境放置小黑窗</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <style>
@@ -491,15 +491,15 @@ const SK={
  mlesson:{n:'操控樂器',c:'BA_MUSICALLESSON',j:'bard',max:10,k:'passive',d:L=>`使用樂器時 ATK +${3*L}`},
  mstrike:{n:'樂器攻擊',c:'BA_MUSICALSTRIKE',j:'bard',max:5,k:'atk',need:['instrument'],mul:L=>1.25+.25*L,sp:L=>1+2*L,d:L=>`樂器 ATK ${125+25*L}%；SP ${1+2*L}`},
  avulcan:{n:'奧義箭亂舞',c:'CG_ARROWVULCAN',j:'bard',max:10,k:'atk',need:['instrument','whip'],hits:()=>9,mul:L=>.5+.1*L,sp:L=>12+2*L,d:L=>`9 次 ATK ${50+10*L}%；SP ${12+2*L}`},
- ascross:{n:'刺客的黃昏',c:'BA_ASSASSINCROSS',j:'bard',max:10,k:'buff',song:1,need:['instrument'],sp:L=>38+2*L,dur:()=>180,d:L=>`全隊攻擊速度 +${5+L}%；持續 180 秒`},
- bragi:{n:'布萊奇之詩',c:'BA_POEMBRAGI',j:'bard',max:10,k:'buff',song:1,need:['instrument'],sp:L=>35+5*L,dur:()=>180,d:L=>`全隊詠唱時間 -${3*L}%；持續 180 秒`},
- idun:{n:'伊登的蘋果',c:'BA_APPLEIDUN',j:'bard',max:10,k:'buff',song:1,need:['instrument'],sp:L=>35+5*L,dur:()=>180,d:L=>`全隊 Max HP +${5+2*L}%；持續 180 秒`},
+ ascross:{n:'刺客的黃昏',c:'BA_ASSASSINCROSS',j:'bard',max:10,k:'buff',song:1,need:['instrument'],sp:L=>38+2*L,dur:()=>180,d:L=>`隊友攻擊速度 +(${5+L} + AGI/20)%（和雙手劍加速等取最大值，拿弓無效）；持續 180 秒`},
+ bragi:{n:'布萊奇之詩',c:'BA_POEMBRAGI',j:'bard',max:10,k:'buff',song:1,need:['instrument'],sp:L=>35+5*L,dur:()=>180,d:L=>`隊友詠唱時間 -(${3*L} + DEX/10)%；持續 180 秒`},
+ idun:{n:'伊登的蘋果',c:'BA_APPLEIDUN',j:'bard',max:10,k:'buff',song:1,need:['instrument'],sp:L=>35+5*L,dur:()=>180,d:L=>`隊友 Max HP +(${5+2*L} + VIT/10)%，每 6 秒補 HP ${30+5*L} + VIT/2；持續 180 秒`},
  dlesson:{n:'練習舞蹈',c:'DC_DANCINGLESSON',j:'dancer',max:10,k:'passive',d:L=>`使用鞭子時 ATK +${3*L}`},
  tarrow:{n:'纏箭投擲',c:'DC_THROWARROW',j:'dancer',max:5,k:'atk',need:['whip'],mul:L=>1.25+.25*L,sp:L=>1+2*L,d:L=>`鞭子 ATK ${125+25*L}%；SP ${1+2*L}`},
  avulcan2:{n:'奧義箭亂舞',c:'CG_ARROWVULCAN',j:'dancer',max:10,k:'atk',need:['instrument','whip'],hits:()=>9,mul:L=>.5+.1*L,sp:L=>12+2*L,d:L=>`9 次 ATK ${50+10*L}%；SP ${12+2*L}`},
- fkiss:{n:'女神之吻',c:'DC_FORTUNEKISS',j:'dancer',max:10,k:'buff',song:1,need:['whip'],sp:L=>40+3*L,dur:()=>180,d:L=>`全隊 CRI +${5+L}；持續 180 秒`},
- humming:{n:'哼唱之音',c:'DC_HUMMING',j:'dancer',max:10,k:'buff',song:1,need:['whip'],sp:L=>20+2*L,dur:()=>180,d:L=>`全隊 HIT +${2*L}；持續 180 秒`},
- service:{n:'為您服務',c:'DC_SERVICEFORYOU',j:'dancer',max:10,k:'buff',song:1,need:['whip'],sp:L=>40+3*L,dur:()=>180,d:L=>`全隊 Max SP +${15+L}%、技能 SP 消耗 -${20+3*L}%；持續 180 秒`},
+ fkiss:{n:'女神之吻',c:'DC_FORTUNEKISS',j:'dancer',max:10,k:'buff',song:1,need:['whip'],sp:L=>40+3*L,dur:()=>180,d:L=>`隊友 CRI +(${10+L} + LUK/10)；持續 180 秒`},
+ humming:{n:'哼唱之音',c:'DC_HUMMING',j:'dancer',max:10,k:'buff',song:1,need:['whip'],sp:L=>20+2*L,dur:()=>180,d:L=>`隊友 HIT +(${1+2*L} + DEX/10)；持續 180 秒`},
+ service:{n:'為您服務',c:'DC_SERVICEFORYOU',j:'dancer',max:10,k:'buff',song:1,need:['whip'],sp:L=>40+3*L,dur:()=>180,d:L=>`隊友 Max SP +(${15+L} + INT/10)%、技能 SP 消耗 -(${20+3*L} + INT/10)%；持續 180 秒`},
  backstab:{n:'背刺',c:'RG_BACKSTAP',j:'rogue',max:10,k:'atk',sure:1,mul:L=>3+.4*L,sp:()=>16,d:L=>`必中攻擊 ATK ${300+40*L}%；SP 16`},
  raid:{n:'潛擊',c:'RG_RAID',j:'rogue',max:5,k:'atk',mul:L=>1+.4*L,sp:()=>20,d:L=>`ATK ${100+40*L}%；SP 20`},
  snatcher:{n:'強奪',c:'RG_SNATCHER',j:'rogue',max:10,k:'passive',d:L=>`普通攻擊時 ${L}% 機率自動偷竊`},
@@ -653,7 +653,7 @@ const SKI={
  SA_ABRACADABRA:{k:'random',sp:()=>50,fd:()=>'隨機放出一個攻擊技能；消耗黃色魔力礦石 2 個；SP 50'},
  BA_DISSONANCE:{k:'buff',song:1,need:['instrument'],sp:L=>15+3*L,dur:()=>180,fd:L=>`不諧和音：戰鬥中每 3 秒對怪物造成 ${30+10*L} 點傷害；持續 180 秒`},
  DC_UGLYDANCE:{k:'passive',fd:()=>'（本遊戲的怪物沒有 SP，用不到）'},
- DC_DONTFORGETME:{k:'buff',song:1,need:['whip'],sp:L=>25+3*L,dur:()=>180,fd:L=>`勿忘我：怪物移動和攻擊變慢；持續 180 秒`},
+ DC_DONTFORGETME:{k:'buff',song:1,need:['whip'],sp:L=>25+3*L,dur:()=>180,fd:L=>`勿忘我：怪物攻速 -(${5+3*L} + DEX/10)%、移動 -(${5+3*L} + AGI/10)%；持續 180 秒`},
  RG_STEALCOIN:{k:'stealz',sp:()=>15,fd:L=>`偷怪物的 Zeny，成功率約 ${L}% + DEX、LUK 加成；SP 15`},
  RG_GANGSTER:{k:'passive',fd:()=>'坐下休息時，主動怪不會過來打你'},
  RG_COMPULSION:{k:'passive',fd:L=>`向 NPC 購買便宜 ${5+4*L}%（跟商人的折扣取較高的）`},
@@ -683,8 +683,8 @@ const SKI={
  BD_DRUMBATTLEFIELD:{k:'buff',ens:1,sp:L=>35+3*L,dur:()=>60,eff:L=>({atk:25+25*L,def:2+2*L}),fd:L=>`合奏・戰鼓震天：全隊 ATK +${25+25*L}、DEF +${2+2*L}`},
  BD_RINGNIBELUNGEN:{k:'buff',ens:1,sp:L=>35+3*L,dur:()=>60,fd:L=>`合奏・尼貝隆根之戒指：拿 Lv4 武器的隊員 ATK +${75+25*L}`},
  BD_ROKISWEIL:{k:'buff',ens:1,sp:()=>180,dur:()=>60,fd:()=>'合奏・洛奇的悲鳴：怪物不能放技能'},
- BD_INTOABYSS:{k:'buff',ens:1,sp:()=>70,dur:()=>60,fd:()=>'合奏・觸媒之所：技能不消耗魔力礦石等觸媒'},
- BD_SIEGFRIED:{k:'buff',ens:1,sp:()=>20,dur:()=>60,eff:L=>({resEle:{水:55+5*L,地:55+5*L,火:55+5*L,風:55+5*L,毒:55+5*L,聖:55+5*L,暗:55+5*L,幽靈:55+5*L,不死:55+5*L}}),fd:L=>`合奏・不死神齊格弗里德：全隊屬性抗性 +${55+5*L}%（無屬性除外）`},
+ BD_INTOABYSS:{k:'buff',ens:1,sp:()=>70,dur:()=>60,fd:()=>'合奏・深淵之中：技能不消耗魔力礦石（只免礦石，其他道具照扣）'},
+ BD_SIEGFRIED:{k:'buff',ens:1,sp:()=>20,dur:()=>60,eff:L=>({resEle:{水:55+5*L,地:55+5*L,火:55+5*L,風:55+5*L,毒:55+5*L,聖:55+5*L,暗:55+5*L,幽靈:55+5*L,不死:55+5*L}}),fd:L=>`合奏・不死神齊格弗里德：全隊屬性抗性 +${55+5*L}%（無屬性除外）、異常狀態抗性 +${10*L}%`},
  BD_ADAPTATION:{k:'passive',fd:()=>'（本遊戲沒有實作：中斷演奏用）'},
  BD_ENCORE:{k:'passive',fd:()=>'（本遊戲沒有實作：重複上一首歌）'},
  SM_FATALBLOW:{k:'passive',fd:()=>'狂擊 Lv6 以上時，有機率讓怪物暈眩 5 秒（機率 = (狂擊等級−5) × Base Lv ÷ 10 %）'},
@@ -787,7 +787,7 @@ const SKI={
  SA_FROSTWEAPON:{k:'buff',sp:()=>40,dur:()=>1200,eff:()=>({wEle:'水'})},
  SA_LIGHTNINGLOADER:{k:'buff',sp:()=>40,dur:()=>1200,eff:()=>({wEle:'風'})},
  SA_SEISMICWEAPON:{k:'buff',sp:()=>40,dur:()=>1200,eff:()=>({wEle:'地'})},
- BA_WHISTLE:{k:'buff',song:1,need:['instrument'],sp:L=>22+2*L,dur:()=>180,eff:L=>({flee:L})},
+ BA_WHISTLE:{k:'buff',song:1,need:['instrument'],sp:L=>20+4*L,dur:()=>180,fd:L=>`口哨：全隊 FLEE +(${L} + AGI/10)、完全迴避 +(${Math.floor((L+1)/2)} + LUK/30)（再加操控樂器加成，演奏者自己不吃）；持續 180 秒`},
  WE_CALLBABY:{k:'passive',fd:()=>'結婚後才用得到（本遊戲沒有結婚系統）'},
  AL_RUWACH:{k:'passive',fd:()=>'怪物躲起來（隱匿、偽裝）時自動施放，揭穿牠並造成 MATK 145% 聖屬性傷害；SP 10'},
  AL_WARP:{k:'passive',fd:()=>'開傳送之陣回城（本遊戲蝴蝶翅膀免費，回城直接用翅膀，不會浪費藍色魔力礦石）'},
@@ -928,9 +928,20 @@ for(const id in SK){const s=SK[id];if(SUPC.has(s.c))s.sup=1;if(PWC.has(s.c))s.pw
 const SPHC=new Set(['MO_INVESTIGATE','MO_FINGEROFFENSIVE','MO_EXTREMITYFIST','MO_EXPLOSIONSPIRITS']);
 const SIZEMOD={fist:[100,100,100],dagger:[100,75,50],sword:[75,100,75],two:[75,75,100],spear:[75,75,100],mace:[75,100,100],axe:[50,75,100],staff:[100,100,100],bow:[100,100,75],knuckle:[100,75,50],katar:[75,100,75],book:[100,100,50],whip:[75,100,50],instrument:[75,100,75],gun:[100,100,100],huuma:[75,75,100],other:[100,100,100]};
 const sizeMul=(d,t)=>{if(buffOnC('BS_WEAPONPERFECT')||(d&&d.E&&d.E.noSize))return 1;const w=wcls();const row=SIZEMOD[w]||SIZEMOD.other;let i={小:0,中:1,大:2}[t.size];if(i==null)i=1;let v=row[i];if(w==='spear'&&i===1&&SLC('KN_RIDING'))v=100;return v/100};
-/* 合奏：隊伍裡要同時有詩人和舞孃（使用者規則），其餘同一般 buff */
-const ensOk=sk=>{if(!sk.ens)return true;if(!partyOn()||!inParty(CUR))return false;const want=S.job==='bard'?'dancer':'bard';
-  return P().members.some(j=>j!==CUR&&ROOT.chars[j]&&ROOT.chars[j].job===want)};
+/* 合奏：隊伍要同時有詩人和舞孃，兩人都拿樂器／鞭子（官方武器判定） */
+const PFW=['instrument','whip'];
+const ensWhy=sk=>{if(!sk.ens)return '';const want=S.job==='bard'?'dancer':'bard',wn=want==='bard'?'詩人':'舞孃';
+  if(!PFW.includes(wcls()))return `自己要拿${S.job==='bard'?'樂器':'鞭子'}`;
+  if(!partyOn()||!inParty(CUR))return `要和${wn}組隊`;
+  const ms=P().members.filter(j=>j!==CUR&&ROOT.chars[j]&&ROOT.chars[j].job===want);if(!ms.length)return `隊伍要有${wn}`;
+  if(!ms.some(j=>{const w=ROOT.chars[j].eq&&ROOT.chars[j].eq.weapon;return w&&ITEMS[w]&&PFW.includes(ITEMS[w].wc)}))return `${wn}要拿${want==='bard'?'樂器':'鞭子'}`;return ''};
+const ensOk=sk=>!ensWhy(sk);
+/* 歌舞效果：記錄演奏者施放當下的能力值；官方演奏者自己吃不到自己的單奏效果 */
+const PS0={agi:0,dex:0,luk:0,int:0,vit:0,les:0};
+const songB=id=>{const b=S.buffs[id];return b&&b.until>S.clock&&b.by!==CUR?{lv:b.lv,ps:b.ps||PS0}:null};
+const songBC=c=>{for(const id of (SKBY[c]||[])){const b=songB(id);if(b)return b}return null};
+const songRaw=c=>{for(const id of (SKBY[c]||[])){const b=S.buffs[id];if(b&&b.until>S.clock)return {lv:b.lv,ps:b.ps||PS0}}return null};
+
 const SLC=c=>Math.max(0,...(SKBY[c]||[]).map(i=>SL(i)));
 const cartW=()=>Object.entries(S.cart||{}).reduce((s,[k,n])=>s+(ITEMS[k]?ITEMS[k].w*n:0),0);
 const shuriPick=()=>{const ok=k=>ITEMS[k]&&ITEMS[k].t==='shuri'&&(S.inv[k]||0)>0&&S.lv>=(ITEMS[k].lv||1);const pf=C().shuri;if(pf&&ok(pf))return pf;let b=null;for(const k in S.inv)if(ok(k)&&(!b||ITEMS[k].atk>ITEMS[b].atk))b=k;return b||pf||'i13250'};
@@ -1102,8 +1113,14 @@ function PE(){const e={};
   if(SL('faith'))addEff(e,{hp:200*SL('faith'),resEle:{聖:5*SL('faith')}});
   if(SL('dragonol'))addEff(e,{race:{龍族:4*SL('dragonol')}});
   const b=id=>buffOn(id)?S.buffs[id].lv:0;
-  if(b('ascross'))addEff(e,{aspdP:5+b('ascross')});if(b('bragi'))addEff(e,{castP:3*b('bragi')});if(b('idun'))addEff(e,{hpP:5+2*b('idun')});
-  if(b('fkiss'))addEff(e,{crit:5+b('fkiss')});if(b('humming'))addEff(e,{hit:2*b('humming')});if(b('service'))addEff(e,{spP:15+b('service'),spCostP:-(20+3*b('service'))});
+  {const F=Math.floor;let x;/* 官方前期公式（刺客的黃昏在攻速計算裡）；les＝操控樂器／練習舞蹈等級 */
+  if(x=songBC('BA_WHISTLE'))addEff(e,{flee:x.lv+F(x.ps.agi/10)+F(x.ps.les/2),pd:F((x.lv+1)/2)+F(x.ps.luk/30)+F(x.ps.les/5)});
+  if(x=songBC('BA_POEMBRAGI'))addEff(e,{castP:3*x.lv+F(x.ps.dex/10)+x.ps.les});
+  if(x=songBC('BA_APPLEIDUN'))addEff(e,{hpP:5+2*x.lv+F(x.ps.vit/10)+F(x.ps.les/2)});
+  if(x=songBC('DC_FORTUNEKISS'))addEff(e,{crit:(F(10+x.lv+x.ps.luk/10)*10+5*x.ps.les)/10});
+  if(x=songBC('DC_HUMMING'))addEff(e,{hit:1+2*x.lv+F(x.ps.dex/10)+x.ps.les});
+  if(x=songBC('DC_SERVICEFORYOU'))addEff(e,{spP:15+x.lv+F(x.ps.int/10)+F(x.ps.les/2),spCostP:-(20+3*x.lv+F(x.ps.int/10)+F(x.ps.les/2))});
+  if(x=songRaw('BD_SIEGFRIED'))addEff(e,{resSt:{blind:10*x.lv,stone:10*x.lv,freeze:10*x.lv,stun:10*x.lv,curse:10*x.lv,sleep:10*x.lv,silence:10*x.lv}})}
   for(const id in S.sk){const s=SK[id];if(s&&s.peff&&S.sk[id])addEff(e,s.peff(S.sk[id]))}
   if(S.pet&&S.pet.int>=910&&PETS[S.pet.mob])addEff(e,PETS[S.pet.mob].e);
   for(const id in S.buffs)if(id.startsWith('food_')&&buffOn(id))e[id.slice(5)]=(e[id.slice(5)]||0)+S.buffs[id].lv;
@@ -1147,6 +1164,7 @@ function D0(){
   let am=ab[wk]!=null?ab[wk]:ab[wc]!=null?ab[wc]:(200-j.aspd)*10;
   am-=Math.floor(am*(4*st.agi+st.dex)/1000);
   let hmax=0;for(const id in S.buffs){const s=SK[id];if(s&&s.haste&&buffOn(id)&&needOk(s))hmax=Math.max(hmax,Math.round((1-s.haste)*1000))}
+  {const x=songBC('BA_ASSASSINCROSS');if(x&&wc!=='bow'&&wc!=='gun')hmax=Math.max(hmax,(5+x.lv+Math.floor(x.ps.agi/20)+Math.floor(x.ps.les/2))*10)}/* 官方：和雙手劍加速等取最大值，拿弓／槍無效 */
   let rate=1000-hmax-(buffOn('pot_aspd')?S.buffs.pot_aspd.lv*10:0)-Math.round((E.aspdP||0)*10);
   if(SLC('KN_RIDING'))rate+=500-100*SLC('KN_CAVALIERMASTERY');
   if(buffOnC('CR_DEFENDER'))rate+=250-50*buffLvC('CR_DEFENDER');
@@ -1247,6 +1265,7 @@ function tick(ms){S.clock+=ms;S.stats.play+=ms;petTick(ms);homTick(ms);
       if(hasS('poison')&&S.hp>mx*.25&&!buffOnC('PR_SLOWPOISON'))S.hp=Math.max(mx*.25,S.hp-mx*.015*ms/1000);
       if(hasS('bleeding'))S.hp=Math.max(1,S.hp-mx*.01*ms/1000);
       if(hasS('stone')&&S.hp>mx*.25)S.hp=Math.max(mx*.25,S.hp-mx*.002*ms/1000)}}
+  {const x=mode!=='dead'&&S.hp>0?songBC('BA_APPLEIDUN'):null;if(x){S.idunT=(S.idunT||0)+ms;while(S.idunT>=6000){S.idunT-=6000;S.hp=Math.min(D().maxHp,S.hp+30+5*x.lv+Math.floor(x.ps.vit/2)+5*x.ps.les)}}else S.idunT=0}/* 伊登的蘋果：每 6 秒補 HP */
   if(mode!=='dead'&&S.hp>0&&!hasS('bleeding')){const d=D();if(wPct(d)<50){
     const hL=SL('hpreg'),sL=Math.max(SL('spreg'),SL('ninpou')),mL=sitting?SL('mo_spiritsrecovery'):0;
     const hr=(d.maxHp/200+d.st.vit/5+1)*(sitting?(SLC('LK_TENSIONRELAX')?6:2):1)*(1+(d.E.hpRegP||0)/100)*ms/6000+(hL?(5*hL+d.maxHp*hL/500)*ms/10000:0)+(mL?(4*mL+d.maxHp*mL/500)*ms/10000:0);
@@ -1448,13 +1467,14 @@ function maintainBuffs(d){
     const cost=spc(sk,lv);if(S.sp<cost||S.sp<d.maxSp*(b.spMin||0)/100)continue;
     /* 官方：賢者的火／水／風元素領域同時只能有一個 */
     if(sk.zone&&Object.keys(S.buffs).some(x=>x!==id&&SK[x]&&SK[x].zone&&buffOn(x)&&(S.buffs[x].by==null||S.buffs[x].by===CUR)))continue;
-    if(!ensOk(sk))continue;if(sk.spheres&&(S.spheres||0)<sk.spheres)continue;if(sk.coin&&(S.coins||0)<1)continue;
+    if(!ensOk(sk))continue;if(sk.ens&&(SKBY[sk.c]||[]).some(x=>x!==id&&buffOn(x)))continue;/* 同一首合奏詩人和舞孃只要一人放 */if(sk.spheres&&(S.spheres||0)<sk.spheres)continue;if(sk.coin&&(S.coins||0)<1)continue;
     {const mi=skItemMiss(sk,lv);if(mi){skItemWarn(sk,mi[0]);continue}}skItemUse(sk,lv);if(sk.spheres)S.spheres-=sk.spheres;if(sk.coin)S.coins--;if(sk.c==='MO_EXPLOSIONSPIRITS'){if((S.spheres||0)<5)continue;S.spheres-=5}
     if(sk.cnt)S.cnt=Object.assign(S.cnt||{},{[sk.c]:sk.cnt(lv)});
     S.sp-=cost;S.buffs[id]={lv,until:S.clock+sk.dur(lv)*1000,by:CUR};if(sk.onCast)sk.onCast(lv,d);
+    if(sk.song){const st=d.st;S.buffs[id].ps={agi:st.agi,dex:st.dex,luk:st.luk,int:st.int,vit:st.vit,les:(sk.c||'').startsWith('DC_')||S.job==='dancer'?SLC('DC_DANCINGLESSON'):SLC('BA_MUSICALLESSON')}}
     if(sk.rnd){const G=[{atkP:100},{def:25},{hit:50,flee:50},{str:20,agi:20,vit:20,int:20,dex:20,luk:20},{hpP:100}];S.buffs[id].eff=pick(G);log('skill',`聖歌的祝福：${effText(S.buffs[id].eff)}。`)}
     if((sk.song||sk.ens||(sk.pw&&b.party!==false))&&partyOn()&&inParty(CUR)){const ms=P().members.filter(j=>j!==CUR&&ROOT.chars[j]&&ROOT.chars[j].hp>0&&ROOT.chars[j].cfg.map===c.map);
-      ms.forEach(j=>{const o=ROOT.chars[j];o.buffs[id]={lv,until:o.clock+sk.dur(lv)*1000,by:CUR,eff:S.buffs[id].eff}});log('skill',`${sk.song&&sk.j!=='t_crusader'?(sk.j==='dancer'||sk.j==='t_dancer'?'跳起':'演奏'):'施放'} ${sk.n} Lv ${lv}${ms.length?`（全隊 ${ms.length+1} 人）`:''}。`)}
+      ms.forEach(j=>{const o=ROOT.chars[j];o.buffs[id]={lv,until:o.clock+sk.dur(lv)*1000,by:CUR,eff:S.buffs[id].eff,ps:S.buffs[id].ps}});log('skill',`${sk.song&&sk.j!=='t_crusader'?(sk.j==='dancer'||sk.j==='t_dancer'?'跳起':'演奏'):'施放'} ${sk.n} Lv ${lv}${ms.length?`（全隊 ${ms.length+1} 人）`:''}。`)}
     else log('skill',`施放 ${sk.n} Lv ${lv}。`);return true}
   return false
 }
@@ -1719,16 +1739,16 @@ function fight(d){
   if(t.owner!==CUR)return schedule(step2,el);
   // 怪物攻擊
   if(t.dot>0){const f=Math.min(t.dot,el);t.dot-=f;const v=Math.max(1,Math.floor(t.hp*.01*f/1000));if(t.cur>1){t.cur=Math.max(1,t.cur-v)}}
-  if(buffOnC('BA_DISSONANCE')&&t.cur>0){t.dis=(t.dis||0)+el;while(t.dis>=3000&&t.cur>0){t.dis-=3000;const v=30+10*buffLvC('BA_DISSONANCE');hitT(t,v);log('skill',`不諧和音對 ${t.n} 造成 ${v} 點傷害。`)}if(t.cur<=0)return win(d)}
+  if(buffOnC('BA_DISSONANCE')&&t.cur>0){t.dis=(t.dis||0)+el;while(t.dis>=3000&&t.cur>0){t.dis-=3000;const _x=songRaw('BA_DISSONANCE')||{lv:buffLvC('BA_DISSONANCE'),ps:PS0};const v=30+10*_x.lv+3*_x.ps.les;hitT(t,v);log('skill',`不諧和音對 ${t.n} 造成 ${v} 點傷害。`)}if(t.cur<=0)return win(d)}
   if(buffOnC('BD_LULLABY')&&!(t.boss||t.mvp)&&!(t.stop>0)){t.lul=(t.lul||0)+el;if(t.lul>=4000){t.lul=0;if(R()<.15){t.stop=10000;t.stopK='sleep';log('skill',`搖籃曲讓 ${t.n} 睡著了。`)}}}
   if(t.imm)return schedule(step2,el);
   let tm=el;if(t.casted&&SLC('SA_FREECAST'))tm=Math.round(tm*(1-.05*SLC('SA_FREECAST')));t.casted=0;
-  const dfm=buffOnC('DC_DONTFORGETME');
+  const _df=songRaw('DC_DONTFORGETME');const dfm=!!_df;const dfmA=_df?Math.min(90,5+3*_df.lv+Math.floor(_df.ps.dex/10)+_df.ps.les):0,dfmM=_df?Math.min(90,5+3*_df.lv+Math.floor(_df.ps.agi/10)+_df.ps.les):0;
   if(t.frozen>0){const f=Math.min(t.frozen,tm);t.frozen-=f;tm-=f}
   if(t.stop>0){const f=Math.min(t.stop,tm);t.stop-=f;tm-=f;if(t.stop<=0)t.stopK=null}
   if(tm>0&&t.dist>t.rng&&t.chase){
     if(t.fld.iw>0){const f=Math.min(t.fld.iw,tm);t.fld.iw-=f;tm-=f;if(f>0&&!t.iwLog){t.iwLog=1;log('skill',`${t.n} 被冰刃之牆擋住了。`)}}
-    const ws=t.ws*(t.deb.slow?1.5:1)*(t.fld.qm?2:1)*(dfm?1.3:1);
+    const ws=t.ws*(t.deb.slow?1.5:1)*(t.fld.qm?2:1)*(dfm?1+dfmM/100:1);
     while(tm>0&&t.dist>t.rng){
       const nd=t.dist-tm/ws, F=t.fld;
       if(F.sb&&t.dist>2&&nd<=2){F.sb=0;tm-=(t.dist-2)*ws;const v=magDmg(d,t,1,'火');hitT(t,v);const kb=!(t.boss||t.mvp);t.dist=kb?5:2;log('skill',`${t.n} 碰到火狩芽，受到 ${v} 點傷害${kb?'並被彈開':''}。`);if(t.cur<=0)return win(d);continue}
@@ -1742,7 +1762,7 @@ function fight(d){
       if(nd<=t.rng){tm-=(t.dist-t.rng)*ws;t.dist=t.rng;if(t.rng<=2)log('battle',`${t.n} 衝到你面前了！`);break}
       t.dist=nd;tm=0}
   }
-  if(t.dist<=t.rng+.01&&tm>0&&!(t.stop>0)&&!(t.frozen>0))t.monAcc+=tm*(t.deb.slow?.8:1)*(dfm?.8:1);
+  if(t.dist<=t.rng+.01&&tm>0&&!(t.stop>0)&&!(t.frozen>0))t.monAcc+=tm*(t.deb.slow?.8:1)*(dfm?1-dfmA/100:1);
   while(t.monAcc>=t.aspd){t.monAcc-=t.aspd;if(kiteMiss(d,t))continue;
     if(t.hid>S.clock)continue;
     if(t.hideR&&(t.hidN||0)<2&&t.cur<t.hp*.8&&!(t.boss||t.mvp)&&R()*10000<t.hideR/2){t.hidN=(t.hidN||0)+1;t.hid=S.clock+5000;t.hidLog=0;log('battle',`${t.n} 躲起來了！`);continue}
@@ -3283,7 +3303,7 @@ function autoView(){
   const buffSk=learned.filter(k=>SK[k].k==='buff');
   const rules=c.atk.rules.map((r,i)=>`<div class="row" style="border-bottom:1px dotted var(--btn-edge);padding-bottom:6px"><b>${i+1}. ${SK[r.sk]?.n||r.sk}</b><span>Lv ${r.lv}</span><span>對 ${r.mon||'所有怪物'}</span><span>${r.once?'每隻一次':'持續施放'}</span>${r.spPct?`<span>SP ≥ ${r.spPct}%</span>`:''}${r.cond?`<span class="good">${RCN[r.cond]||r.cond}</span>`:''}<label class="chk">只打 ${cS(`atk.rules.${i}.ele`,RELE)}</label><label class="chk">怪物 ≥ ${cS(`atk.rules.${i}.minMob`,[[0,'不限'],[2,2],[3,3],[4,4],[5,5],[6,6],[8,8],[10,10],[12,12],[15,15]],true)} 隻才用</label>${SL(r.sk)?'':'<span class="bad">尚未學會</span>'}<span class="btns"><button type="button" class="sm" data-a="rmv" data-k="${i}" data-n="-1">▲</button><button type="button" class="sm" data-a="rmv" data-k="${i}" data-n="1">▼</button><button type="button" class="sm" data-a="rdel" data-k="${i}">✕</button></span></div>`).join('');
   const mons=[...new Set(MAPS.flatMap(m=>mapMonsX(m).map(x=>x.n)))];
-  const buffs=buffSk.map(k=>{const b=c.buffs[k]||(c.buffs[k]={on:false,lv:SL(k),early:0,spMin:0});if((SK[k].sup||SK[k].pw)&&b.party===undefined)b.party=true;const ensNo=SK[k].ens&&!ensOk(SK[k]);return `<div class="row">${ensNo?cC(`buffs.${k}.on`,SK[k].n).replace('<input','<input disabled')+`<span class="bad">合奏：隊伍要有${S.job==='bard'?'舞孃':'詩人'}才能放</span>`:cC(`buffs.${k}.on`,SK[k].n)}${SK[k].sup?cC(`buffs.${k}.party`,'也幫隊友放')+(partyOn()&&inParty(CUR)?btoUI(k,b):''):SK[k].pw?cC(`buffs.${k}.party`,'全隊一起（官方效果）'):''}<label class="chk">Lv ${cN(`buffs.${k}.lv`,50)}</label><label class="chk">提前 ${cN(`buffs.${k}.early`,50)} 秒補放</label><label class="chk">SP ≥ ${cN(`buffs.${k}.spMin`,50)}%</label></div>`}).join('');
+  const buffs=buffSk.map(k=>{const b=c.buffs[k]||(c.buffs[k]={on:false,lv:SL(k),early:0,spMin:0});if((SK[k].sup||SK[k].pw)&&b.party===undefined)b.party=true;const ensNo=SK[k].ens&&ensWhy(SK[k]);return `<div class="row">${ensNo?cC(`buffs.${k}.on`,SK[k].n).replace('<input','<input disabled')+`<span class="bad">合奏：${ensNo}才能放</span>`:cC(`buffs.${k}.on`,SK[k].n)}${SK[k].sup?cC(`buffs.${k}.party`,'也幫隊友放')+(partyOn()&&inParty(CUR)?btoUI(k,b):''):SK[k].pw?cC(`buffs.${k}.party`,'全隊一起（官方效果）'):''}<label class="chk">Lv ${cN(`buffs.${k}.lv`,50)}</label><label class="chk">提前 ${cN(`buffs.${k}.early`,50)} 秒補放</label><label class="chk">SP ≥ ${cN(`buffs.${k}.spMin`,50)}%</label></div>`}).join('');
   // 藥水
   const canRs=k=>SHOP.tool.includes(k);
   const rsCtl=k=>{const r=c.restock[k];return canRs(k)?`<label class="chk"><input type="checkbox" data-a2="rs" data-k="${k}" ${r&&r.on?'checked':''}> 回城補</label>${r&&r.on?`<label class="chk">少於 ${cN(`restock.${k}.min`,56)} 個就買到 ${cN(`restock.${k}.to`,56)} 個</label>`:''}`:'<span class="note">（商店不賣）</span>'};
