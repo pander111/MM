@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#79a75a"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="小黑窗"><meta name="apple-mobile-web-app-status-bar-style" content="default"><style>body{margin:0}</style><script>window.RO_GH=1;window.RO_BUILD="20261111170653";if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))</script></head><body>
+<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#79a75a"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="小黑窗"><meta name="apple-mobile-web-app-status-bar-style" content="default"><style>body{margin:0}</style><script>window.RO_GH=1;window.RO_BUILD="20261111171102";if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))</script></head><body>
 <title>仙境放置小黑窗</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <style>
@@ -645,9 +645,9 @@ const SKI={
  SA_MAGICROD:{k:'buff',sp:()=>2,dur:L=>2+L,fd:L=>`吸收怪物對你放的魔法技能並回復 SP；持續 ${2+L} 秒`},
  SA_SPELLBREAKER:{k:'passive',fd:()=>'（本遊戲的怪物沒有詠唱時間，用不到）'},
  SA_FREECAST:{k:'passive',fd:L=>`詠唱時怪物靠近得比較慢（可以邊走邊念）：詠唱期間怪物前進的距離 -${5*L}%`},
- SA_VOLCANO:{k:'buff',sp:L=>40+8*L,dur:L=>60*L,eff:L=>({atk:5+5*L}),fd:L=>`火元素領域：ATK +${5+5*L}；消耗黃色魔力礦石 1 個；持續 ${60*L} 秒`},
- SA_DELUGE:{k:'buff',sp:L=>40+8*L,dur:L=>60*L,eff:L=>({hpP:[5,9,12,14,15][L-1]}),fd:L=>`水元素領域：Max HP +${[5,9,12,14,15][L-1]}%；消耗黃色魔力礦石 1 個；持續 ${60*L} 秒`},
- SA_VIOLENTGALE:{k:'buff',sp:L=>40+8*L,dur:L=>60*L,eff:L=>({flee:3*L}),fd:L=>`風元素領域：FLEE +${3*L}；消耗黃色魔力礦石 1 個；持續 ${60*L} 秒`},
+ SA_VOLCANO:{k:'buff',zone:1,sp:L=>40+8*L,dur:L=>60*L,eff:L=>({atk:5+5*L}),fd:L=>`火元素領域：ATK +${5+5*L}；消耗黃色魔力礦石 1 個；持續 ${60*L} 秒`},
+ SA_DELUGE:{k:'buff',zone:1,sp:L=>40+8*L,dur:L=>60*L,eff:L=>({hpP:[5,9,12,14,15][L-1]}),fd:L=>`水元素領域：Max HP +${[5,9,12,14,15][L-1]}%；消耗黃色魔力礦石 1 個；持續 ${60*L} 秒`},
+ SA_VIOLENTGALE:{k:'buff',zone:1,sp:L=>40+8*L,dur:L=>60*L,eff:L=>({flee:3*L}),fd:L=>`風元素領域：FLEE +${3*L}；消耗黃色魔力礦石 1 個；持續 ${60*L} 秒（火／水／風領域同時只能有一個）`},
  SA_LANDPROTECTOR:{k:'passive',fd:()=>'（本遊戲的怪物不會放地面魔法，用不到）'},
  SA_DISPELL:{k:'passive',fd:()=>'（本遊戲的怪物身上沒有增益，用不到）'},
  SA_ABRACADABRA:{k:'random',sp:()=>50,fd:()=>'隨機放出一個攻擊技能；消耗黃色魔力礦石 2 個；SP 50'},
@@ -1445,6 +1445,8 @@ function maintainBuffs(d){
     const left=S.buffs[id]?S.buffs[id].until-S.clock:0;
     if(left>(b.early||0)*1000)continue;
     const cost=spc(sk,lv);if(S.sp<cost||S.sp<d.maxSp*(b.spMin||0)/100)continue;
+    /* 官方：賢者的火／水／風元素領域同時只能有一個 */
+    if(sk.zone&&Object.keys(S.buffs).some(x=>x!==id&&SK[x]&&SK[x].zone&&buffOn(x)&&(S.buffs[x].by==null||S.buffs[x].by===CUR)))continue;
     if(!ensOk(sk))continue;if(sk.spheres&&(S.spheres||0)<sk.spheres)continue;if(sk.coin&&(S.coins||0)<1)continue;
     {const mi=skItemMiss(sk,lv);if(mi){skItemWarn(sk,mi[0]);continue}}skItemUse(sk,lv);if(sk.spheres)S.spheres-=sk.spheres;if(sk.coin)S.coins--;if(sk.c==='MO_EXPLOSIONSPIRITS'){if((S.spheres||0)<5)continue;S.spheres-=5}
     if(sk.cnt)S.cnt=Object.assign(S.cnt||{},{[sk.c]:sk.cnt(lv)});
