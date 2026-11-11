@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#79a75a"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="小黑窗"><meta name="apple-mobile-web-app-status-bar-style" content="default"><style>body{margin:0}</style><script>window.RO_GH=1;window.RO_BUILD="20261111163227";if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))</script></head><body>
+<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#79a75a"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="小黑窗"><meta name="apple-mobile-web-app-status-bar-style" content="default"><style>body{margin:0}</style><script>window.RO_GH=1;window.RO_BUILD="20261111165640";if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))</script></head><body>
 <title>仙境放置小黑窗</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <style>
@@ -1892,15 +1892,17 @@ function protectedItem(k){return sellQty(k)<=0}
 const CRSP={AM_PHARMACY:5,AL_HOLYWATER:10,AC_MAKINGARROW:10,TF_PICKSTONE:3,SA_CREATECON:30};
 const CRAFTBY={};CRAFT.forEach(r=>CRAFTBY[r.id]=r);
 const HAMMER={1:'i613',2:'i614',3:'i615'};
-const PHB={red:20,yellow:20,white:20,blue:-5,i970:10,i7135:10,i7136:10,i7137:10,i7138:10,i7139:-10,i545:0,i546:0,i547:0};
+/* 官方製藥加成：[固定, 隨機上限]；隨機為 0.1～上限 %（負數為扣） */
+const PHB={red:[20,10],yellow:[20,10],white:[20,10],i970:[10,10],i7135:[0,10],i7136:[0,10],i7137:[0,10],i7138:[0,10],i546:[0,-5],i547:[0,-10],i7139:[0,-10]};
+const phBonus=(o,roll)=>{const b=PHB[o];if(!b)return 0;const m=Math.abs(b[1]),v=roll?(1+Math.floor(R()*m*10))/10:(m+.1)/2;return b[0]+(b[1]<0?-v:v)};
 const KITS=[['i12129',15],['i12128',14],['i12127',13],['i12126',12],['i12125',11]];
 const bestKit=()=>KITS.find(([k])=>(S.inv[k]||0)>0)||KITS[4];
 function craftMats(r){const m=r.mats.slice();if(r.g==='cook')m.push([bestKit()[0],1]);if(r.g==='forge')m.push([HAMMER[r.wl],1]);if(r.g==='ore')m.push(['i612',1]);if(r.sk==='AM_PHARMACY')m.push(['i7134',1]);return m}
-function craftRate(r,d){const st=d.st,L=SLC(r.sk);let p;
+function craftRate(r,d,roll){const st=d.st,L=SLC(r.sk);let p;
   if(r.g==='forge'){const anv=S.inv.i988?5:S.inv.i987?3:0;p=50+5*L+(r.wl===3?SLC('BS_ORIDEOCON'):0)+SLC('BS_WEAPONRESEARCH')+.2*S.jlv+.1*(st.dex+st.luk)+anv-20*(r.wl-1)}
   else if(r.g==='ore')p=(r.sk==='BS_ENCHANTEDSTONE'?10:20)+5*L+.2*S.jlv+.1*(st.dex+st.luk);
   else if(r.g==='cook'){const kit=bestKit()[1];p=(1200*(kit-10)+20*(S.lv+1)+20*(st.dex+1)+100*18-400*r.wl-10*(100-st.luk+1)-250)/100}
-  else if(r.sk==='AM_PHARMACY')p=20+3*L+.5*SLC('AM_LEARNINGPOTION')+.2*S.jlv+.05*st.int+.1*(st.dex+st.luk)+(PHB[r.out]||0);
+  else if(r.sk==='AM_PHARMACY')p=3*L+.5*SLC('AM_LEARNINGPOTION')+.2*S.jlv+Math.floor(st.int/2)*.1+.1*(st.dex+st.luk)+phBonus(r.out,roll);
   else p=100;
   return Math.max(1,Math.min(100,Math.round(p)))}
 const craftOk=r=>r.sk==='COOK'||SLC(r.sk)>=r.lv&&(r.out!=='i7142'||SLC('AM_BIOETHICS')>0);
@@ -1911,7 +1913,7 @@ function doCraft(r,times,quiet){const d=D();let ok=0,fail=0;
   for(let i=0;i<times;i++){if(craftMax(r)<1)break;
     for(const [k,q] of craftMats(r))if(q>0){useI(k,q);if(!S.inv[k])delete S.inv[k]}
     S.sp-=CRSP[r.sk]||0;
-    if(R()*100<craftRate(r,d)){addItem(r.out,r.n);ok++}else fail++}
+    if(R()*100<craftRate(r,d,true)){addItem(r.out,r.n);ok++}else fail++}
   if(ok||fail)log('drop',`製作 ${ITEMS[r.out].n}${r.n>1?` ×${r.n}`:''}：成功 ${ok} 次${fail?`、失敗 ${fail} 次`:''}。`);dirty=true;return ok}
 function autoCraft(){const c=C();if(!c.craft||!c.craft.length)return;
   for(const e of c.craft){const r=CRAFTBY[e.id];if(!r||!craftOk(r))continue;
@@ -2110,7 +2112,7 @@ function twilight(code){if(!SLC(code)){toast('還沒學這個技能');return}con
   if(miss.length){toast('材料不夠：'+miss.join('、'));return}
   if(S.sp<200){toast('SP 不足（需要 200）');return}S.sp-=200;
   for(const k in need){useI(k,need[k]);if(!S.inv[k])delete S.inv[k]}
-  const d=D(),out=[];for(const [o,n] of TWI[code]){const r=CRAFT.find(x=>x.sk==='AM_PHARMACY'&&x.out===o);const p=Math.min(100,craftRate(r,d)+20);let ok=0;for(let i=0;i<n;i++)if(R()*100<p)ok++;if(ok)addItem(o,ok);out.push(`${ITEMS[o].n} ${ok}/${n}`)}
+  const d=D(),out=[];for(const [o,n] of TWI[code]){const r=CRAFT.find(x=>x.sk==='AM_PHARMACY'&&x.out===o);let ok=0;for(let i=0;i<n;i++)if(R()*100<craftRate(r,d,true))ok++;if(ok)addItem(o,ok);out.push(`${ITEMS[o].n} ${ok}/${n}`)}
   log('drop',`施放 ${TWIN[code]}：${out.join('、')}。`);dirty=true}
 /* 塗鴉（流氓） */
 const grafCode=()=>MAPS[C().map].c;
