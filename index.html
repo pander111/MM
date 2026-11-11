@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#79a75a"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="小黑窗"><meta name="apple-mobile-web-app-status-bar-style" content="default"><style>body{margin:0}</style><script>window.RO_GH=1;window.RO_BUILD="20261111154326";if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))</script></head><body>
+<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#79a75a"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="小黑窗"><meta name="apple-mobile-web-app-status-bar-style" content="default"><style>body{margin:0}</style><script>window.RO_GH=1;window.RO_BUILD="20261111154929";if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))</script></head><body>
 <title>仙境放置小黑窗</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <style>
@@ -563,7 +563,7 @@ const SKI={
  ST_FULLSTRIP:{k:'debuff',st:'fullstrip',rng:()=>1,chance:L=>5+2*L,dur:()=>0,sp:()=>22,cast:()=>0,fd:L=>`全部卸除：${5+2*L}% 機率讓怪物攻擊 -25%、防禦 -15%、VIT 防禦 -40%`},
  CR_SLIMPITCHER:{k:'passive',fd:L=>`隊伍裡有人 HP 低於回復門檻時，丟纖細藥水讓全隊回血（Lv1-5 紅、6-9 黃、10 白）`},
  CR_FULLPROTECTION:{k:'passive',fd:()=>'（本遊戲的怪物不會卸除裝備，用不到）'},
- CR_ACIDDEMONSTRATION:{k:'atk',rng:()=>9,hits:L=>L,mul:()=>0,flat:(L,d)=>{const v=Math.max(1,(target&&target.vdef||1)*2);return Math.floor(.7*d.st.int*d.st.int*v/(d.st.int+v))},sure:1,nodef:1,sp:()=>30,cast:()=>1000,fd:L=>`強酸火煙瓶：${L} 下，每下約 0.7 × INT² × 怪物VIT ÷ (INT + 怪物VIT)；消耗火煙瓶、強酸瓶各 1 個`},
+ CR_ACIDDEMONSTRATION:{k:'atk',rng:()=>9,hits:L=>L,mul:()=>0,misc:(d,t)=>{const v=Math.max(1,t.vdef||0),i=d.st.int;return Math.floor(7*v*i*i/(10*(v+i)))},sure:1,nodef:1,sp:()=>30,cast:()=>1000,fd:L=>`強酸火煙瓶（特殊攻擊）：${L} 下，每下 0.7 × INT² × 怪物VIT ÷ (INT + 怪物VIT)；必中、無屬性，不看 ATK、武器、卡片%與防禦；消耗火煙瓶、強酸瓶各 1 個`},
  CR_CULTIVATION:{k:'passive',fd:()=>'（本遊戲沒有實作：種植物）'},
  CG_MOONLIT:{k:'passive',fd:()=>'（本遊戲沒有實作：保護區域，放置型戰鬥用不到）'},
  CG_MARIONETTE:{k:'passive',fd:()=>'（本遊戲沒有實作：把能力分給隊友）'},
@@ -1352,7 +1352,7 @@ function pileOf(t){const out=[],add=o=>{if(o&&!o.dead&&o.cur>0&&!out.includes(o)
 const AOE=new Set(['WZ_STORMGUST','WZ_METEOR','WZ_VERMILION','MG_THUNDERSTORM','WZ_HEAVENDRIVE','MG_FIREBALL','WZ_FROSTNOVA','WZ_SIGHTRASHER','WZ_SIGHTBLASTER','AC_SHOWER','SM_MAGNUM','KN_BOWLINGBASH','KN_BRANDISHSPEAR','MC_CARTREVOLUTION','PR_MAGNUS','CR_GRANDCROSS','AS_GRIMTOOTH','AS_SPLASHER','HW_NAPALMVULCAN','NJ_HUUMA','NJ_BAKUENRYU','NJ_HYOUSYOURAKU','NJ_KAMAITACHI','NJ_RAIGEKISAI','NJ_KAENSIN','GS_SPREADATTACK','GS_DESPERADO','GS_GROUNDDRIFT','SN_SHARPSHOOTING','CG_ARROWVULCAN','HT_BLASTMINE','HT_CLAYMORETRAP','BA_DISSONANCE','PA_GOSPEL','LK_SPIRALPIERCE','MO_BALKYOUNG','TK_STORMKICK','SA_VOLCANO']);
 const AOE_SINGLE=new Set(['CG_ARROWVULCAN','LK_SPIRALPIERCE','BA_DISSONANCE','PA_GOSPEL','SA_VOLCANO']);
 function aoeSplash(d,t,sk,L,kind,smul){if(!AOE.has(sk.c)||AOE_SINGLE.has(sk.c))return;const others=pileOf(t).filter(o=>o!==t);if(!others.length)return;let tot=0,kill=0;
-  for(const o of others){let v=0;if(kind==='magic'){const h=sk.hits(L,o);for(let i=0;i<h;i++)v+=magDmg(d,o,smul,sk.ele)}else{const h=sk.hits?sk.hits(L,o):1;for(let i=0;i<h;i++){const r=physDmg(d,o,smul,sk.ele,sk.flat?sk.flat(L,d):0,{sure:sk.sure,nodef:sk.nodef,vitdef:sk.vitdef,pure:sk.pure,nocard:sk.nocard});if(!r.miss)v+=r.dmg}}
+  for(const o of others){let v=0;if(kind==='magic'){const h=sk.hits(L,o);for(let i=0;i<h;i++)v+=magDmg(d,o,smul,sk.ele)}else{const h=sk.hits?sk.hits(L,o):1;for(let i=0;i<h;i++){const r=physDmg(d,o,smul,sk.ele,sk.flat?sk.flat(L,d):0,{sure:sk.sure,nodef:sk.nodef,vitdef:sk.vitdef,pure:sk.pure,nocard:sk.nocard,misc:sk.misc});if(!r.miss)v+=r.dmg}}
     if(d.E.skAtk&&d.E.skAtk[sk.c])v=Math.round(v*(1+d.E.skAtk[sk.c]/100));hitT(o,v);tot+=v;
     if(o.cur>0&&sk.freeze&&eleOf(o.ele)!=='不死'&&o.race!=='不死'&&!(o.frozen>0)&&R()*100<freezeRate(sk.freeze(L),o))o.frozen=3000;
     if(o.cur>0&&sk.kb){o.dist=Math.min(14,(o.dist||1)+sk.kb)}
@@ -1487,6 +1487,8 @@ function onHurtEff(d,t){const E=d.E;cardAbon(d,'hurt');if(t.rng<=3&&E.aeh)for(co
   return t.cur<=0}
 const HITP={SM_BASH:L=>5*L,SM_MAGNUM:L=>10*L,KN_PIERCE:L=>5*L,AS_SONICBLOW:()=>SLC('AS_SONICACCEL')?50:0};
 function physDmg(d,t,mul,ele,flat,opt){opt=opt||{};
+  /* 特殊攻擊（Misc，例如強酸火煙瓶）：只看公式，固定無屬性，不吃武器、卡片、防禦 */
+  if(opt.misc){const m=opt.misc(d,t)*eMul('無',t.ele);return{dmg:Math.max(0,Math.floor(m))}}
   const hitc=opt.sure||(d.E.sureP&&R()*100<d.E.sureP)?100:clamp(Math.floor((80+d.hit-t.flee)*(1+(opt.hitP||0)/100)),5,100);
   if(R()*100>=hitc)return{miss:true};
   const pure=opt.pure,nocard=opt.pure||opt.nocard;let dmg=(pure?d.atk-(d.refA||0)-(d.mastA||0):d.atk)*(buffOnC('BS_MAXIMIZE')?1.1:(.9+R()*.2))*mul*sizeMul(d,t);
@@ -1603,7 +1605,7 @@ function fight(d){
     if(sk.k==='atk'&&sk.zg){const z=Math.min(S.zeny,rnd(500*L,1000*L));S.zeny-=z;zOut('技能：投擲金錢',z);const v=Math.floor(z*((t.boss||t.mvp)?.5:1));hitT(t,v);log('skill',`投擲金錢 ${fmt(z)} Zeny！對 ${t.n} 造成 ${v} 點傷害。`);el=1000}
     else if(sk.k==='atk'&&sk.issen){const v=d.st.str*40+Math.floor(S.hp*8*L/100);S.hp=1;hitT(t,v);log('skill',`一閃擊！對 ${t.n} 造成 ${v} 點傷害，自己的 HP 剩 1。`);el=1500}
     else if(sk.k==='atk'){if(sk.hpCost)S.hp=Math.max(1,S.hp-Math.floor(d.maxHp*sk.hpCost));if(sk.zeny){const zc=Math.floor(sk.zeny(L)*(SLC('BS_UNFAIRLYTRICK')?.9:1));S.zeny-=zc;zOut('技能：'+sk.n,zc)}const hits=sk.hits?sk.hits(L,t):1;let tot=0,miss=0;const mul0=(sk.mulD?sk.mulD(L,d,t):sk.mul(L))*(sk.c==='AS_SONICBLOW'&&SLC('AS_SONICACCEL')?1.1:1);if(sk.charge)t.dist=1;
-      for(let i=0;i<hits;i++){const r2=physDmg(d,t,mul0,sk.ele,sk.flat?sk.flat(L,d):0,{sure:sk.sure,nodef:sk.nodef,vitdef:sk.vitdef,pure:sk.pure,nocard:sk.nocard,hitP:HITP[sk.c]?HITP[sk.c](L):0});if(r2.miss)miss++;else tot+=r2.dmg}
+      for(let i=0;i<hits;i++){const r2=physDmg(d,t,mul0,sk.ele,sk.flat?sk.flat(L,d):0,{sure:sk.sure,nodef:sk.nodef,vitdef:sk.vitdef,pure:sk.pure,nocard:sk.nocard,misc:sk.misc,hitP:HITP[sk.c]?HITP[sk.c](L):0});if(r2.miss)miss++;else tot+=r2.dmg}
       if(d.E.skAtk&&d.E.skAtk[sk.c])tot=Math.round(tot*(1+d.E.skAtk[sk.c]/100));hitT(t,tot);log('skill',`施放 ${sk.n} Lv ${L}！${miss===hits?`攻擊 ${t.n} 落空。`:`對 ${t.n} 造成 ${tot} 點傷害。`}`);aoeSplash(d,t,sk,L,'atk',mul0);el=Math.max(d.interval,700);
       if(tot>0&&t.cur>0){if(sk.kb&&!(t.boss||t.mvp)){t.dist=Math.min(14,(t.dist||1)+sk.kb);t.arrived=0}if(sk.after)sk.after(t,L,d);
         if(sk.c==='SM_BASH'&&L>=6&&SLC('SM_FATALBLOW')&&!(t.boss||t.mvp)&&R()*100<(L-5)*S.lv/10){t.stop=Math.max(t.stop||0,5000);t.stopK='stun';log('skill',`攻擊弱點！${t.n} 暈眩了。`)}}}
