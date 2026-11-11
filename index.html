@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#79a75a"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="小黑窗"><meta name="apple-mobile-web-app-status-bar-style" content="default"><style>body{margin:0}</style><script>window.RO_GH=1;window.RO_BUILD="20261111153130";if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))</script></head><body>
+<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#79a75a"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="小黑窗"><meta name="apple-mobile-web-app-status-bar-style" content="default"><style>body{margin:0}</style><script>window.RO_GH=1;window.RO_BUILD="20261111154326";if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))</script></head><body>
 <title>仙境放置小黑窗</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <style>
@@ -365,6 +365,14 @@ function devoUI(){const L=SLC('CR_DEVOTION');if(!L||!partyOn()||!inParty(CUR))re
   return `<div class="row" style="margin-top:4px"><b>犧牲 Lv ${L}</b><button type="button" class="sm" data-a="fold" data-k="devo">保護：${sum} ${op?'▴':'▾'}</button></div>`+(op?`<div class="row" style="padding-left:1em">${ms.map(j=>{const o=ROOT.chars[j];return `<label class="chk"><input type="checkbox" data-c="devoPick.${bKey(o.name)}" ${pk[bKey(o.name)]===true?'checked':''}> ${esc(o.name)}<span class="note">（${JOBS[o.job]?JOBS[o.job].n:o.job}）</span></label>`}).join('')}</div><div class="note" style="padding-left:1em">最多保護 ${L} 人（技能等級）。都不勾＝照隊伍順序保護前 ${L} 位；勾超過 ${L} 人時只保護名單前面的 ${L} 位。</div>`:'')}
 /* 暗之障壁：放在輔助技能，可勾選對象（含自己） */
 const swOn=o=>(o.sw||0)>0&&(o.swUntil||0)>o.clock;
+/* 智者 靈魂轉換：和隊友交換 SP */
+function soulStep(d){const c=C(),w=c.soul;if(!w||!w.on||!SLC('PF_SOULCHANGE')||!c.partySupport||!partyOn()||!inParty(CUR)||hasS('silence')||incap()||S.sp<5)return 0;
+  if((S.soulCd||0)>S.clock)return 0;if(S.sp<d.maxSp*(w.me||70)/100)return 0;let best=null,br=1;
+  for(const j of P().members){if(j===CUR)continue;const o=ROOT.chars[j];if(!o||o.hp<=0||o.cfg.map!==c.map||!buffTo(w,o))continue;const mx=withChar(j,()=>D().maxSp);const r=o.sp/Math.max(1,mx);if(r<(w.mate||20)/100&&r<br&&o.sp<S.sp-5){br=r;best=[j,o,mx]}}
+  if(!best)return 0;const [j,o,mx]=best;const ct=castT({c:'PF_SOULCHANGE',cast:()=>3000},1,d);S.sp-=5;const a=S.sp,b=o.sp;S.sp=Math.min(d.maxSp,b);o.sp=Math.min(mx,a);S.soulCd=S.clock+ct+5000;
+  log('skill',`靈魂轉換：和 ${o.name} 交換 SP（${o.name} ${fmt(b)} → ${fmt(o.sp)}，自己 ${fmt(a)} → ${fmt(S.sp)}）。`);return ct+5000}
+function soulUI(){if(!SLC('PF_SOULCHANGE')||!partyOn()||!inParty(CUR))return '';const w=C().soul||{};
+  return `<div class="row">${cC('soul.on','靈魂轉換（幫隊友補 SP）')}<label class="chk">隊友 SP 低於 ${cN('soul.mate',40)}%</label><label class="chk">自己 SP 高於 ${cN('soul.me',40)}% 才換</label>${toUI('soul','bto_soul',w)}</div><div class="note">把自己目前的 SP 和隊友交換（官方效果）：適合 SP 很多的智者幫祭司、巫師回魔。需要勾「對隊友施放輔助 / 回復技能」。空白時預設：隊友低於 20%、自己高於 70%。</div>`}
 function swallStep(d){const c=C(),w=c.swall,L0=SLC('MG_SAFETYWALL');if(!w||!w.on||!L0||hasS('silence')||incap())return 0;
   const id=[].concat(SKBY.MG_SAFETYWALL)[0],sk=SK[id],L=Math.max(1,Math.min(w.lv||L0,L0));if(S.sp<spc(sk,L)||skItemMiss(sk,L))return 0;
   const melee=j=>{const r=rtOf(j),t=r.target;return r.mode==='fight'&&t&&!t.dead&&t.cur>0&&t.rng<=3&&(t.dist||0)<=t.rng+3};
@@ -435,7 +443,7 @@ const SK={
  impo:{n:'神威祈福',j:'priest',max:5,k:'buff',sp:L=>10+3*L,dur:()=>60,d:L=>`ATK +${5*L}；SP ${10+3*L}；持續 60 秒`},
  ironhand:{n:'鐵沙掌',j:'monk',max:10,k:'passive',d:L=>`空手或拳套時 ATK +${3*L}`},
  triple:{n:'三段掌',j:'monk',max:10,k:'passive',d:L=>`普攻時 ${30-L}% 機率改成三連擊，三下合計 ATK ${100+20*L}%`},
- asura:{n:'阿修羅霸凰拳',j:'monk',max:5,k:'asura',sp:()=>10,d:L=>`消耗全部 SP，ATK×(8+SP/10) + ${250+150*L}；之後 SP 不回復 5 秒`},
+ asura:{n:'阿修羅霸凰拳',j:'monk',max:5,k:'asura',sp:()=>10,cast:L=>4500-500*L,d:L=>`爆氣中、氣彈 5 顆才能用。消耗全部 SP，ATK×(8+SP/10) + ${250+150*L}，必中、無視防禦；詠唱 ${4.5-.5*L} 秒（DEX 可縮短）。用完爆氣結束，5 分鐘內 SP 不會自然恢復（藥水照常可喝）`},
  katarm:{n:'拳刃修練',j:'assassin',max:10,k:'passive',d:L=>`使用拳刃時 ATK +${3*L}`},
  sonic:{n:'音速投擲',j:'assassin',max:10,k:'atk',need:['katar'],mul:L=>4+.4*L,sp:L=>14+2*L,d:L=>`拳刃 ATK ${400+40*L}%；SP ${14+2*L}`},
  wres:{n:'武器研究',j:'smith',max:10,k:'passive',d:L=>`ATK +${2*L}、HIT +${2*L}`},
@@ -542,7 +550,7 @@ const SKI={
  CH_CHAINCRUSH:{k:'passive',fd:L=>`連段：伏虎拳後接連柱崩擊，ATK ${400+100*L}%，消耗氣彈 2 顆`},
  CH_SOULCOLLECT:{k:'passive',fd:()=>'氣彈不足 5 顆時，一次蓄滿 5 顆（SP 20）'},
  PF_HPCONVERSION:{k:'passive',fd:L=>`SP 低於 30%、HP 高於 50% 時，把 10% Max HP 轉成 SP（轉換率 ${10*L}%）`},
- PF_SOULCHANGE:{k:'passive',fd:()=>'（本遊戲沒有實作：和隊友交換 SP）'},
+ PF_SOULCHANGE:{k:'passive',fd:()=>'靈魂轉換：和隊友交換目前的 SP（在「輔助技能」設定對象與時機）；SP 5、詠唱 3 秒'},
  PF_SOULBURN:{k:'passive',fd:()=>'（本遊戲的怪物沒有 SP，用不到）'},
  PF_MINDBREAKER:{k:'debuff',st:'mdefdown',chance:()=>100,dur:()=>0,sp:L=>8+4*L,cast:()=>700,fd:L=>`精神衝擊：怪物 MDEF -${12*L}%`},
  PF_MEMORIZE:{k:'buff',sp:()=>1,dur:()=>60,eff:()=>({castP:50}),fd:()=>'記憶術：詠唱時間 -50%；持續 60 秒'},
@@ -1284,7 +1292,7 @@ function step(){
 }
 /* 純輔助：不找怪，平常坐著回 SP，隊友要補血／輔助時才站起來 */
 function supStep(d,c){
-  const busy=()=>{sitting=false;return healMates(d)||!!swallStep(d)||maintainBuffs(d)||careRes(d)||supportMates(d)};
+  const busy=()=>{sitting=false;return healMates(d)||!!swallStep(d)||!!soulStep(d)||maintainBuffs(d)||careRes(d)||supportMates(d)};
   if(busy()){S.supSit=0;setState('輔助隊友');return schedule(step,1000)}
   sitting=true;if(!S.supSit){S.supSit=1;log('sys',S.sp<d.maxSp?'沒有需要幫忙的，坐下等 SP。':'待命中，坐著等隊友需要補血或輔助。')}
   setState(S.sp<d.maxSp||S.hp<d.maxHp?'坐下等 SP':'待命（坐著）');
@@ -1568,6 +1576,7 @@ function fight(d){
   if(!acted&&maintainBuffs(d)){acted=true;el=1000}
   if(!acted&&careRes(d)){acted=true;el=800}
   if(!acted){const w=swallStep(d);if(w){acted=true;el=w}}
+  if(!acted){const w=soulStep(d);if(w){acted=true;el=w}}
   if(!acted&&supportMates(d)){acted=true;el=1000}
   if(!acted&&berserkPitch()){acted=true;el=1000}
   if(!acted&&t.hid>S.clock){const rv=revealHid(d,t);acted=true;el=rv===1?1000:800}
@@ -1622,7 +1631,10 @@ function fight(d){
     else if(sk.k==='stealz'){if(!t.zstolen&&R()*100<L+d.st.dex/10+d.st.luk/10){t.zstolen=1;const z=Math.floor(t.lv*10*(.5+R()));S.zeny+=z;zIn('偷錢',z);log('drop',`偷到 ${fmt(z)} Zeny！`)}else log('skill','偷錢失敗。');el=d.interval}
     else if(sk.k==='steal'){const ch=10+4*L+d.st.dex/5;const it=pick(t.drops.filter(x=>!x[0].startsWith('card_')))[0];
       if(R()*100<ch&&!t.stolen){t.stolen=1;addItem(it,1);log('drop',`偷竊成功！獲得 ${ITEMS[it].n} ×1。`)}else log('skill','偷竊失敗。');el=d.interval}
-    else if(sk.k==='asura'){const sp=S.sp+cost;S.sp=0;S.asuraLock=S.clock+5000;const dmg=Math.round(d.atk*(8+sp/10)+250+150*L);hitT(t,dmg);log('skill',`阿修羅霸凰拳！！對 ${t.n} 造成 ${dmg} 點傷害。`);el=1500}
+    else if(sk.k==='asura'){/* 官方前期：ATK×(8+SP/10)+250+150×Lv，必中、無視防禦；不吃精煉與熟練；吃屬性、體型、%卡片。用完 SP 歸零、爆氣結束、5 分鐘內 SP 不會自然恢復 */
+      const ct=castT(sk,L,d);const sp=S.sp+cost;S.sp=0;S.asuraLock=S.clock+ct+300000;for(const id in S.buffs)if(SK[id]&&SK[id].c==='MO_EXPLOSIONSPIRITS')delete S.buffs[id];
+      const base=d.atk-(d.refA||0)-(d.mastA||0);const dmg=Math.max(1,Math.round((base*(8+sp/10)*sizeMul(d,t)+250+150*L)*eMul(d.wele,t.ele)*modMul(d,t)));
+      hitT(t,dmg);log('skill',`${ct>0?`詠唱 ${(ct/1000).toFixed(1)} 秒…`:''}阿修羅霸凰拳！！（消耗 SP ${fmt(sp)}）對 ${t.n} 造成 ${fmt(dmg)} 點傷害。爆氣結束，5 分鐘內 SP 不會自然恢復。`);el=ct+3500-500*L}
     break}}
   // 普通攻擊
   const goal=Math.max(wRange(),rangeWant);
@@ -1655,9 +1667,12 @@ function fight(d){
         if(SL('triple')&&R()*100<30-SL('triple')){dmg=Math.round(dmg*(1+.2*SL('triple')));log('skill',`三段掌！對 ${t.n} 造成 ${dmg} 點傷害。`);
           const cL=SLC('MO_CHAINCOMBO');if(cL&&S.sp>=10+cL){S.sp-=10+cL;const r4=physDmg(d,t,1.5+.5*cL);if(!r4.miss){hitT(t,r4.dmg);log('skill',`連環全身掌！對 ${t.n} 造成 ${r4.dmg} 點傷害。`)}
             const fL=SLC('MO_COMBOFINISH');if(fL&&t.cur>0&&(S.spheres||0)>0&&S.sp>=10+fL){S.sp-=10+fL;S.spheres--;const r5=physDmg(d,t,2.4+.6*fL);if(!r5.miss){hitT(t,r5.dmg);log('skill',`猛龍誇強！對 ${t.n} 造成 ${r5.dmg} 點傷害。`)}
-              const pL=SLC('CH_PALMSTRIKE');if(pL&&t.cur>0&&S.sp>=2+pL){S.sp-=2+pL;const a=physDmg(d,t,2+pL);if(!a.miss){hitT(t,a.dmg);log('skill',`猛虎硬爬山！對 ${t.n} 造成 ${a.dmg} 點傷害。`)}
-                const tL=SLC('CH_TIGERFIST');if(tL&&t.cur>0&&(S.spheres||0)>=1&&S.sp>=4+tL){S.sp-=4+tL;S.spheres--;const b2=physDmg(d,t,1+tL);if(!b2.miss){hitT(t,b2.dmg);log('skill',`伏虎拳！對 ${t.n} 造成 ${b2.dmg} 點傷害。`)}
-                  const cL2=SLC('CH_CHAINCRUSH');if(cL2&&t.cur>0&&(S.spheres||0)>=2&&S.sp>=4+cL2){S.sp-=4+cL2;S.spheres-=2;const c3=physDmg(d,t,4+cL2);if(!c3.miss){hitT(t,c3.dmg);log('skill',`連柱崩擊！對 ${t.n} 造成 ${c3.dmg} 點傷害。`)}}}}}}}
+              /* 官方：猛龍誇強之後只能接一條路線 → 伏虎拳 → 連柱崩擊，或直接連柱崩擊，或（爆氣中）猛虎硬爬山 */
+              const tL=SLC('CH_TIGERFIST'),cL2=SLC('CH_CHAINCRUSH'),pL=SLC('CH_PALMSTRIKE');
+              const crush=()=>{if(cL2&&t.cur>0&&(S.spheres||0)>=2&&S.sp>=2+2*cL2){S.sp-=2+2*cL2;S.spheres-=2;const c3=physDmg(d,t,4+cL2);if(!c3.miss){hitT(t,c3.dmg);log('skill',`連柱崩擊！對 ${t.n} 造成 ${c3.dmg} 點傷害。`)}}};
+              if(tL&&t.cur>0&&(S.spheres||0)>=1&&S.sp>=2+2*tL){S.sp-=2+2*tL;S.spheres--;const b2=physDmg(d,t,.4+tL);if(!b2.miss){hitT(t,b2.dmg);log('skill',`伏虎拳！對 ${t.n} 造成 ${b2.dmg} 點傷害。`)}crush()}
+              else if(cL2&&t.cur>0&&(S.spheres||0)>=2&&S.sp>=2+2*cL2)crush();
+              else if(pL&&t.cur>0&&buffOnC('MO_EXPLOSIONSPIRITS')&&S.sp>=2*pL){S.sp-=2*pL;const a=physDmg(d,t,2+pL);if(!a.miss){hitT(t,a.dmg);log('skill',`猛虎硬爬山！對 ${t.n} 造成 ${a.dmg} 點傷害。`)}}}}}
         else log('battle',`對 ${t.n} 造成 ${dmg} 點傷害${crit?'（爆擊！）':hits>1?'（二連擊）':''}。`);hitT(t,dmg);cardOnHit(d,t,dmg);
         if(t.cur>0)onHitEff(d,t);
         if(LW&&t.cur>0&&i===0){const rw=W()?W().atk:1;const lv=Math.max(1,Math.round(dmg*(LW.atk/Math.max(1,rw))*(30+10*SLC('AS_LEFT'))/100));hitT(t,lv);log('battle',`左手追擊 ${t.n}，造成 ${lv} 點傷害。`)}
@@ -3269,7 +3284,7 @@ function autoView(){
       <select id="rSk"><option value="">— 選擇攻擊技能 —</option>${atkSk.map(k=>`<option value="${k}">${SK[k].n}（Lv ${SL(k)}）</option>`).join('')}</select>
       <label class="chk">施放 Lv <input type="number" id="rLv" value="10" style="width:52px"></label><select id="rOnce"><option value="0">持續施放</option><option value="1">每隻一次</option></select><label class="chk">SP ≥ <input type="number" id="rSp" value="0" style="width:52px">%</label><select id="rCond">${RCOND.map(([v,n])=>`<option value="${v}">${n}</option>`).join('')}</select><button type="button" class="sm pri" data-a="radd">＋ 新增規則</button><span class="note">選好技能後要按「新增規則」才會存進上面的清單。</span></div><div class="note">連招：用「條件」讓技能接著放，例如巫師：①雷鳴術「怪物冰凍中才放」②冰凍術「怪物沒冰凍才放」——沒凍住就一直放冰凍術，凍住後接雷鳴術（冰凍的怪會變水屬性，風屬性魔法 1.75 倍，也不會走過來打斷你）。</div>`:'<div class="note">還沒有學會攻擊技能。</div>'}
     <div class="note">依順序選第一條符合的設定；專用規則放前面，通用規則放最後。</div>
-    <b>輔助技能（自動維持）</b>${buffs||(SLC('MG_SAFETYWALL')?'':'<div class="note">還沒有學會輔助技能。</div>')}${swallUI()}
+    <b>輔助技能（自動維持）</b>${buffs||(SLC('MG_SAFETYWALL')?'':'<div class="note">還沒有學會輔助技能。</div>')}${swallUI()}${soulUI()}
     <b>回復技能</b>${SL('heal')?`<div class="row">${cC('healSk.on','治癒術')}<label class="chk">HP 低於 ${cN('healSk.pct',56)}% 時施放</label></div>`:'<div class="note">沒有已學會的回復技能。</div>'}
     <div class="note">判斷順序：逃生 → 藥水 → 回復技能 → 輔助 → 攻擊技能（依清單順序）→ 普通攻擊。</div>`)+
   card('藥水與補給',syncBtn('藥水與補給')+`<div class="row">${cC('hpPot.on','HP 低於')} ${cN('hpPot.pct',56)}% 喝 HP 回復道具</div><div class="row">${cC('spPot.on','SP 低於')} ${cN('spPot.pct',56)}% 喝 SP 回復道具</div>
