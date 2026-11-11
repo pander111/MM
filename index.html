@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#79a75a"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="小黑窗"><meta name="apple-mobile-web-app-status-bar-style" content="default"><style>body{margin:0}</style><script>window.RO_GH=1;window.RO_BUILD="20261111165640";if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))</script></head><body>
+<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#79a75a"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="小黑窗"><meta name="apple-mobile-web-app-status-bar-style" content="default"><style>body{margin:0}</style><script>window.RO_GH=1;window.RO_BUILD="20261111170253";if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))</script></head><body>
 <title>仙境放置小黑窗</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <style>
@@ -305,17 +305,19 @@ const eMul=(a,d)=>{const m=String(d||'無').match(/^(\D+)(\d)?$/)||[0,'無'];con
 /* 別西卜：官方 1873 蒼蠅型態（無經驗、無掉落）被擊倒後變身為 1874 真身（MVP） */
 (()=>{const I=GD.items,ALLJ=['sword','mage','archer','acolyte','merch','thief','knight','priest','wizard','smith','hunter','assassin','crusader','monk','sage','rogue','alchemist','bard','dancer','ninja','gunslinger'];
   const add=(k,o)=>{if(!I[k])I[k]=o};
-  add('i7754',{n:'破碎的王冠',w:1,sell:1125,t:'etc',buy:2250,d:'別西卜頭上戴著的王冠碎片。'});
+  add('i7754',{n:'破碎的王冠',w:1,sell:1500,t:'etc',buy:3000,d:'別西卜頭上戴著的王冠碎片。'});
+  add('i742',{n:'啾啾娃娃',w:10,sell:1500,t:'etc',buy:3000,d:'做成蒼蠅模樣的娃娃。'});
+  add('i12030',{n:'怨念之箱',w:20,sell:500,t:'etc',buy:1000,d:'充滿怨念的箱子。'});
   add('i6223',{n:'卡紐',w:1,sell:750,t:'etc',buy:1500,d:'精煉用的稀有礦石。'});
-  add('i2423',{n:'變異鞋',w:30,sell:10,t:'eq',slot:'shoes',slots:0,def:2,eff:{},jobs:ALLJ,lv:0,d:'沾染了別西卜氣息的鞋子。\nMaxHP、MaxSP +(20 − 精煉值)%，DEF + 精煉值/2。\n裝備: 初學者以外的全職業',buy:20});
-  add('i1565',{n:'死亡筆記',w:60,sell:10,t:'eq',slot:'weapon',slots:2,wc:'book',atk:120,wl:4,eff:{},jobs:['priest','monk','sage'],lv:70,d:'記載死者名字的書。\nMATK +15%，STR +3，INT +3，LUK −20，攻擊時有機率讓人形怪物昏迷（Coma），攻速依精煉值上升。賢者裝備時攻擊有機率自動施放地獄審判 Lv5。\n裝備: 祭司系／賢者',buy:20});
-  add('i2000',{n:'毀滅之杖',w:300,sell:10,t:'eq',slot:'weapon',slots:1,wc:'staff',atk:40,wl:4,two:1,eff:{},jobs:['wizard','sage'],lv:70,d:'雙手杖。\nMATK +(25 + 精煉值/2)%，INT +3，AGI +10，SP 消耗量 +(精煉值×2)%，被攻擊時有機率自動施放雷鳴術 Lv5。\n裝備: 巫師／賢者',buy:20});
-  add('i2702',{n:'野牛角',w:10,sell:10,t:'eq',slot:'acc',slots:1,def:0,eff:{},jobs:ALLJ,lv:0,d:'AGI +2。\n裝備: 初學者以外的全職業',buy:20});
+  add('i2423',{n:'變異鞋',w:50,sell:10,t:'eq',slot:'shoes',slots:0,def:3,eff:{},jobs:ALLJ,lv:85,up:1,d:'沾染了別西卜氣息的鞋子。\nMaxHP、MaxSP +(20 − 精煉值)%，DEF + 精煉值/2。\n裝備: 轉生職業（初學者以外），Lv 85 以上',buy:20});
+  add('i1565',{n:'死亡筆記',w:100,sell:10,t:'eq',slot:'weapon',slots:2,wc:'book',atk:137,wl:4,eff:{},jobs:['priest','sage'],lv:85,d:'記載死者名字的書。\nMATK +15%，STR +3，INT +3，LUK −20，攻擊時 0.1% 機率讓人形怪物昏迷（Coma），攻速 + 精煉值%。賢者系裝備時攻擊有機率自動施放地獄審判 Lv5。\n裝備: 祭司系／賢者系，Lv 85 以上',buy:20});
+  add('i2000',{n:'毀滅之杖',w:250,sell:10,t:'eq',slot:'weapon',slots:1,wc:'staff',atk:130,wl:4,two:1,eff:{},jobs:['wizard'],lv:80,up:1,d:'雙手杖。\nMATK +(25 + 精煉值/2)%，INT +3，AGI +10，SP 消耗量 +(精煉值×2)%，被攻擊時有機率自動施放雷鳴術 Lv5，魔力增幅詠唱 −50%。\n裝備: 超魔導士（轉生巫師），Lv 80 以上',buy:20});
+  add('i2702',{n:'野牛角',w:10,sell:10,t:'eq',slot:'acc',slots:1,def:0,eff:{},jobs:ALLJ,lv:90,up:1,d:'AGI +2。\n裝備: 轉生職業（初學者以外），Lv 90 以上',buy:20});
   add('card_4145',{n:'別西卜卡片',w:1,sell:10,t:'card',ctype:'acc',eff:{castP:-30},d:'詠唱時間 −30%。',buy:20});
   const fly=GD.mobs['1873'];
   if(fly){fly.morph=1874;
-    if(!GD.mobs['1874'])GD.mobs['1874']={...fly,n:'別西卜（真身）',hp:4444444,size:'大',exp:6666666,jexp:6666666,morph:undefined,boss:undefined,mvp:1,morphOnly:1,
-      drops:[['i7754',45],['i2423',10],['i1565',10],['i2000',10],['i2702',10],['i6223',5],['card_4145',0.01],['i617',55],['i607',50]],
+    if(!GD.mobs['1874'])GD.mobs['1874']={...fly,n:'別西卜（真身）',hp:6666666,atk:11705,def:40,mdef:40,vdef:200,hit:264,flee:208,int:250,aspd:212,rng:2,ws:100,size:'大',exp:6666666,jexp:6666666,morph:undefined,boss:undefined,mvp:1,morphOnly:1,
+      drops:[['i7754',90],['i2423',20],['i1565',20],['i2000',20],['i2702',20],['i985',54.32],['i742',55],['card_4145',0.01],['i617',55],['i607',50],['i12030',55]],
       sk:[['NPC_HELLJUDGEMENT',5,100],['NPC_DARKBREATH',5,10]]}}})();
 /* 補上官方舊版缺少的 MVP：死靈騎士、克特魯拉努克斯、魔劍士 達納托斯的記憶（數值照 rAthena 前期資料） */
 (()=>{const I=GD.items,ALLJ=['sword','mage','archer','acolyte','merch','thief','knight','priest','wizard','smith','hunter','assassin','crusader','monk','sage','rogue','alchemist','bard','dancer','ninja','gunslinger'],MAGE=['mage','wizard','sage'];
@@ -927,11 +929,12 @@ const SPHC=new Set(['MO_INVESTIGATE','MO_FINGEROFFENSIVE','MO_EXTREMITYFIST','MO
 const SIZEMOD={fist:[100,100,100],dagger:[100,75,50],sword:[75,100,75],two:[75,75,100],spear:[75,75,100],mace:[75,100,100],axe:[50,75,100],staff:[100,100,100],bow:[100,100,75],knuckle:[100,75,50],katar:[75,100,75],book:[100,100,50],whip:[75,100,50],instrument:[75,100,75],gun:[100,100,100],huuma:[75,75,100],other:[100,100,100]};
 const sizeMul=(d,t)=>{if(buffOnC('BS_WEAPONPERFECT')||(d&&d.E&&d.E.noSize))return 1;const w=wcls();const row=SIZEMOD[w]||SIZEMOD.other;let i={小:0,中:1,大:2}[t.size];if(i==null)i=1;let v=row[i];if(w==='spear'&&i===1&&SLC('KN_RIDING'))v=100;return v/100};
 const ensOk=sk=>{if(!sk.ens)return true;if(!partyOn()||!inParty(CUR))return false;const want=S.job==='bard'?'dancer':'bard';
-  return P().members.some(j=>j!==CUR&&ROOT.chars[j]&&ROOT.chars[j].job===want&&ROOT.chars[j].hp>0&&ROOT.chars[j].cfg.map===C().map&&(SKBY[sk.c]||[]).some(i=>ROOT.chars[j].sk[i]))};
+  return P().members.some(j=>j!==CUR&&ROOT.chars[j]&&ROOT.chars[j].job===want&&ROOT.chars[j].hp>0&&ROOT.chars[j].cfg.map===C().map&&(SKBY[sk.c]||[]).some(i=>ROOT.chars[j].sk[i])&&!Object.keys(ROOT.chars[j].buffs||{}).some(x=>SK[x]&&SK[x].song&&ROOT.chars[j].buffs[x].by===j&&ROOT.chars[j].buffs[x].until>ROOT.chars[j].clock))};
 const SLC=c=>Math.max(0,...(SKBY[c]||[]).map(i=>SL(i)));
 const cartW=()=>Object.entries(S.cart||{}).reduce((s,[k,n])=>s+(ITEMS[k]?ITEMS[k].w*n:0),0);
 const shuriPick=()=>{const ok=k=>ITEMS[k]&&ITEMS[k].t==='shuri'&&(S.inv[k]||0)>0&&S.lv>=(ITEMS[k].lv||1);const pf=C().shuri;if(pf&&ok(pf))return pf;let b=null;for(const k in S.inv)if(ok(k)&&(!b||ITEMS[k].atk>ITEMS[b].atk))b=k;return b||pf||'i13250'};
-const skItems=(s,L)=>s.c==='NJ_SYURIKEN'?[[shuriPick(),1]]:buffOnC('BD_INTOABYSS')?[]:(s.items||[]).filter(([k,n,lv])=>(!lv||lv===L)&&!(EB().noGem&&['i715','i716','i717'].includes(k))).map(([k,n])=>[k,n]);
+/* 深淵之中、免魔力礦石效果：只免藍／黃／紅色魔力礦石（官方），其他道具（瓶子、陷阱…）照扣 */
+const skItems=(s,L)=>s.c==='NJ_SYURIKEN'?[[shuriPick(),1]]:(s.items||[]).filter(([k,n,lv])=>(!lv||lv===L)&&!((EB().noGem||buffOnC('BD_INTOABYSS'))&&['i715','i716','i717'].includes(k))).map(([k,n])=>[k,n]);
 const skItemMiss=(s,L)=>skItems(s,L).find(([k,n])=>(S.inv[k]||0)<n);
 const skItemUse=(s,L)=>{for(const [k,n] of skItems(s,L)){useI(k,n);if(!S.inv[k])delete S.inv[k]}};
 function skItemWarn(s,k){if(!(S.itemWarnAt>S.clock)){S.itemWarnAt=S.clock+60000;log('warn',`缺少 ${ITEMS[k]?ITEMS[k].n:k}，${s.n} 放不出來（可在「掛機設定 → 藥水與補給 → 其他補給」設定回城自動買）。`)}}
@@ -1159,7 +1162,7 @@ function D0(){
 }
 const weight=()=>{let w=0;for(const k in S.inv)w+=(ITEMS[k]?.w||0)*S.inv[k];if(S.ammo.id)w+=ITEMS[S.ammo.id].w*S.ammo.n;return w};
 const wPct=d=>Math.floor(weight()/(d||D()).maxW*100);
-const canWield=(it,job)=>{job=job||S.job;if(it.lv&&S.lv<it.lv)return false;if(it.sex&&C().look.g!==it.sex)return false;if(it.slot==='weapon'&&(it.wc==='other'||!JOBS[job].w.includes(it.wc)))return false;return !it.jobs||it.jobs.includes(job)};
+const canWield=(it,job)=>{job=job||S.job;if(it.lv&&S.lv<it.lv)return false;if(it.up&&!(S.trans||String(job).startsWith('t_')))return false;if(it.sex&&C().look.g!==it.sex)return false;if(it.slot==='weapon'&&(it.wc==='other'||!JOBS[job].w.includes(it.wc)))return false;return !it.jobs||it.jobs.includes(job)};
 const DCP=[0,7,9,11,13,15,17,19,21,23,24];
 const dcPct=()=>Math.max(DCP[SL('discount')]||0,SLC('RG_COMPULSION')?5+4*SLC('RG_COMPULSION'):0);
 const dcSrc=()=>{const a=DCP[SL('discount')]||0,b=SLC('RG_COMPULSION')?5+4*SLC('RG_COMPULSION'):0;return b>a?`強迫折扣 Lv ${SLC('RG_COMPULSION')}`:`低價買入 Lv ${SL('discount')}`};
@@ -1445,7 +1448,8 @@ function maintainBuffs(d){
     if(!ensOk(sk))continue;if(sk.spheres&&(S.spheres||0)<sk.spheres)continue;if(sk.coin&&(S.coins||0)<1)continue;
     {const mi=skItemMiss(sk,lv);if(mi){skItemWarn(sk,mi[0]);continue}}skItemUse(sk,lv);if(sk.spheres)S.spheres-=sk.spheres;if(sk.coin)S.coins--;if(sk.c==='MO_EXPLOSIONSPIRITS'){if((S.spheres||0)<5)continue;S.spheres-=5}
     if(sk.cnt)S.cnt=Object.assign(S.cnt||{},{[sk.c]:sk.cnt(lv)});
-    if(sk.song&&Object.keys(S.buffs).some(x=>x!==id&&SK[x]&&SK[x].song&&buffOn(x)&&S.buffs[x].by===CUR))continue;
+    /* 官方：每位詩人／舞孃同時只能進行一個演奏（獨奏或合奏）；合奏中兩人都不能再演奏別的 */
+    if((sk.song||sk.ens)&&Object.keys(S.buffs).some(x=>x!==id&&SK[x]&&buffOn(x)&&((SK[x].song&&S.buffs[x].by===CUR)||SK[x].ens)))continue;
     S.sp-=cost;S.buffs[id]={lv,until:S.clock+sk.dur(lv)*1000,by:CUR};if(sk.onCast)sk.onCast(lv,d);
     if(sk.rnd){const G=[{atkP:100},{def:25},{hit:50,flee:50},{str:20,agi:20,vit:20,int:20,dex:20,luk:20},{hpP:100}];S.buffs[id].eff=pick(G);log('skill',`聖歌的祝福：${effText(S.buffs[id].eff)}。`)}
     if((sk.song||sk.ens||(sk.pw&&b.party!==false))&&partyOn()&&inParty(CUR)){const ms=P().members.filter(j=>j!==CUR&&ROOT.chars[j]&&ROOT.chars[j].hp>0&&ROOT.chars[j].cfg.map===c.map);
