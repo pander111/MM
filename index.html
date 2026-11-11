@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#79a75a"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="小黑窗"><meta name="apple-mobile-web-app-status-bar-style" content="default"><style>body{margin:0}</style><script>window.RO_GH=1;window.RO_BUILD="20261111173909";if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))</script></head><body>
+<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#79a75a"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="小黑窗"><meta name="apple-mobile-web-app-status-bar-style" content="default"><style>body{margin:0}</style><script>window.RO_GH=1;window.RO_BUILD="20261111175157";if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))</script></head><body>
 <title>仙境放置小黑窗</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <style>
@@ -491,15 +491,15 @@ const SK={
  mlesson:{n:'操控樂器',c:'BA_MUSICALLESSON',j:'bard',max:10,k:'passive',d:L=>`使用樂器時 ATK +${3*L}`},
  mstrike:{n:'樂器攻擊',c:'BA_MUSICALSTRIKE',j:'bard',max:5,k:'atk',need:['instrument'],mul:L=>1.25+.25*L,sp:L=>1+2*L,d:L=>`樂器 ATK ${125+25*L}%；SP ${1+2*L}`},
  avulcan:{n:'奧義箭亂舞',c:'CG_ARROWVULCAN',j:'bard',max:10,k:'atk',need:['instrument','whip'],hits:()=>9,mul:L=>.5+.1*L,sp:L=>12+2*L,d:L=>`9 次 ATK ${50+10*L}%；SP ${12+2*L}`},
- ascross:{n:'刺客的黃昏',c:'BA_ASSASSINCROSS',j:'bard',max:10,k:'buff',song:1,need:['instrument'],sp:L=>38+2*L,dur:()=>180,d:L=>`隊友攻擊速度 +(${5+L} + AGI/20)%（和雙手劍加速等取最大值，拿弓無效）；持續 180 秒`},
- bragi:{n:'布萊奇之詩',c:'BA_POEMBRAGI',j:'bard',max:10,k:'buff',song:1,need:['instrument'],sp:L=>35+5*L,dur:()=>180,d:L=>`隊友詠唱時間 -(${3*L} + DEX/10)%；持續 180 秒`},
- idun:{n:'伊登的蘋果',c:'BA_APPLEIDUN',j:'bard',max:10,k:'buff',song:1,need:['instrument'],sp:L=>35+5*L,dur:()=>180,d:L=>`隊友 Max HP +(${5+2*L} + VIT/10)%，每 6 秒補 HP ${30+5*L} + VIT/2；持續 180 秒`},
+ ascross:{n:'刺客的黃昏',c:'BA_ASSASSINCROSS',j:'bard',max:10,k:'buff',song:1,need:['instrument'],sp:L=>38+2*L,dur:()=>180,d:L=>`全隊攻擊速度 +(${5+L} + AGI/20)%（和雙手劍加速等取最大值，拿弓無效）；持續 180 秒`},
+ bragi:{n:'布萊奇之詩',c:'BA_POEMBRAGI',j:'bard',max:10,k:'buff',song:1,need:['instrument'],sp:L=>35+5*L,dur:()=>180,d:L=>`全隊詠唱時間 -(${3*L} + DEX/10)%；持續 180 秒`},
+ idun:{n:'伊登的蘋果',c:'BA_APPLEIDUN',j:'bard',max:10,k:'buff',song:1,need:['instrument'],sp:L=>35+5*L,dur:()=>180,d:L=>`全隊 Max HP +(${5+2*L} + VIT/10)%，每 6 秒補 HP ${30+5*L} + VIT/2；持續 180 秒`},
  dlesson:{n:'練習舞蹈',c:'DC_DANCINGLESSON',j:'dancer',max:10,k:'passive',d:L=>`使用鞭子時 ATK +${3*L}`},
  tarrow:{n:'纏箭投擲',c:'DC_THROWARROW',j:'dancer',max:5,k:'atk',need:['whip'],mul:L=>1.25+.25*L,sp:L=>1+2*L,d:L=>`鞭子 ATK ${125+25*L}%；SP ${1+2*L}`},
  avulcan2:{n:'奧義箭亂舞',c:'CG_ARROWVULCAN',j:'dancer',max:10,k:'atk',need:['instrument','whip'],hits:()=>9,mul:L=>.5+.1*L,sp:L=>12+2*L,d:L=>`9 次 ATK ${50+10*L}%；SP ${12+2*L}`},
- fkiss:{n:'女神之吻',c:'DC_FORTUNEKISS',j:'dancer',max:10,k:'buff',song:1,need:['whip'],sp:L=>40+3*L,dur:()=>180,d:L=>`隊友 CRI +(${10+L} + LUK/10)；持續 180 秒`},
- humming:{n:'哼唱之音',c:'DC_HUMMING',j:'dancer',max:10,k:'buff',song:1,need:['whip'],sp:L=>20+2*L,dur:()=>180,d:L=>`隊友 HIT +(${1+2*L} + DEX/10)；持續 180 秒`},
- service:{n:'為您服務',c:'DC_SERVICEFORYOU',j:'dancer',max:10,k:'buff',song:1,need:['whip'],sp:L=>40+3*L,dur:()=>180,d:L=>`隊友 Max SP +(${15+L} + INT/10)%、技能 SP 消耗 -(${20+3*L} + INT/10)%；持續 180 秒`},
+ fkiss:{n:'女神之吻',c:'DC_FORTUNEKISS',j:'dancer',max:10,k:'buff',song:1,need:['whip'],sp:L=>40+3*L,dur:()=>180,d:L=>`全隊 CRI +(${10+L} + LUK/10)；持續 180 秒`},
+ humming:{n:'哼唱之音',c:'DC_HUMMING',j:'dancer',max:10,k:'buff',song:1,need:['whip'],sp:L=>20+2*L,dur:()=>180,d:L=>`全隊 HIT +(${1+2*L} + DEX/10)；持續 180 秒`},
+ service:{n:'為您服務',c:'DC_SERVICEFORYOU',j:'dancer',max:10,k:'buff',song:1,need:['whip'],sp:L=>40+3*L,dur:()=>180,d:L=>`全隊 Max SP +(${15+L} + INT/10)%、技能 SP 消耗 -(${20+3*L} + INT/10)%；持續 180 秒`},
  backstab:{n:'背刺',c:'RG_BACKSTAP',j:'rogue',max:10,k:'atk',sure:1,mul:L=>3+.4*L,sp:()=>16,d:L=>`必中攻擊 ATK ${300+40*L}%；SP 16`},
  raid:{n:'潛擊',c:'RG_RAID',j:'rogue',max:5,k:'atk',mul:L=>1+.4*L,sp:()=>20,d:L=>`ATK ${100+40*L}%；SP 20`},
  snatcher:{n:'強奪',c:'RG_SNATCHER',j:'rogue',max:10,k:'passive',d:L=>`普通攻擊時 ${L}% 機率自動偷竊`},
@@ -608,8 +608,8 @@ const SKI={
  WZ_ESTIMATION:{k:'passive',fd:()=>'遇到怪物時，在訊息框顯示牠的 HP、屬性、種族和體型'},
  HT_FALCON:{k:'passive',fd:()=>'帶著獵鷹（自動向獵人公會租）。閃光爆擊、獵鷹相關技能要有獵鷹才能用'},
  HT_POWER:{k:'atk',need:['bow'],vs:t=>t.race==='動物'||t.race==='昆蟲',mulD:(L,d)=>1+.08*d.st.str,sp:()=>12,fd:()=>'只對動物、昆蟲型：弓 ATK (100 + STR×8)%；SP 12'},
- ALL_RESURRECTION:{k:'passive',fd:L=>`隊友倒下時（還沒回儲存點前）把他救起來，HP 回復 ${[10,30,50,80][L-1]||80}%；消耗藍色魔力礦石 1 個`},
- PR_SUFFRAGIUM:{k:'buff',sp:()=>8,dur:()=>10,eff:L=>({castP:15*L}),fd:L=>`隊友詠唱時間 -${15*L}%；持續 10 秒；SP 8`},
+ ALL_RESURRECTION:{k:'passive',fd:L=>`全隊倒下時（還沒回儲存點前）把他救起來，HP 回復 ${[10,30,50,80][L-1]||80}%；消耗藍色魔力礦石 1 個`},
+ PR_SUFFRAGIUM:{k:'buff',sp:()=>8,dur:()=>10,eff:L=>({castP:15*L}),fd:L=>`全隊詠唱時間 -${15*L}%；持續 10 秒；SP 8`},
  PR_BENEDICTIO:{k:'buff',sp:()=>20,dur:L=>40*L,eff:()=>({armorEle:'聖'}),fd:L=>`把鎧甲變成聖屬性；持續 ${40*L} 秒；SP 20`},
  PR_SANCTUARY:{k:'buff',sp:L=>12+3*L,dur:L=>4+L,fd:L=>`在腳下放光耀之堂：${4+L} 秒內每秒回復 ${[100,200,300,400,500,600,777][Math.min(6,L-1)]} HP（全隊）；消耗藍色魔力礦石 1 個；SP ${12+3*L}`},
  PR_SLOWPOISON:{k:'buff',sp:L=>4+2*L,dur:L=>10*L,fd:L=>`${10*L} 秒內中毒不扣血；SP ${4+2*L}`},
@@ -658,7 +658,7 @@ const SKI={
  RG_GANGSTER:{k:'passive',fd:()=>'坐下休息時，主動怪不會過來打你'},
  RG_COMPULSION:{k:'passive',fd:L=>`向 NPC 購買便宜 ${5+4*L}%（跟商人的折扣取較高的）`},
  RG_PLAGIARISM:{k:'passive',fd:L=>`被怪物的技能打到時，把那個技能抄下來自己用（最高 Lv ${L}，會覆蓋上一個）`},
- AM_POTIONPITCHER:{k:'passive',fd:L=>`隊友 HP 低於回復門檻時，丟藥水給他，回復量 +${10*L}%（消耗身上的紅、橙、黃、白色藥水）`},
+ AM_POTIONPITCHER:{k:'passive',fd:L=>`全隊 HP 低於回復門檻時，丟藥水給他，回復量 +${10*L}%（消耗身上的紅、橙、黃、白色藥水）`},
  AM_CANNIBALIZE:{k:'atk',rng:()=>4,mul:()=>0,flat:(L,d)=>(150+50*L)*4,sure:1,nodef:1,sp:()=>20,fd:L=>`種下食人植物幫你打怪，造成約 ${(150+50*L)*4} 點傷害；消耗植物瓶 1 個；SP 20`},
  AM_SPHEREMINE:{k:'atk',rng:()=>3,mul:()=>0,flat:L=>400+400*L,sure:1,nodef:1,sp:()=>10,fd:L=>`召喚氣泡蟲撞上怪物爆炸，造成約 ${400+400*L} 點傷害；消耗迷你瓶 1 個；SP 10`},
  NJ_ZENYNAGE:{k:'atk',rng:()=>9,mul:()=>0,zg:1,sure:1,nodef:1,sp:()=>50,fd:L=>`丟出 ${500*L}～${1000*L} Zeny 造成同等傷害（BOSS 減半）；SP 50`},
@@ -787,7 +787,7 @@ const SKI={
  SA_FROSTWEAPON:{k:'buff',sp:()=>40,dur:()=>1200,eff:()=>({wEle:'水'})},
  SA_LIGHTNINGLOADER:{k:'buff',sp:()=>40,dur:()=>1200,eff:()=>({wEle:'風'})},
  SA_SEISMICWEAPON:{k:'buff',sp:()=>40,dur:()=>1200,eff:()=>({wEle:'地'})},
- BA_WHISTLE:{k:'buff',song:1,need:['instrument'],sp:L=>20+4*L,dur:()=>180,fd:L=>`口哨：全隊 FLEE +(${L} + AGI/10)、完全迴避 +(${Math.floor((L+1)/2)} + LUK/30)（再加操控樂器加成，演奏者自己不吃）；持續 180 秒`},
+ BA_WHISTLE:{k:'buff',song:1,need:['instrument'],sp:L=>20+4*L,dur:()=>180,fd:L=>`口哨：全隊 FLEE +(${L} + AGI/10)、完全迴避 +(${Math.floor((L+1)/2)} + LUK/30)（再加操控樂器加成）；持續 180 秒`},
  WE_CALLBABY:{k:'passive',fd:()=>'結婚後才用得到（本遊戲沒有結婚系統）'},
  AL_RUWACH:{k:'passive',fd:()=>'怪物躲起來（隱匿、偽裝）時自動施放，揭穿牠並造成 MATK 145% 聖屬性傷害；SP 10'},
  AL_WARP:{k:'passive',fd:()=>'開傳送之陣回城（本遊戲蝴蝶翅膀免費，回城直接用翅膀，不會浪費藍色魔力礦石）'},
@@ -936,9 +936,9 @@ const ensWhy=sk=>{if(!sk.ens)return '';const want=S.job==='bard'?'dancer':'bard'
   const ms=P().members.filter(j=>j!==CUR&&ROOT.chars[j]&&ROOT.chars[j].job===want);if(!ms.length)return `隊伍要有${wn}`;
   if(!ms.some(j=>{const w=ROOT.chars[j].eq&&ROOT.chars[j].eq.weapon;return w&&ITEMS[w]&&PFW.includes(ITEMS[w].wc)}))return `${wn}要拿${want==='bard'?'樂器':'鞭子'}`;return ''};
 const ensOk=sk=>!ensWhy(sk);
-/* 歌舞效果：記錄演奏者施放當下的能力值；官方演奏者自己吃不到自己的單奏效果 */
+/* 歌舞效果：記錄演奏者施放當下的能力值；（使用者規則）演奏者自己也吃得到 */
 const PS0={agi:0,dex:0,luk:0,int:0,vit:0,les:0};
-const songB=id=>{const b=S.buffs[id];return b&&b.until>S.clock&&b.by!==CUR?{lv:b.lv,ps:b.ps||PS0}:null};
+const songB=id=>{const b=S.buffs[id];return b&&b.until>S.clock?{lv:b.lv,ps:b.ps||PS0}:null};
 const songBC=c=>{for(const id of (SKBY[c]||[])){const b=songB(id);if(b)return b}return null};
 const songRaw=c=>{for(const id of (SKBY[c]||[])){const b=S.buffs[id];if(b&&b.until>S.clock)return {lv:b.lv,ps:b.ps||PS0}}return null};
 
