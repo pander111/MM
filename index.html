@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#79a75a"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="小黑窗"><meta name="apple-mobile-web-app-status-bar-style" content="default"><style>body{margin:0}</style><script>window.RO_GH=1;window.RO_BUILD="20261111154929";if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))</script></head><body>
+<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#79a75a"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="小黑窗"><meta name="apple-mobile-web-app-status-bar-style" content="default"><style>body{margin:0}</style><script>window.RO_GH=1;window.RO_BUILD="20261111160157";if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))</script></head><body>
 <title>仙境放置小黑窗</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <style>
@@ -317,6 +317,29 @@ const eMul=(a,d)=>{const m=String(d||'無').match(/^(\D+)(\d)?$/)||[0,'無'];con
     if(!GD.mobs['1874'])GD.mobs['1874']={...fly,n:'別西卜（真身）',hp:4444444,size:'大',exp:6666666,jexp:6666666,morph:undefined,boss:undefined,mvp:1,morphOnly:1,
       drops:[['i7754',45],['i2423',10],['i1565',10],['i2000',10],['i2702',10],['i6223',5],['card_4145',0.01],['i617',55],['i607',50]],
       sk:[['NPC_HELLJUDGEMENT',5,100],['NPC_DARKBREATH',5,10]]}}})();
+/* 補上官方舊版缺少的 MVP：亡者之王、克特魯拉努克斯、魔劍士 達納托斯的記憶（數值照 rAthena 前期資料） */
+(()=>{const I=GD.items,ALLJ=['sword','mage','archer','acolyte','merch','thief','knight','priest','wizard','smith','hunter','assassin','crusader','monk','sage','rogue','alchemist','bard','dancer','ninja','gunslinger'],MAGE=['mage','wizard','sage'];
+  const add=(k,o)=>{if(!I[k])I[k]=Object.assign({sell:Math.floor((o.buy||20)/2)},o)};
+  add('i603',{n:'神秘箱子',w:20,t:'etc',buy:10000,d:'古老的藍色箱子，不知道裝著什麼。'});
+  add('i616',{n:'古老的卡片相簿',w:5,t:'etc',buy:10000,d:'收藏卡片用的古老相簿。'});
+  add('i2509',{n:'生存者斗篷',w:55,t:'eq',slot:'garment',slots:0,def:0,eff:{},jobs:MAGE,lv:75,buy:20000,d:'MDEF +5，VIT +10。\n裝備: 魔法師系列'});
+  add('i2519',{n:'茉莉雅娜斗篷',w:60,t:'eq',slot:'garment',slots:0,def:3,eff:{},jobs:ALLJ,lv:61,buy:30000,d:'LUK +2，完全迴避 +8。\n裝備: 初學者以外的全職業'});
+  add('i2342',{n:'秘銀金屬盔甲',w:550,t:'eq',slot:'armor',slots:1,def:11,eff:{},jobs:['crusader'],lv:70,buy:102500,d:'十字軍專用的重型盔甲。\n裝備: 十字軍'});
+  add('i2412',{n:'重靴',w:75,t:'eq',slot:'shoes',slots:1,def:5,eff:{},jobs:['crusader','knight'],lv:65,buy:54000,d:'用鋼鐵製作的靴子。\n裝備: 騎士/十字軍'});
+  add('i2515',{n:'老鷹之翅膀',w:30,t:'eq',slot:'garment',slots:1,def:1,eff:{},jobs:MAGE,lv:85,buy:20000,d:'像老鷹翅膀一樣的披風。\n裝備: 魔法師系列'});
+  add('i2655',{n:'血跡鐵球',w:400,t:'eq',slot:'acc',slots:0,def:0,eff:{},jobs:ALLJ,lv:1,buy:50000,d:'沾著血跡的腳鐐鐵球，非常重。\n裝備: 初學者以外的全職業'});
+  add('card_4276',{n:'亡者之王卡片',w:1,t:'card',ctype:'weapon',eff:{},buy:20,d:'近身攻擊時 5% 機率讓目標暈眩、詛咒、沉默、中毒、出血；1% 機率讓一般怪物 HP 變 1（Coma）。'});
+  add('card_4419',{n:'克特魯拉努克斯卡片',w:1,t:'card',ctype:'armor',eff:{},buy:20,d:'對火屬性攻擊 +50%；被攻擊時 2% 機率自動施放冰凍術 Lv 10。'});
+  add('card_4399',{n:'魔劍士 達納托斯的記憶卡片',w:1,t:'card',ctype:'weapon',eff:{},buy:20,d:'目標 DEF 越高傷害越高（無視並轉換防禦）；每次攻擊 SP -1；DEF -30、FLEE -30。'});
+  const M=GD.mobs,mk=(id,o)=>{if(!M[id])M[id]=Object.assign({beh:'主動',mvp:1,int:0},o)};
+  mk('1373',{n:'亡者之王',lv:94,hp:603383,atk:3831,def:77,vdef:30,mdef:73,flee:193,hit:194,exp:131343,jexp:43345,ele:'暗3',race:'惡魔',size:'大',aspd:1446,rng:3,ws:180,int:109,
+    drops:[['i7108',53.35],['i1417',0.05],['i1230',0.1],['i2621',0.02],['i7109',0.1],['i1306',0.01],['i1529',0.02],['card_4276',0.01],['i607',55],['i732',50],['i617',50]],sk:[['NPC_STUNATTACK',3,10],['NPC_CURSEATTACK',3,10],['NPC_DARKNESSATTACK',5,10],['NPC_DARKBREATH',5,5]]});
+  mk('1779',{n:'克特魯拉努克斯',lv:98,hp:4417000,atk:6020,def:40,vdef:30,mdef:42,flee:224,hit:275,exp:2720050,jexp:1120020,ele:'水4',race:'動物',size:'大',aspd:432,rng:3,ws:400,int:125,
+    drops:[['i7562',90],['i616',30],['i2509',30],['i2111',50],['i617',50],['i607',50],['card_4419',0.01],['i607',55],['i617',50]],sk:[['WZ_STORMGUST',10,5],['MG_FROSTDIVER',10,10],['NPC_WATERATTACK',5,10]]});
+  mk('1708',{n:'魔劍士 達納托斯的記憶',lv:99,hp:445660,atk:5647,def:35,vdef:30,mdef:35,flee:207,hit:246,exp:3666000,jexp:2145060,ele:'幽靈4',race:'惡魔',size:'大',aspd:115,rng:3,ws:120,int:86,
+    drops:[['i7444',10],['i2519',10],['i7450',50],['i2342',50],['i2412',50],['i2515',10],['i2655',5],['card_4399',0.01],['i617',55],['i603',50],['i732',20]],sk:[['SM_BASH',10,10],['NPC_TELEKINESISATTACK',5,10],['NPC_STUNATTACK',3,5]]});
+  const put=(c,id)=>{const m=GD.maps.find(x=>x.c===c);if(m&&!m.m.some(([i])=>i===id))m.m.push([id,1])};
+  put('niflheim',1373);put('ice_dun03',1779);put('tha_t12',1708)})();
 const MON={};for(const id in GD.mobs){const o=GD.mobs[id];MON[id]={...o,id:+id,boss:!!o.boss,mvp:!!o.mvp}}
 /* 卡片回收價：一般怪 50 萬、小王 150 萬、MVP 1000 萬（看掉這張卡的怪是哪一級，取最高） */
 {const CARDZ={n:500000,b:1500000,m:10000000};const tier={};for(const id in MON){const m=MON[id],t=m.mvp?'m':m.boss?'b':'n';for(const [k] of (m.drops||[]))if(String(k).startsWith('card_')&&(!tier[k]||CARDZ[t]>CARDZ[tier[k]]))tier[k]=t}
