@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#79a75a"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="小黑窗"><meta name="apple-mobile-web-app-status-bar-style" content="default"><style>body{margin:0}</style><script>window.RO_GH=1;window.RO_BUILD="20261111170253";if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))</script></head><body>
+<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#79a75a"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="小黑窗"><meta name="apple-mobile-web-app-status-bar-style" content="default"><style>body{margin:0}</style><script>window.RO_GH=1;window.RO_BUILD="20261111170653";if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))</script></head><body>
 <title>仙境放置小黑窗</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <style>
@@ -304,7 +304,7 @@ const eMul=(a,d)=>{const m=String(d||'無').match(/^(\D+)(\d)?$/)||[0,'無'];con
 /* 怪物與地圖（資料來源：rAthena 經典版怪物分布、數值與掉落表） */
 /* 別西卜：官方 1873 蒼蠅型態（無經驗、無掉落）被擊倒後變身為 1874 真身（MVP） */
 (()=>{const I=GD.items,ALLJ=['sword','mage','archer','acolyte','merch','thief','knight','priest','wizard','smith','hunter','assassin','crusader','monk','sage','rogue','alchemist','bard','dancer','ninja','gunslinger'];
-  const add=(k,o)=>{if(!I[k])I[k]=o};
+  const add=(k,o)=>{if(o.t==='eq'&&o.slots>0)o.n+=`[${o.slots}]`;if(!I[k])I[k]=o};
   add('i7754',{n:'破碎的王冠',w:1,sell:1500,t:'etc',buy:3000,d:'別西卜頭上戴著的王冠碎片。'});
   add('i742',{n:'啾啾娃娃',w:10,sell:1500,t:'etc',buy:3000,d:'做成蒼蠅模樣的娃娃。'});
   add('i12030',{n:'怨念之箱',w:20,sell:500,t:'etc',buy:1000,d:'充滿怨念的箱子。'});
@@ -321,7 +321,7 @@ const eMul=(a,d)=>{const m=String(d||'無').match(/^(\D+)(\d)?$/)||[0,'無'];con
       sk:[['NPC_HELLJUDGEMENT',5,100],['NPC_DARKBREATH',5,10]]}}})();
 /* 補上官方舊版缺少的 MVP：死靈騎士、克特魯拉努克斯、魔劍士 達納托斯的記憶（數值照 rAthena 前期資料） */
 (()=>{const I=GD.items,ALLJ=['sword','mage','archer','acolyte','merch','thief','knight','priest','wizard','smith','hunter','assassin','crusader','monk','sage','rogue','alchemist','bard','dancer','ninja','gunslinger'],MAGE=['mage','wizard','sage'];
-  const add=(k,o)=>{if(!I[k])I[k]=Object.assign({sell:Math.floor((o.buy||20)/2)},o)};
+  const add=(k,o)=>{if(o.t==='eq'&&o.slots>0)o.n+=`[${o.slots}]`;if(!I[k])I[k]=Object.assign({sell:Math.floor((o.buy||20)/2)},o)};
   add('i603',{n:'神秘箱子',w:20,t:'etc',buy:10000,d:'古老的藍色箱子，不知道裝著什麼。'});
   add('i616',{n:'古老的卡片相簿',w:5,t:'etc',buy:10000,d:'收藏卡片用的古老相簿。'});
   add('i2509',{n:'生存者斗篷',w:55,t:'eq',slot:'garment',slots:0,def:0,eff:{},jobs:MAGE,lv:75,buy:20000,d:'MDEF +5，VIT +10。\n裝備: 魔法師系列'});
