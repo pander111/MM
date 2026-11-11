@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#79a75a"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="小黑窗"><meta name="apple-mobile-web-app-status-bar-style" content="default"><style>body{margin:0}</style><script>window.RO_GH=1;window.RO_BUILD="20261111014520";if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))</script></head><body>
+<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#79a75a"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="小黑窗"><meta name="apple-mobile-web-app-status-bar-style" content="default"><style>body{margin:0}</style><script>window.RO_GH=1;window.RO_BUILD="20261111153130";if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))</script></head><body>
 <title>仙境放置小黑窗</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <style>
@@ -470,8 +470,8 @@ const SK={
  snatcher:{n:'強奪',c:'RG_SNATCHER',j:'rogue',max:10,k:'passive',d:L=>`普通攻擊時 ${L}% 機率自動偷竊`},
  axem:{n:'斧頭使用熟練度',c:'AM_AXEMASTERY',j:'alchemist',max:10,k:'passive',d:L=>`使用斧時 ATK +${3*L}`},
  lpotion:{n:'知識藥水',c:'AM_LEARNINGPOTION',j:'alchemist',max:10,k:'passive',d:L=>`藥水回復量 +${5*L}%`},
- acid:{n:'強酸攻擊',c:'AM_ACIDTERROR',j:'alchemist',max:5,k:'atk',sure:1,nodef:1,mul:L=>1+.4*L,sp:()=>15,d:L=>`無視防禦的必中攻擊 ATK ${100+40*L}%；SP 15`},
- demon:{n:'火煙瓶投擲',c:'AM_DEMONSTRATION',j:'alchemist',max:5,k:'atk',ele:'火',hits:()=>3,mul:L=>.4+.2*L,sp:()=>10,d:L=>`3 次火屬性 ATK ${40+20*L}%；SP 10`},
+ acid:{n:'強酸攻擊',c:'AM_ACIDTERROR',j:'alchemist',max:5,k:'atk',sure:1,nodef:1,vitdef:1,pure:1,ele:'無',mul:L=>1+.4*L,sp:()=>15,d:L=>`必中、無視裝備 DEF（仍會被 VIT 防禦扣）、固定無屬性 ATK ${100+40*L}%；不吃武器精煉、武器熟練與 % 卡片加成；SP 15`},
+ demon:{n:'火煙瓶投擲',c:'AM_DEMONSTRATION',j:'alchemist',max:5,k:'atk',ele:'火',nocard:1,hits:()=>3,mul:L=>.4+.2*L,sp:()=>10,d:L=>`3 次火屬性 ATK ${40+20*L}%；不吃 % 卡片加成；SP 10`},
  tobidougu:{n:'飛刀修練',c:'NJ_TOBIDOUGU',j:'ninja',max:10,k:'passive',d:L=>`「投擲飛鏢」傷害 +${3*L}`},
  kunai:{n:'投擲飛刀',c:'NJ_KUNAI',j:'ninja',max:5,k:'atk',hits:()=>3,mul:L=>.6+.1*L,sp:()=>15,d:L=>`3 次 ATK ${60+10*L}%；SP 15`},
  huuma:{n:'投擲風魔飛鏢',c:'NJ_HUUMA',j:'ninja',max:5,k:'atk',need:['huuma'],mul:L=>1.5+1.5*L,sp:L=>15+5*L,d:L=>`風魔手裏劍 ATK ${150+150*L}%；SP ${15+5*L}`},
@@ -1089,9 +1089,10 @@ function D0(){
   st.dex+=SL('owl');
   const w=W(),wc=wcls(),bow=RANGED.has(wc);
   let watk=w?w.atk:0; if(ammoOk())watk+=ITEMS[S.ammo.id].atk;
-  let oref=0;if(w&&S.eq.weapon){const rr=refineOf(S.eq.weapon),tb=refRow(S.eq.weapon);if(rr&&tb){watk+=Math.floor(tb[rr-1][1]/100);oref=Math.floor(tb[rr-1][2]/100)}}
+  let oref=0,refA=0;if(w&&S.eq.weapon){const rr=refineOf(S.eq.weapon),tb=refRow(S.eq.weapon);if(rr&&tb){refA=Math.floor(tb[rr-1][1]/100);watk+=refA;oref=Math.floor(tb[rr-1][2]/100)}}
   const main=bow?st.dex:st.str, sub=bow?st.str:st.dex;
   let atk=main+Math.pow(Math.floor(main/10),2)+Math.floor(sub/5)+Math.floor(st.luk/5)+watk;
+  const atk0=atk;
   if(wc==='dagger'||wc==='sword')atk+=4*SL('swordm');
   if(wc==='two')atk+=4*SL('twohand');
   if(wc==='mace')atk+=3*SL('macem');
@@ -1099,7 +1100,7 @@ function D0(){
   if(wc==='fist'||wc==='knuckle')atk+=3*SL('ironhand');
   if(wc==='spear')atk+=4*(SL('spearm')+SL('spearm2'));if(wc==='book')atk+=3*SL('advbook');if(wc==='axe')atk+=3*SL('axem');
   if(wc==='instrument')atk+=3*SL('mlesson');if(wc==='whip')atk+=3*SL('dlesson');
-  atk+=2*SL('wres')+5*buffLv('impo')+(E.atk||0)+3*(S.spheres||0);
+  atk+=2*SL('wres')+3*(S.spheres||0);const mastA=atk-atk0;atk+=5*buffLv('impo')+(E.atk||0);
   if(buffOnC('BD_RINGNIBELUNGEN')&&w&&(w.wl||1)===4)atk+=75+25*buffLvC('BD_RINGNIBELUNGEN');
   const matkp=(w&&w.matk?1+w.matk/100:1)*(1+(E.matkP||0)/100);
   const matkMin=Math.floor((st.int+Math.pow(Math.floor(st.int/7),2)+(E.matk||0))*matkp), matkMax=Math.floor((st.int+Math.pow(Math.floor(st.int/5),2)+(E.matk||0))*matkp);
@@ -1121,7 +1122,7 @@ function D0(){
   const maxW=j.wt+st.str*30+200*SL('enlarge')+(SLC('KN_RIDING')?1000:0)+(S.wtPlus||0);
   return{st,atk:Math.max(1,Math.floor(atk)),matkMin,matkMax,hard:Math.min(90,hard),soft:Math.floor((st.vit/2+st.agi/5)*(1+(E.softP||0)/100)),
     hit:S.lv+st.dex+SL('vulture')+2*SL('wres')+(E.hit||0)+SL('snake')+(wc==='gun'?2*SL('single'):0),flee:S.lv+st.agi+3*SL('imflee')+(E.flee||0),crit:Math.round((1+st.luk*.3+(E.crit||0)+(bow?(E.critLong||0):0))*10)/10,mdef:(E.mdef||0)+Math.floor(st.int/5),E,
-    oref,aspd,interval:Math.round(interval),maxHp,maxSp,maxW,wele:(()=>{for(const id in S.buffs){const s=SK[id];if(s&&s.eff&&buffOn(id)){const e=s.eff(S.buffs[id].lv);if(e&&e.wEle)return e.wEle}}return ammoOk()&&ITEMS[S.ammo.id].ele!=='無'?ITEMS[S.ammo.id].ele:(E.wEle||'無')})()}
+    oref,refA,mastA,aspd,interval:Math.round(interval),maxHp,maxSp,maxW,wele:(()=>{for(const id in S.buffs){const s=SK[id];if(s&&s.eff&&buffOn(id)){const e=s.eff(S.buffs[id].lv);if(e&&e.wEle)return e.wEle}}return ammoOk()&&ITEMS[S.ammo.id].ele!=='無'?ITEMS[S.ammo.id].ele:(E.wEle||'無')})()}
 }
 const weight=()=>{let w=0;for(const k in S.inv)w+=(ITEMS[k]?.w||0)*S.inv[k];if(S.ammo.id)w+=ITEMS[S.ammo.id].w*S.ammo.n;return w};
 const wPct=d=>Math.floor(weight()/(d||D()).maxW*100);
@@ -1343,7 +1344,7 @@ function pileOf(t){const out=[],add=o=>{if(o&&!o.dead&&o.cur>0&&!out.includes(o)
 const AOE=new Set(['WZ_STORMGUST','WZ_METEOR','WZ_VERMILION','MG_THUNDERSTORM','WZ_HEAVENDRIVE','MG_FIREBALL','WZ_FROSTNOVA','WZ_SIGHTRASHER','WZ_SIGHTBLASTER','AC_SHOWER','SM_MAGNUM','KN_BOWLINGBASH','KN_BRANDISHSPEAR','MC_CARTREVOLUTION','PR_MAGNUS','CR_GRANDCROSS','AS_GRIMTOOTH','AS_SPLASHER','HW_NAPALMVULCAN','NJ_HUUMA','NJ_BAKUENRYU','NJ_HYOUSYOURAKU','NJ_KAMAITACHI','NJ_RAIGEKISAI','NJ_KAENSIN','GS_SPREADATTACK','GS_DESPERADO','GS_GROUNDDRIFT','SN_SHARPSHOOTING','CG_ARROWVULCAN','HT_BLASTMINE','HT_CLAYMORETRAP','BA_DISSONANCE','PA_GOSPEL','LK_SPIRALPIERCE','MO_BALKYOUNG','TK_STORMKICK','SA_VOLCANO']);
 const AOE_SINGLE=new Set(['CG_ARROWVULCAN','LK_SPIRALPIERCE','BA_DISSONANCE','PA_GOSPEL','SA_VOLCANO']);
 function aoeSplash(d,t,sk,L,kind,smul){if(!AOE.has(sk.c)||AOE_SINGLE.has(sk.c))return;const others=pileOf(t).filter(o=>o!==t);if(!others.length)return;let tot=0,kill=0;
-  for(const o of others){let v=0;if(kind==='magic'){const h=sk.hits(L,o);for(let i=0;i<h;i++)v+=magDmg(d,o,smul,sk.ele)}else{const h=sk.hits?sk.hits(L,o):1;for(let i=0;i<h;i++){const r=physDmg(d,o,smul,sk.ele,sk.flat?sk.flat(L,d):0,{sure:sk.sure,nodef:sk.nodef});if(!r.miss)v+=r.dmg}}
+  for(const o of others){let v=0;if(kind==='magic'){const h=sk.hits(L,o);for(let i=0;i<h;i++)v+=magDmg(d,o,smul,sk.ele)}else{const h=sk.hits?sk.hits(L,o):1;for(let i=0;i<h;i++){const r=physDmg(d,o,smul,sk.ele,sk.flat?sk.flat(L,d):0,{sure:sk.sure,nodef:sk.nodef,vitdef:sk.vitdef,pure:sk.pure,nocard:sk.nocard});if(!r.miss)v+=r.dmg}}
     if(d.E.skAtk&&d.E.skAtk[sk.c])v=Math.round(v*(1+d.E.skAtk[sk.c]/100));hitT(o,v);tot+=v;
     if(o.cur>0&&sk.freeze&&eleOf(o.ele)!=='不死'&&o.race!=='不死'&&!(o.frozen>0)&&R()*100<freezeRate(sk.freeze(L),o))o.frozen=3000;
     if(o.cur>0&&sk.kb){o.dist=Math.min(14,(o.dist||1)+sk.kb)}
@@ -1480,17 +1481,18 @@ const HITP={SM_BASH:L=>5*L,SM_MAGNUM:L=>10*L,KN_PIERCE:L=>5*L,AS_SONICBLOW:()=>S
 function physDmg(d,t,mul,ele,flat,opt){opt=opt||{};
   const hitc=opt.sure||(d.E.sureP&&R()*100<d.E.sureP)?100:clamp(Math.floor((80+d.hit-t.flee)*(1+(opt.hitP||0)/100)),5,100);
   if(R()*100>=hitc)return{miss:true};
-  let dmg=d.atk*(buffOnC('BS_MAXIMIZE')?1.1:(.9+R()*.2))*mul*sizeMul(d,t);
+  const pure=opt.pure,nocard=opt.pure||opt.nocard;let dmg=(pure?d.atk-(d.refA||0)-(d.mastA||0):d.atk)*(buffOnC('BS_MAXIMIZE')?1.1:(.9+R()*.2))*mul*sizeMul(d,t);
+  if(opt.nodef&&opt.vitdef)dmg-=buffOnC('BD_ETERNALCHAOS')?0:t.vdef;
   if(!opt.nodef){if(d.E.defRatio)dmg=dmg*(t.def+t.vdef)/100;else{const ig=Math.max(((d.E.ignDef||{})[t.race]||0)/100,((t.boss||t.mvp)?d.E.ignDefB:d.E.ignDefN)?1:0);dmg=dmg*(100-t.def*(1-ig))/100-(buffOnC('BD_ETERNALCHAOS')?0:t.vdef*(1-ig))}}
   if(d.E.atkP)dmg*=1+d.E.atkP/100;
-  if(d.E.longP&&RANGED.has(wcls()))dmg*=1+d.E.longP/100;
+  if(d.E.longP&&!nocard&&RANGED.has(wcls()))dmg*=1+d.E.longP/100;
   if(SLC('SM_AUTOBERSERK')&&S.hp<d.maxHp*.25)dmg*=1.32;
   if(t.race==='不死'||t.race==='惡魔'||eleOf(t.ele)==='不死')dmg+=(Math.floor(S.lv/20)+3)*SL('demonb');
   if(t.race==='動物'||t.race==='昆蟲')dmg+=4*SL('beastb');
   dmg+=flat||0;
-  if(d.oref)dmg+=Math.floor(R()*(d.oref+1));
+  if(d.oref&&!pure)dmg+=Math.floor(R()*(d.oref+1));
   if(buffOnC('LK_AURABLADE'))dmg+=20*buffLvC('LK_AURABLADE');
-  dmg*=eMul(ele||d.wele,t.ele)*modMul(d,t);
+  dmg*=eMul(ele||d.wele,t.ele)*(nocard?1:modMul(d,t));
   if(d.E.drain&&dmg>0)S.hp=Math.min(d.maxHp,S.hp+dmg*d.E.drain/100);
   return{dmg:Math.max(eMul(ele||d.wele,t.ele)<=0?0:1,Math.round(dmg))}
 }
@@ -1592,7 +1594,7 @@ function fight(d){
     if(sk.k==='atk'&&sk.zg){const z=Math.min(S.zeny,rnd(500*L,1000*L));S.zeny-=z;zOut('技能：投擲金錢',z);const v=Math.floor(z*((t.boss||t.mvp)?.5:1));hitT(t,v);log('skill',`投擲金錢 ${fmt(z)} Zeny！對 ${t.n} 造成 ${v} 點傷害。`);el=1000}
     else if(sk.k==='atk'&&sk.issen){const v=d.st.str*40+Math.floor(S.hp*8*L/100);S.hp=1;hitT(t,v);log('skill',`一閃擊！對 ${t.n} 造成 ${v} 點傷害，自己的 HP 剩 1。`);el=1500}
     else if(sk.k==='atk'){if(sk.hpCost)S.hp=Math.max(1,S.hp-Math.floor(d.maxHp*sk.hpCost));if(sk.zeny){const zc=Math.floor(sk.zeny(L)*(SLC('BS_UNFAIRLYTRICK')?.9:1));S.zeny-=zc;zOut('技能：'+sk.n,zc)}const hits=sk.hits?sk.hits(L,t):1;let tot=0,miss=0;const mul0=(sk.mulD?sk.mulD(L,d,t):sk.mul(L))*(sk.c==='AS_SONICBLOW'&&SLC('AS_SONICACCEL')?1.1:1);if(sk.charge)t.dist=1;
-      for(let i=0;i<hits;i++){const r2=physDmg(d,t,mul0,sk.ele,sk.flat?sk.flat(L,d):0,{sure:sk.sure,nodef:sk.nodef,hitP:HITP[sk.c]?HITP[sk.c](L):0});if(r2.miss)miss++;else tot+=r2.dmg}
+      for(let i=0;i<hits;i++){const r2=physDmg(d,t,mul0,sk.ele,sk.flat?sk.flat(L,d):0,{sure:sk.sure,nodef:sk.nodef,vitdef:sk.vitdef,pure:sk.pure,nocard:sk.nocard,hitP:HITP[sk.c]?HITP[sk.c](L):0});if(r2.miss)miss++;else tot+=r2.dmg}
       if(d.E.skAtk&&d.E.skAtk[sk.c])tot=Math.round(tot*(1+d.E.skAtk[sk.c]/100));hitT(t,tot);log('skill',`施放 ${sk.n} Lv ${L}！${miss===hits?`攻擊 ${t.n} 落空。`:`對 ${t.n} 造成 ${tot} 點傷害。`}`);aoeSplash(d,t,sk,L,'atk',mul0);el=Math.max(d.interval,700);
       if(tot>0&&t.cur>0){if(sk.kb&&!(t.boss||t.mvp)){t.dist=Math.min(14,(t.dist||1)+sk.kb);t.arrived=0}if(sk.after)sk.after(t,L,d);
         if(sk.c==='SM_BASH'&&L>=6&&SLC('SM_FATALBLOW')&&!(t.boss||t.mvp)&&R()*100<(L-5)*S.lv/10){t.stop=Math.max(t.stop||0,5000);t.stopK='stun';log('skill',`攻擊弱點！${t.n} 暈眩了。`)}}}
