@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#79a75a"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="小黑窗"><meta name="apple-mobile-web-app-status-bar-style" content="default"><style>body{margin:0}</style><script>window.RO_GH=1;window.RO_BUILD="20261112164137";if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))</script></head><body>
+<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#79a75a"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="小黑窗"><meta name="apple-mobile-web-app-status-bar-style" content="default"><style>body{margin:0}</style><script>window.RO_GH=1;window.RO_BUILD="20261112183603";if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))</script></head><body>
 <title>仙境放置小黑窗</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <style>
@@ -1335,7 +1335,7 @@ function step(){
   const wp=wPct(d);
   if(wp>=c.sellAt&&!(S.sellCD>S.clock)&&Object.keys(S.inv).some(k=>sellQty(k)>0))return goTown(`負重 ${wp}%，回城賣`);
   if(c.stop90&&wp>=90)return stop('負重達 90%');
-  if(c.storeOn&&wp>=c.storeAt&&Object.keys(S.inv).some(k=>S.inv[k]>0&&ih(k).act==='store'))return goTown(`負重 ${wp}%，回城存倉`);
+  if(c.storeOn&&wp>=c.storeAt&&!(S.storeCD>S.clock)&&Object.keys(S.inv).some(k=>S.inv[k]>0&&(ih(k).act==='store'||sellQty(k)>0)))return goTown(`負重 ${wp}%，回城賣東西、存倉`);/* 存倉門檻也會順便賣掉設為「賣」的東西 */
   const low=Object.entries(c.restock).find(([k,r])=>r.on&&craftHave(k)<r.min);
   if(low&&!(S.restockCD>S.clock))return goTown(`${ITEMS[low[0]].n} 少於 ${low[1].min}`);
   if(incap())return schedule(step,1000);
@@ -2305,6 +2305,7 @@ function townStep(){
       if(craftHave(k)<r.min)fail=true}}
   autoCraft();autoAmmo();
   if(fail){S.restockCD=S.clock+600000;log('warn','Zeny 不夠，補給沒有補滿，10 分鐘後再試。')}else S.restockCD=0;
+  if(c.storeOn&&wPct()>=c.storeAt){S.storeCD=S.clock+600000;log('warn',`整理後負重仍有 ${wPct()}%（存倉門檻 ${c.storeAt}%），10 分鐘內不再為了存倉回城。可以把更多道具設為賣或存，或調低「保留」數量。`)}
   if(wPct()>=c.sellAt){S.sellCD=S.clock+600000;log('warn',`整理後負重仍有 ${wPct()}%，10 分鐘內不再為了賣東西回城。可在「掛機設定 → 回城處理」把更多道具設為賣或存，或調低「保留」數量。`)}
   dirty=true;log('sys',`回到 ${MAPS[c.map].n}。`);mode='search';setState('移動中');schedule(step,1500)
 }
