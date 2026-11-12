@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#79a75a"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="小黑窗"><meta name="apple-mobile-web-app-status-bar-style" content="default"><style>body{margin:0}</style><script>window.RO_GH=1;window.RO_BUILD="20261112191758";if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))</script></head><body>
+<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#79a75a"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="小黑窗"><meta name="apple-mobile-web-app-status-bar-style" content="default"><style>body{margin:0}</style><script>window.RO_GH=1;window.RO_BUILD="20261112212040";if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))</script></head><body>
 <title>仙境放置小黑窗</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <style>
@@ -352,6 +352,12 @@ const MAPS=GD.maps.map(m=>({r:m.r,n:m.n,c:m.c,mons:m.m.filter(([id])=>MON[id]).m
 const ALLMON=[];MAPS.forEach((m,i)=>mapMonsX(m).forEach(x=>{let a=ALLMON.find(y=>y.id===x.id);if(!a){a={...x,maps:[]};ALLMON.push(a)}a.maps.push(i)}));
 const POP=MAPS.map(m=>{let h=0;for(const ch of m.c)h=(h*31+ch.charCodeAt(0))%9973;const t=30+h%2400;return[t,Math.max(1,Math.round(t/(7+h%6)))]});
 const EQUIPS=Object.keys(BASE).filter(k=>BASE[k].t==='eq'&&BASE[k].wc!=='other'),CARDLIST=Object.keys(BASE).filter(k=>BASE[k].t==='card');
+/* 神器（雷神腰帶、布理辛加梅、雷神之錘、斯雷普尼爾）和神器材料：箱子開不到 */
+const GODITEMS=new Set(['i2629','i2630','i1530','i2410','i7058',...Array.from({length:16},(_,i)=>'i'+(7073+i))]);
+/* 箱子能開到的裝備：排除只有 BOSS／MVP 會掉的裝備、神器與神器材料 */
+let _boxEq=null;const boxEquips=()=>{if(_boxEq)return _boxEq;const boss=new Set(),norm=new Set();
+  for(const id in MON){const m=MON[id];for(const [it] of (m.drops||[]))((m.boss||m.mvp)?boss:norm).add(it)}
+  return _boxEq=EQUIPS.filter(k=>!GODITEMS.has(k)&&!(boss.has(k)&&!norm.has(k)))};
 const mapIdx=code=>{const i=MAPS.findIndex(m=>m.c===code);return i<0?0:i};
 function migKey(k){if(BASE[k])return k;const [b,cs]=String(k).split('|');const nb=BASE[b]?b:MIG.mig[b];if(!nb)return null;
   if(!cs)return nb;const nc=cs.split(',').map(c=>BASE[c]?c:MIG.mig[c]).filter(Boolean);return nc.length?nb+'|'+nc.join(','):nb}
@@ -3604,7 +3610,7 @@ panel.addEventListener('click',e=>{
     S.inv[k]--;log('sys',`把 ${ITEMS[k].n} 插進裝備，變成 ${ITEMS[nk].n}。`);toast(ITEMS[nk].n)}break;
   case'use':{const it=ITEMS[k],d=D();if(it&&it.t==='food'){eatFood(k);break}if(it&&it.t==='boost'){useBoost(k);break}
     if(k==='i12103'&&S.inv[k]>0){const qi=document.getElementById('sq_'+k);const q=Math.max(1,Math.min(S.inv[k],qi?Math.floor(Number(qi.value)||1):1));bbUse(q);break}
-    if(k==='i604'&&S.inv[k]>0){S.inv[k]--;if(!S.inv[k])delete S.inv[k];S.summonQ=(S.summonQ||0)+1;log('warn','折斷了枯樹枝……附近好像有什麼東西被召喚出來了！');if(S.auto&&mode==='search'){}break}if(it&&it.t==='box'&&S.inv[k]>0){S.inv[k]--;const pool=it===ITEMS.album?CARDLIST:EQUIPS;const g=pick(pool);addItem(g,1);log(ITEMS[g].t==='card'?'lvl':'drop',`打開 ${it.n}，得到 ${ITEMS[g].n}！`);toast(`得到 ${ITEMS[g].n}！`);break}
+    if(k==='i604'&&S.inv[k]>0){S.inv[k]--;if(!S.inv[k])delete S.inv[k];S.summonQ=(S.summonQ||0)+1;log('warn','折斷了枯樹枝……附近好像有什麼東西被召喚出來了！');if(S.auto&&mode==='search'){}break}if(it&&it.t==='box'&&S.inv[k]>0){S.inv[k]--;const pool=it===ITEMS.album?CARDLIST:boxEquips();const g=pick(pool);addItem(g,1);log(ITEMS[g].t==='card'?'lvl':'drop',`打開 ${it.n}，得到 ${ITEMS[g].n}！`);toast(`得到 ${ITEMS[g].n}！`);break}
     if(S.inv[k]>0){S.inv[k]--;if(!S.inv[k])delete S.inv[k];const g=potGain(k,d);log('skill',`使用 ${it.n}，恢復 ${g}。`)}}break;
   case'sell':if(S.inv[k]>0){const qi=b.dataset.q?document.getElementById('sq_'+k):null,qv=qi?Math.floor(Number(qi.value)||0):1;if(b.dataset.q&&qv<1){toast('請輸入要賣的數量');rr=false;break}const q=b.dataset.all?S.inv[k]:Math.min(b.dataset.q?qv:n,S.inv[k]),p=priceSell(k)*q;S.inv[k]-=q;if(!S.inv[k])delete S.inv[k];S.zeny+=p;zIn('手動賣出',p);log('sys',`賣出 ${ITEMS[k].n} ×${q}（+${ocZ(ITEMS[k].sell*q,p)}）。`);if(ocPct())toast(`${fmt(ITEMS[k].sell*q)}z ⇒ ${fmt(p)}z（高價賣出 +${ocPct()}%）`)}break;
   case'sellall':{let t=0,m=0,tb=0;for(const x of Object.keys(S.inv))if(S.inv[x]>0&&ih(x).act==='sell'&&!protectedItem(x)&&ITEMS[x].t!=='eq'){t+=priceSell(x)*S.inv[x];tb+=ITEMS[x].sell*S.inv[x];m+=S.inv[x];S.inv[x]=0}S.zeny+=t;zIn('手動賣出',t);log('sys',`賣出 ${m} 件，獲得 ${ocZ(tb,t)}。`);if(ocPct()&&t)toast(`${fmt(tb)}z ⇒ ${fmt(t)}z（高價賣出 +${ocPct()}%）`)}break;
