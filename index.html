@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#79a75a"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="小黑窗"><meta name="apple-mobile-web-app-status-bar-style" content="default"><style>body{margin:0}</style><script>window.RO_GH=1;window.RO_BUILD="20261112183603";if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))</script></head><body>
+<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#79a75a"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="小黑窗"><meta name="apple-mobile-web-app-status-bar-style" content="default"><style>body{margin:0}</style><script>window.RO_GH=1;window.RO_BUILD="20261112183904";if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))</script></head><body>
 <title>仙境放置小黑窗</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <style>
@@ -1669,7 +1669,7 @@ function magHits(d,t,sk,L,smul,h){if(sk.sg&&t.frozen>0)return 0;let tot=0;const 
 const freezeRate=(base,t)=>base*Math.max(0,(100-(t.mdef||0))/100)*Math.max(0,1-((t.lv||1)-S.lv)/1000);
 function fight(d){
   const t=target,c=C();if(t&&!t.dead&&t.cur<=0)return win(d);
-  if(!t||t.dead){if(t&&t.killer!=null&&t.killer!==CUR&&ROOT.chars[t.killer])log('battle',`${t.n} 被隊友 ${ROOT.chars[t.killer].name} 打倒了（經驗值照隊伍分配，掉落物給最後一擊的人）。`);target=null;mode='search';return schedule(step,400)}
+  if(!t||t.dead){if(t&&t.killer!=null&&t.killer!==CUR&&ROOT.chars[t.killer])log('battle',`${t.n} 被隊友 ${ROOT.chars[t.killer].name} 打倒了（經驗值照隊伍分配，${P().lootMode==='even'?'掉落物隨機分給隊友':'掉落物給最後一擊的人'}）。`);target=null;mode='search';return schedule(step,400)}
   stEle(t);
   // 逃生
   if(c.esc.hpAct!=='none'&&S.hp<d.maxHp*c.esc.hp/100&&!incap()&&c.hpPot.on&&!hasS('confusion')){for(let i=0;i<3&&S.hp<d.maxHp*Math.max(c.esc.hp,c.hpPot.pct)/100;i++){const k=c.potList.find(x=>(S.inv[x]||0)>0);if(!k)break;useI(k,1);if(!S.inv[k])delete S.inv[k];dirty=true;const g=potGain(k,d);log('skill',`HP 危險，先喝 ${ITEMS[k].n}，恢復 ${g}。`)}}
@@ -1970,10 +1970,15 @@ function winReward(d,t,bd){
   {const sdL=SLC('HW_SOULDRAIN');if(sdL&&t.lastMagic)S.sp=Math.min(d.maxSp,S.sp+Math.floor(t.lv*(95+15*sdL)/100))}
   if(SLC('BS_FINDINGORE')&&R()<.02){const o=pick(['i1002','i1003','i756','i757'].filter(k=>ITEMS[k]));if(o){addItem(o,1);log('drop',`尋找礦石：撿到 ${ITEMS[o].n} ×1。`)}}
   {const E=d.E;if(E.spGain&&E.spGain[t.race])S.sp=Math.min(d.maxSp,S.sp+E.spGain[t.race]);if(E.ad)for(const [it,rc,r] of E.ad){if((!rc||rc===t.race)&&ITEMS[it]&&R()*100<r*DROPB()){addItem(it,1);log('drop',`裝備效果：得到 ${ITEMS[it].n} ×1。`)}}}
-  if(C().loot.on){let got=false;
+  const lootEven=partyOn()&&inParty(CUR)&&P().lootMode==='even';
+  if(C().loot.on||lootEven){let got=false;
     for(const [k,r] of t.drops){if(R()*100<r*(1+d.st.luk*.005)*DROPB()){
-      if(!ih(k).pick)continue;
-      if(weight()+ITEMS[k].w>d.maxW){log('warn',`負重已滿，無法撿取 ${ITEMS[k].n}。`);continue}
+      if(lootEven){/* 道具隨機分配（官方「隊伍共享」）：每件掉落隨機給同地圖、活著、會撿這件、背得動的隊友 */
+        const me=CUR,cand=P().members.filter(j=>{const o=ROOT.chars[j];return o&&o.hp>0&&o.cfg.map===S.cfg.map&&o.cfg.loot&&o.cfg.loot.on&&withChar(j,()=>ih(k).pick&&weight()+ITEMS[k].w<=D().maxW)});
+        if(!cand.length)continue;const to=pick(cand);
+        if(to!==me){const who=ROOT.chars[to].name,kn=S.name;withChar(to,()=>{addItem(k,1);log(ITEMS[k].t==='card'?'lvl':'drop',`隊伍分配：得到 ${ITEMS[k].n} ×1（${kn} 打倒的 ${t.n}）。`)});bd.push(ITEMS[k].n);log('drop',`撿取物品：${ITEMS[k].n} ×1 → 分給 ${who}。`);if(ITEMS[k].t==='card')toast(`${who} 分到 ${ITEMS[k].n}！`);continue}}
+      else{if(!ih(k).pick)continue;
+      if(weight()+ITEMS[k].w>d.maxW){log('warn',`負重已滿，無法撿取 ${ITEMS[k].n}。`);continue}}
       if(!got){setState('撿取物品');got=true}
       addItem(k,1);bd.push(ITEMS[k].n);log(ITEMS[k].t==='card'?'lvl':'drop',`撿取物品：${ITEMS[k].n} ×1。`);if(ITEMS[k].t==='card')toast(`撿取物品：${ITEMS[k].n} ×1。`)}}}
 }
@@ -3070,7 +3075,7 @@ party0(){if(ui.pv==null||!ROOT.parties[ui.pv]){const i=ROOT.parties.findIndex(q=
     ${others.length===0&&mem.length<MAXP?`<div class="row"><span class="note">角色都已經在隊伍裡了（要換隊先從原本的隊伍移出）。</span><button type="button" class="sm" data-a="gochars">建立新角色</button></div>`:''}
     <div class="row"><input type="text" id="pName" value="${esc(p.name||'')}" placeholder="${esc(pname)}" maxlength="16"><button type="button" class="sm" data-a="pname">修改隊伍名稱</button></div>
     <div class="row">${mem.length?`<button type="button" class="pri" data-a="pstart">全隊開始掛機</button><button type="button" data-a="pstop">全隊停止</button>`:''}<button type="button" class="sm" data-a="pdisband">${armed==='pdisband'?'確定解散？':'解散這支隊伍'}</button></div>`)+
-  `<div style="height:10px"></div>`+box('分配方式',`<div class="row">經驗：<select data-p="expMode"><option value="dmg" ${p.expMode!=='even'?'selected':''}>各自得到（依傷害比例）</option><option value="even" ${p.expMode==='even'?'selected':''}>平均分配</option></select></div>
+  `<div style="height:10px"></div>`+box('分配方式',`<div class="row">經驗：<select data-p="expMode"><option value="dmg" ${p.expMode!=='even'?'selected':''}>各自得到（依傷害比例）</option><option value="even" ${p.expMode==='even'?'selected':''}>平均分配</option></select></div><div class="row">道具：<select data-p="lootMode"><option value="self" ${p.lootMode!=='even'?'selected':''}>各自取得（打倒的人撿）</option><option value="even" ${p.lootMode==='even'?'selected':''}>隊伍共享（每件隨機分給同地圖隊友）</option></select></div><div class="note">隊伍共享：每件掉落隨機分給同一張地圖、活著、有開撿東西、這件設定為要撿、而且背得動的隊友，可以把負重分散到大家身上。</div>
     <div class="row">掉落：<span>各自取得（打倒的人）</span></div>
     <div class="note">平均分配：同一張地圖、還活著的隊員平分，每多一人總經驗 +10%；隊員等級差超過 15 時改回依傷害比例。</div>`)+
   `<div style="height:10px"></div>`+box('怎麼玩',`<div class="note">・隊伍成員一起在隊長（★）的地圖掛機；在掛機設定換地圖會全隊一起換。<br>
