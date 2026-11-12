@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#79a75a"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="小黑窗"><meta name="apple-mobile-web-app-status-bar-style" content="default"><style>body{margin:0}</style><script>window.RO_GH=1;window.RO_BUILD="20261112184633";if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))</script></head><body>
+<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#79a75a"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="小黑窗"><meta name="apple-mobile-web-app-status-bar-style" content="default"><style>body{margin:0}</style><script>window.RO_GH=1;window.RO_BUILD="20261112185050";if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))</script></head><body>
 <title>仙境放置小黑窗</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <style>
@@ -1333,7 +1333,6 @@ function step(){
   // search
   setState('尋找怪物');
   const wp=wPct(d);
-  const wGate=th=>Math.max(th,S.townW>=th?S.townW+15:0);/* 回城整理後還是超過門檻（身上留的東西太重）：多撿 15% 再回城，不會停掉不回 */
   if(wp>=wGate(c.sellAt)&&Object.keys(S.inv).some(k=>sellQty(k)>0))return goTown(`負重 ${wp}%，回城賣`);
   if(c.stop90&&wp>=90)return stop('負重達 90%');
   if(c.storeOn&&wp>=wGate(c.storeAt)&&Object.keys(S.inv).some(k=>S.inv[k]>0&&(ih(k).act==='store'||sellQty(k)>0)))return goTown(`負重 ${wp}%，回城賣東西、存倉`);/* 存倉門檻也會順便賣掉設為「賣」的東西 */
@@ -1483,7 +1482,13 @@ function pullTop(t){const c=C();if(!(c.pull>0)||!(c.pullTop>0)||!t||t.dead||t.cu
   S.pullTopAt=S.clock+5000;if(!n)return;const pool=map.mons.filter(x=>!x.mvp&&!x.boss&&!x.imm&&!['flee','skip'].includes(c.mc[x.n]));if(!pool.length)return;
   t.pack=(t.pack||[]).filter(o=>!o.dead&&o.cur>0);const cnt={};for(let i=0;i<n;i++){const o=mkMob(weighted(pool),true,null);o.dist=(t.dist||1)+3;o.pBy=CUR;t.pack.push(o);cnt[o.n]=(cnt[o.n]||0)+1}
   log('battle',`補拖：又引來 ${Object.entries(cnt).map(([k,v])=>k+(v>1?' ×'+v:'')).join('、')}，現在跟著 ${t.pack.length+1} 隻。`)}
-function step2(){if(!S.auto)return;const c=C(),t=target;if(t&&t.bb)bbSync(t);pullTop(t);
+const wGate=th=>Math.max(th,S.townW>=th?S.townW+15:0);/* 回城整理後還是超過門檻（身上留的東西太重）：多撿 15% 再回城，不會停掉不回 */
+/* 戰鬥中負重一超過門檻就回城（拖怪、補拖時一直在打，不會回到搜尋），打 BOSS／MVP 時等打完 */
+function fightTown(t){const c=C(),wp=wPct();if(t&&!t.dead&&(t.boss||t.mvp))return false;
+  if(wp>=wGate(c.sellAt)&&Object.keys(S.inv).some(k=>sellQty(k)>0)){goTown(`戰鬥中負重 ${wp}%，先回城賣`);return true}
+  if(c.storeOn&&wp>=wGate(c.storeAt)&&Object.keys(S.inv).some(k=>S.inv[k]>0&&(ih(k).act==='store'||sellQty(k)>0))){goTown(`戰鬥中負重 ${wp}%，先回城賣東西、存倉`);return true}
+  return false}
+function step2(){if(!S.auto)return;const c=C(),t=target;if(t&&t.bb)bbSync(t);if(fightTown(t))return;pullTop(t);
   if(t&&!t.dead&&t.cur>0&&t.owner===CUR&&c.mc[t.n]==='flee'){log('warn',`正在交戰的 ${t.n} Lv.${t.lv} 設定為「看到就逃」，立刻脫離！`);return escape(c.esc.dangerAct==='none'?'fly':c.esc.dangerAct)}
   fight(D())}
 function escape(act,quiet){
