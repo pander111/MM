@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#79a75a"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="小黑窗"><meta name="apple-mobile-web-app-status-bar-style" content="default"><style>body{margin:0}</style><script>window.RO_GH=1;window.RO_BUILD="20261112161933";if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))</script></head><body>
+<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#79a75a"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="小黑窗"><meta name="apple-mobile-web-app-status-bar-style" content="default"><style>body{margin:0}</style><script>window.RO_GH=1;window.RO_BUILD="20261112162644";if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))</script></head><body>
 <title>仙境放置小黑窗</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <style>
@@ -1690,10 +1690,10 @@ function fight(d){
   if(!acted&&buffOnC('HP_BASILICA')){acted=true;el=1000}
   // 攻擊技能
   if(!acted&&t.dist<=9){const tr=tryTame(d,t);if(tr==='ok')return schedule(step,800);if(tr){acted=true;el=1000}}
-  let rangeWant=0;
+  let rangeWant=0,waitMob=0;
   if(!acted&&!sil&&!t.plant){for(const r of c.atk.rules){
     const sk=SK[r.sk],L=Math.min(r.lv||1,SL(r.sk));if(!sk||!L)continue;
-    if(r.mon&&r.mon!==t.n)continue; if(r.once&&t.used[r.sk])continue; if(r.minMob>1&&pileOf(t).length<r.minMob)continue; if(r.ele&&eleOf(t.ele)!==r.ele)continue; if(r.cond&&!condOk(r.cond,t))continue;
+    if(r.mon&&r.mon!==t.n)continue; if(r.once&&t.used[r.sk])continue; if(r.minMob>1&&pileOf(t).length<r.minMob){if(SL(r.sk)&&S.sp>=spc(SK[r.sk],L))waitMob=Math.max(waitMob,r.minMob);continue} if(r.ele&&eleOf(t.ele)!==r.ele)continue; if(r.cond&&!condOk(r.cond,t))continue;
     if(!needOk(sk))continue;
     if(t.bsLock&&S.bsUntil>S.clock&&!BSOK(S.bsLv||1).includes(sk.c))continue;/* 真劍百破道鎖住時只能用特定技能 */
     if(sk.vs&&!sk.vs(t))continue;
@@ -1764,6 +1764,7 @@ function fight(d){
     if(gc){S.sp-=gc[1];if(gc[2])S.spheres--;t.dist=goal;acted=true;el=500;log('skill',`${gc[0]}！瞬間來到 ${t.n} 面前。`)}}
   if(!acted&&t.dist>goal+.01){const mv=Math.max(el,400)/(SLC('KN_RIDING')||buffOnC('WS_CARTBOOST')||buffOnC('SN_WINDWALK')||buffOn('hom_avoid')?100:150)*(1+(d.E.speedP||0)/100);const was=t.dist;t.dist=Math.max(goal,t.dist-mv);acted=true;el=Math.max(el,400);
     if(!t.walked||was-t.dist>=3){t.walked=1;log('battle',`走向 ${t.n}（距離 ${Math.ceil(t.dist)} 格）。`)}}
+  if(!acted&&c.atk.onlySkill&&c.atk.rules.length&&waitMob&&S.clock-(t.waitMobT||(t.waitMobT=S.clock))<15000){acted=true;el=1000;if(!(S.waitMobAt>S.clock)){S.waitMobAt=S.clock+10000;log('battle',`只用技能：等怪物聚到 ${waitMob} 隻再放（目前 ${pileOf(t).length} 隻，最多等 15 秒）。`)}}
   if(!acted){
     if(c.atk.onlySkill&&c.atk.rules.length){log('warn','沒有可施放的攻擊技能，脫離戰鬥休息。');return escape('fly',true)}
     const need=needAmmo(wcls());
