@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#79a75a"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="小黑窗"><meta name="apple-mobile-web-app-status-bar-style" content="default"><style>body{margin:0}</style><script>window.RO_GH=1;window.RO_BUILD="20261113222532";if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))</script></head><body>
+<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#79a75a"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="小黑窗"><meta name="apple-mobile-web-app-status-bar-style" content="default"><style>body{margin:0}</style><script>window.RO_GH=1;window.RO_BUILD="20261113224614";if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))</script></head><body>
 <title>仙境放置小黑窗</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <style>
@@ -72,6 +72,12 @@ td.r,th.r{text-align:right} td.c,th.c{text-align:center}
 .card[open] > summary::before{content:"▼ "}
 .card > summary::-webkit-details-marker{display:none}
 .cb{padding:8px 10px;display:flex;flex-direction:column;gap:8px}
+section.card > h3{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.ctog{min-width:30px;padding:0 8px;height:26px;font-size:16px;line-height:1;flex:none}
+.card.cc > .cb > :not(.card){display:none}
+#shopQRes:not(:empty),#mapMonRes:not(:empty){max-height:340px;overflow-y:auto;border:1.5px solid var(--btn-edge);border-radius:4px;padding:6px;background:var(--win)}
+.card.cc > .cb{padding:0;gap:0}
+.card.cc > .cb > .card{margin:8px 10px}
 .statbar{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;padding:7px}
 .statbar .pill{display:block;width:100%;min-width:0;height:34px;line-height:24px;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;box-sizing:border-box}
 .pill{background:var(--sub);border:1.5px solid var(--btn-edge);border-radius:5px;padding:4px 10px;font-size:14px;font-variant-numeric:tabular-nums}
@@ -3805,7 +3811,7 @@ panel.addEventListener('change',e=>{const el=e.target;
   if(el.id==='rSk'&&el.value){toast('選好了，記得按「新增規則」')}
   if(el.id==='townSel'){ui.town=el.value;ROOT.ui.town=el.value;renderTab()}
 });
-panel.addEventListener('input',e=>{if(e.target.id==='storQ'){ui.storQ=e.target.value;storFilter();return}if(e.target.id==='mkQ'){ui.mkQ=e.target.value;mkFilter();return}if(e.target.id==='mQ'){ui.mQ=e.target.value;const sel=$('mTo');if(sel)sel.innerHTML=mOptHtml();return}if(e.target.id==='svIn'){ui.svIn=e.target.value;ui.svObj=null;ui.svErr=''}if(e.target.id==='qIn'){if(e.isComposing||qComp)return;ui.q=e.target.value;clearTimeout(ui.qt);ui.qt=setTimeout(updQ,300)}});
+panel.addEventListener('input',e=>{if(e.target.id==='shopQ'){ui.shopQ=e.target.value;clearTimeout(ui.sqt);ui.sqt=setTimeout(shopQUpd,250);return}if(e.target.id==='mapMonQ'){ui.mapMonQ=e.target.value;clearTimeout(ui.mmt);ui.mmt=setTimeout(mapMonQUpd,250);return}if(e.target.id==='storQ'){ui.storQ=e.target.value;storFilter();return}if(e.target.id==='mkQ'){ui.mkQ=e.target.value;mkFilter();return}if(e.target.id==='mQ'){ui.mQ=e.target.value;const sel=$('mTo');if(sel)sel.innerHTML=mOptHtml();return}if(e.target.id==='svIn'){ui.svIn=e.target.value;ui.svObj=null;ui.svErr=''}if(e.target.id==='qIn'){if(e.isComposing||qComp)return;ui.q=e.target.value;clearTimeout(ui.qt);ui.qt=setTimeout(updQ,300)}});
 /* 查詢：注音、倉頡等輸入法選字時不要更新，只更新下方結果，不重畫輸入框 */
 let qComp=false;
 panel.addEventListener('compositionstart',e=>{if(e.target.id==='qIn')qComp=true});
@@ -3813,7 +3819,10 @@ panel.addEventListener('compositionend',e=>{if(e.target.id==='qIn'){qComp=false;
 function updQ(){const box=$('qRes');if(!box||tab!=='query')return;const tmp=document.createElement('div');tmp.innerHTML=VIEWS.query();const r=tmp.querySelector('#qRes');if(r)box.innerHTML=r.innerHTML}
 
 const card=(title,body,open=true,cls='')=>`<details class="card ${cls}" ${open?'open':''}><summary>${title}</summary><div class="cb">${body}</div></details>`;
-const box=(title,body)=>`<section class="card"><h3>${title}</h3><div class="cb">${body}</div></section>`;
+const CARDC=(()=>{try{return JSON.parse(localStorage.getItem('ro-cardc')||'{}')}catch(e){return{}}})();
+const ckey=t=>String(t).replace(/<[^>]*>/g,'').replace(/[（(][^）)]*[）)]/g,'').replace(/[\d,]+/g,'').trim();
+const box=(title,body)=>{const k=ckey(title),c=!!CARDC[k];return `<section class="card${c?' cc':''}" data-ck="${esc(k)}"><h3><span>${title}</span><button type="button" class="ctog" data-ctog="1" title="${c?'展開':'縮小'}">${c?'＋':'－'}</button></h3><div class="cb">${body}</div></section>`};
+document.addEventListener('click',e=>{const b=e.target.closest('[data-ctog]');if(!b)return;e.preventDefault();e.stopPropagation();const sec=b.closest('section.card');if(!sec)return;const c=!sec.classList.contains('cc');sec.classList.toggle('cc',c);b.textContent=c?'＋':'－';b.title=c?'展開':'縮小';const k=sec.dataset.ck;if(c)CARDC[k]=1;else delete CARDC[k];try{localStorage.setItem('ro-cardc',JSON.stringify(CARDC))}catch(err){}},true);
 /* 可以縮小的區塊（記住狀態） */
 const fbox=(id,title,body)=>{const f=!!((ROOT.ui.fold||{})[id]);return `<section class="card"><h3 style="display:flex;align-items:center;gap:8px"><span style="flex:1">${title}</span><button type="button" class="wbtn" data-a="fold" data-k="${id}" aria-label="${f?'展開':'縮小'}">${f?'□':'_'}</button></h3>${f?'':`<div class="cb">${body}</div>`}</section>`};
 function barHTML(id,col,label){return `<span>${label}</span><div class="bar"><i id="${id}f" style="background:${col}"></i><span id="${id}t"></span></div>`}
@@ -3822,6 +3831,20 @@ function mOptHtml(){const q=(ui.mQ||'').trim().toLowerCase();const L=(NET.mOpts|
   return L.length?L.map(([u,n])=>`<option value="${esc(u)}">${esc(n)}</option>`).join(''):'<option value="">（找不到符合的玩家）</option>'}
 function craftFx(k){const it=ITEMS[k];if(!it)return'';try{if(it.t==='food')return `${it.fst.toUpperCase()} +${it.fv}（持續 ${Math.round(it.dur/60)} 分鐘，同種素質只取最高的一道）`;
   const t=String(itemInfo(k)||'').replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim();return t.length>90?t.slice(0,90)+'…':t}catch(e){return''}}
+const SHOPCN={tool:'道具商人',weapon:'武器商人',armor:'防具商人',j3:'三轉裝備商人'};
+function shopQHtml(){const q=(ui.shopQ||'').trim().toLowerCase();if(!q)return'';const hit={};
+  for(const t of GD.towns)for(const c in SHOPCN)for(const k of (t.s[c]||[])){const it=ITEMS[k];if(!it||!it.n.toLowerCase().includes(q))continue;(hit[k]=hit[k]||[]).push([t.n,c])}
+  const ks=Object.keys(hit).sort((a,b)=>ITEMS[a].n.length-ITEMS[b].n.length).slice(0,30);
+  if(!ks.length)return'<div class="note">沒有商店賣名稱含「'+esc(ui.shopQ.trim())+'」的道具（可能只能打怪或製作取得）。</div>';
+  return `<div class="tw"><table><tbody>${ks.map(k=>`<tr><td>${IN(k)}<div class="note">${fmt(priceBuy(k))}z</div></td><td><span class="btns">${hit[k].map(([tn,c])=>`<button type="button" class="sm ${ui.town===tn&&ui.shopTab===c?'on':''}" data-a="shopgo" data-k="${esc(tn+'|'+c)}">${esc(tn)}・${SHOPCN[c]}</button>`).join('')}</span></td></tr>`).join('')}</tbody></table></div>${Object.keys(hit).length>30?'<div class="note">只列前 30 項，請再打詳細一點。</div>':''}<div class="note">按城鎮按鈕會直接切到那間商店。</div>`}
+function shopQUpd(){const b=$('shopQRes');if(b)b.innerHTML=shopQHtml()}
+/* 掛機地圖：用怪物名稱找地圖 */
+function mapMonQHtml(){const q=(ui.mapMonQ||'').trim().toLowerCase();if(!q)return'';const by={};const c=C();
+  MAPS.forEach((m,i)=>{for(const x of m.mons){if(!x.n||!x.n.toLowerCase().includes(q)||!(x.count>0))continue;const o=by[x.n]=by[x.n]||{lv:x.lv,boss:x.mvp?'MVP':x.boss?'BOSS':'',maps:[]};if(!o.maps.some(a=>a[0]===i))o.maps.push([i,x.count])}});
+  const ns=Object.keys(by).sort((a,b)=>a.length-b.length||by[a].lv-by[b].lv).slice(0,20);
+  if(!ns.length)return'<div class="note">沒有地圖出現名稱含「'+esc(ui.mapMonQ.trim())+'」的怪物。</div>';
+  return ns.map(n=>{const o=by[n];return `<div style="margin:4px 0"><b>${esc(n)}</b> <span class="note">Lv ${o.lv}${o.boss?'・'+o.boss:''}・${o.maps.length} 張地圖</span><div class="btns" style="margin-top:3px">${o.maps.sort((a,b)=>b[1]-a[1]).map(([i,cnt])=>`<button type="button" class="sm ${i===c.map?'on':''}" data-a="map" data-k="${i}">${esc(MAPS[i].n)} <small>×${cnt}</small></button>`).join('')}</div></div>`}).join('')+(Object.keys(by).length>20?'<div class="note">只列前 20 種怪物，請再打詳細一點。</div>':'')+'<div class="note">按地圖按鈕就會換到那張圖掛機；×後面是那張圖的怪物數量。</div>'}
+function mapMonQUpd(){const b=$('mapMonRes');if(b)b.innerHTML=mapMonQHtml()}
 function storFilter(){const q=(ui.storQ||'').trim().toLowerCase();panel.querySelectorAll('tr[data-sn]').forEach(tr=>{tr.hidden=!!q&&!tr.dataset.sn.toLowerCase().includes(q)})}
 function lockH(){const pn=panel;if(tab!=='main'){if(pn.style.minHeight)pn.style.minHeight='';return}
   const sig=[ROOT.ui.arena!==false,partyOn()?P().members.length:0,JSON.stringify(ROOT.ui.fold||{}),ROOT.cur,!!S.hom].join('|');if(sig!==ui.mainSig){ui.mainSig=sig;ui.mainH=0;pn.style.minHeight=''}const h=pn.scrollHeight;if(h>(ui.mainH||0))ui.mainH=h;pn.style.boxSizing='border-box';pn.style.minHeight=ui.mainH+'px'}
@@ -3968,8 +3991,9 @@ shop(){const refineBox=()=>{const list=refineList();
   const list=srcList.map(k=>{const it=ITEMS[k],p=priceBuy(k);const info=itemInfo(k)+(it.t==='eq'&&!canWield(it)?' <span class="bad">（目前職業或等級不能用）</span>':'');
     const qs=it.t==='arrow'||it.t==='shuri'?[100,500]:it.t==='eq'?[1]:[1,10];
     return `<tr><td>${IN(k)}<div class="note">${info}</div></td><td class="r">${dcCell(k)}</td><td class="r"><span class="btns" style="justify-content:flex-end">${qs.map(q=>`<button type="button" class="sm" data-a="buy" data-k="${k}" data-n="${q}" ${S.zeny<p*q?'disabled':''}>×${q}</button>`).join('')}</span></td></tr>`}).join('');
-  return box('商店與 NPC',`<div class="row"><label class="chk">城鎮 <select id="townSel">${towns.map(t=>`<option ${t.n===tw.n?'selected':''}>${t.n}</option>`).join('')}</select></label><span>Zeny <b>${fmt(S.zeny)}</b></span></div>
-    <div class="btns">${cats.map(([c,n])=>`<button type="button" class="sm ${st===c?'on':''}" data-a="stab" data-k="${c}">${n}（${c==='j3'?'你能用的':tw.s[c].length}）</button>`).join('')}</div>${st==='j3'?'<div class="note">三轉與擴充職業的專屬裝備（新版官方資料：防具 DEF 換算成本遊戲的 % 制 ÷10（整套三轉裝的減傷和新版公式差不多）；武器 MATK 換算成 % ÷10）。只列出目前職業能穿的。</div>':''}
+  return box('商店與 NPC',`<div class="row"><input type="search" id="shopQ" placeholder="🔍 搜尋道具：查哪個城鎮的商店有賣" value="${esc(ui.shopQ||'')}" style="flex:1;min-width:10em" autocomplete="off" autocorrect="off" spellcheck="false"></div><div id="shopQRes">${shopQHtml()}</div>
+    <div class="row"><label class="chk">城鎮 <select id="townSel">${towns.map(t=>`<option ${t.n===tw.n?'selected':''}>${t.n}</option>`).join('')}</select></label><span>Zeny <b>${fmt(S.zeny)}</b></span></div>
+    <div class="btns">${cats.map(([c,n])=>`<button type="button" class="sm ${st===c?'on':''}" data-a="stab" data-k="${c}">${n}（${c==='j3'?'你能用的':tw.s[c].length}）</button>`).join('')}</div>${st==='j3'?'<div class="note">三轉與擴充職業的專屬裝備（新版官方資料）。只列出目前職業能穿的。</div>':''}
     ${dcPct()?`<div class="note good">🏷️ ${dcSrc()} 生效中：在 NPC 商店購買便宜 ${dcPct()}%（價錢欄顯示 原價⇒實付）。</div>`:''}<div class="tw"><table><tbody>${list}</tbody></table></div>
     <div class="note">各城鎮商人賣的東西照官方 NPC 商店資料，只能打怪取得的裝備不會出現在商店。掛機時「回城補」會從有賣該道具的城鎮買。</div>`+`<div style="height:10px"></div>`+box('重置 NPC',(()=>{let sp=0;for(const k in S.st)for(let v=1;v<S.st[k];v++)sp+=statCost(v);let kp=0;for(const k in S.sk)if(SK[k]&&!SK[k].quest&&(k!=='basic'||S.job==='novice'))kp+=S.sk[k];
     const rc=resetCost();return `<div class="note">把點錯的點數全部退回來重新分配。${GHM?'初心者和一轉免費；二轉以後每次重置（屬性或技能各算一次）收 1,000,000z。':'免費，可以重複使用。'}</div>
@@ -4382,7 +4406,7 @@ function autoView(){
   const allocRows=c.alloc.rules.map((r,i)=>`<tr><td>${i+1}</td><td>${cS(`alloc.rules.${i}.st`,STN.map(s=>[s,s.toUpperCase()]))}</td><td>${cN(`alloc.rules.${i}.to`,60)}</td><td class="r"><span class="btns" style="justify-content:flex-end"><button type="button" class="sm" data-a="amv" data-k="${i}" data-n="-1">▲</button><button type="button" class="sm" data-a="amv" data-k="${i}" data-n="1">▼</button><button type="button" class="sm" data-a="adel" data-k="${i}">✕</button></span></td></tr>`).join('');
   return `<div class="row" style="margin-bottom:8px;justify-content:space-between"><span class="row"><span class="note">設定修改後立即生效。</span></span><span class="btns"><button type="button" class="sm" data-a="openall">全部展開</button><button type="button" class="sm" data-a="closeall">全部收合</button></span></div>`+
   (GHM?'':card('掉寶倍率（測試用）',`<label class="chk">掉寶率 <select data-a2="droprate">${[1,2,5,10].map(x=>`<option value="${x}" ${DROPM()===x?'selected':''}>×${x}${x===1?'（官方）':''}</option>`).join('')}</select></label><div class="note">全部角色一起套用，卡片也一樣變多。測試完記得改回 ×1。</div>`))+
-  card('掛機地圖',syncBtn('掛機地圖')+`${(()=>{const RP=realPop();const top=Object.entries(RP).filter(([i])=>MAPS[i]).sort((a,b)=>b[1]-a[1]).slice(0,8);return top.length?`<div style="margin-bottom:8px"><b>現在大家在哪掛機</b><div class="btns" style="margin-top:4px">${top.map(([i,n])=>`<button type="button" class="sm ${+i===c.map?'on':''}" data-a="map" data-k="${i}">${esc(MAPS[i].n)} <b class="good">${n} 人</b></button>`).join('')}</div></div>`:''})()}<div class="maplist">${mapList}</div><div class="note">人數是真人玩家（包含你自己）在這張地圖掛機的<b>角色數</b>，關掉遊戲在離線掛機的也算（48 小時內有開過遊戲的）。每個角色各自一個世界，不會被搶怪；同地圖的跨玩家隊友可以分經驗。</div><b>${map.n}</b>${monT}`)+
+  card('掛機地圖',syncBtn('掛機地圖')+`${(()=>{const RP=realPop();const top=Object.entries(RP).filter(([i])=>MAPS[i]).sort((a,b)=>b[1]-a[1]).slice(0,8);return top.length?`<div style="margin-bottom:8px"><b>現在大家在哪掛機</b><div class="btns" style="margin-top:4px">${top.map(([i,n])=>`<button type="button" class="sm ${+i===c.map?'on':''}" data-a="map" data-k="${i}">${esc(MAPS[i].n)} <b class="good">${n} 人</b></button>`).join('')}</div></div>`:''})()}<div class="row"><input type="search" id="mapMonQ" placeholder="🔍 搜尋怪物名稱：查牠出現在哪些地圖" value="${esc(ui.mapMonQ||'')}" style="flex:1;min-width:10em" autocomplete="off" autocorrect="off" spellcheck="false"></div><div id="mapMonRes">${mapMonQHtml()}</div><div class="maplist">${mapList}</div><div class="note">人數是真人玩家（包含你自己）在這張地圖掛機的<b>角色數</b>，關掉遊戲在離線掛機的也算（48 小時內有開過遊戲的）。每個角色各自一個世界，不會被搶怪；同地圖的跨玩家隊友可以分經驗。</div><b>${map.n}</b>${monT}`)+
   card('選怪',syncBtn('選怪')+`<div class="row">怪物等級 ${cN('lvMin',56)} ～ ${cN('lvMax',56)} <span class="note">（0 = 不限）</span></div>${cC('skipAggro','搜尋到主動怪時略過')}
     <div>白名單（只打這些；空 = 不限）：</div><div class="chips">${c.white.map((n,i)=>`<button type="button" class="chip" data-a="wdel" data-k="${i}">${n} ✕</button>`).join('')||'<span class="note">（不限）</span>'}</div>
     <select data-a2="wadd"><option value="">＋ 加入怪物（本地圖的怪物在前）…</option>${[...mapMonsX(map).map(m=>m.n),...mons.filter(n=>!map.mons.some(m=>m.n===n))].map(n=>`<option>${n}</option>`).join('')}</select>
@@ -4568,6 +4592,7 @@ panel.addEventListener('click',e=>{
   case'sell':if(S.inv[k]>0){const qi=b.dataset.q?document.getElementById('sq_'+k):null,qv=qi?Math.floor(Number(qi.value)||0):1;if(b.dataset.q&&qv<1){toast('請輸入要賣的數量');rr=false;break}const q=b.dataset.all?S.inv[k]:Math.min(b.dataset.q?qv:n,S.inv[k]),p=priceSell(k)*q;S.inv[k]-=q;if(!S.inv[k])delete S.inv[k];S.zeny+=p;zIn('手動賣出',p);log('sys',`賣出 ${ITEMS[k].n} ×${q}（+${ocZ(ITEMS[k].sell*q,p)}）。`);if(ocPct())toast(`${fmt(ITEMS[k].sell*q)}z ⇒ ${fmt(p)}z（高價賣出 +${ocPct()}%）`)}break;
   case'sellall':{let t=0,m=0,tb=0;for(const x of Object.keys(S.inv))if(S.inv[x]>0&&ih(x).act==='sell'&&!protectedItem(x)&&ITEMS[x].t!=='eq'){t+=priceSell(x)*S.inv[x];tb+=ITEMS[x].sell*S.inv[x];m+=S.inv[x];S.inv[x]=0}S.zeny+=t;zIn('手動賣出',t);log('sys',`賣出 ${m} 件，獲得 ${ocZ(tb,t)}。`);if(ocPct()&&t)toast(`${fmt(tb)}z ⇒ ${fmt(t)}z（高價賣出 +${ocPct()}%）`)}break;
   case'stab':ui.shopTab=k;break;
+  case'shopgo':{const i=k.lastIndexOf('|');ui.town=k.slice(0,i);ROOT.ui.town=ui.town;ui.shopTab=k.slice(i+1);break}
   case'amobdel':{const m=C().arrows.mob||{};delete m[k]}break;
   case'xpnew':case'xpjoin':xpAct(a,k);break;
   case'xpleave':if(armed==='xpl'){xpAct('xpleave')}else{armed='xpl';keepArm=true}break;
