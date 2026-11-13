@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#79a75a"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="小黑窗"><meta name="apple-mobile-web-app-status-bar-style" content="default"><style>body{margin:0}</style><script>window.RO_GH=1;window.RO_BUILD="20261113171843";if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))</script></head><body>
+<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#79a75a"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="小黑窗"><meta name="apple-mobile-web-app-status-bar-style" content="default"><style>body{margin:0}</style><script>window.RO_GH=1;window.RO_BUILD="20261113173517";if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))</script></head><body>
 <title>仙境放置小黑窗</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <style>
@@ -694,7 +694,7 @@ const SKI={
  GN_DEMONIC_FIRE:{items:[['i7135',1]],onHit:(t,L)=>{S.dfire=S.clock+(8+2*L)*1000},k:'magic',aoe:1,ele:'火',hits:()=>5,mul:L=>1.1+.2*L,sp:xsp('GN_DEMONIC_FIRE'),cast:xct('GN_DEMONIC_FIRE'),fd:L=>`惡魔火焰：地上燃起火焰，火屬性 MATK ${110+20*L}% 連續 5 下；消耗火煙瓶 1；燒著的時候可以接火焰擴散`},
  GN_FIRE_EXPANSION:{k:'atk',aoe:1,rng:()=>9,mul:()=>0,vs:()=>(S.dfire||0)>S.clock,items:[['i6216',1,1],['i6213',1,2],['i6214',1,3],['i6215',1,4],['i7136',1,5]],sp:xsp('GN_FIRE_EXPANSION'),cast:xct('GN_FIRE_EXPANSION'),custom:(d,t,L)=>fireExp(d,t,L),fd:L=>`火焰擴散：惡魔火焰還在燒時才能放。${['Lv1 油瓶：火勢延續（再燒一陣，MATK 130% ×4）','Lv2 炸藥粉：引爆，MATK (150 + INT + Job Lv)% × Base Lv/100','Lv3 煙幕粉：全隊 FLEE +20%（4 秒）','Lv4 催淚瓦斯：怪物每 2 秒失去 5% HP、命中下降','Lv5 強酸瓶：放出強酸火煙瓶（Lv 5 或自己學的等級）'][Math.min(5,L)-1]}`},
  GN_HELLS_PLANT:{items:[['i7137',1]],k:'atk',aoe:1,rng:()=>3,mul:L=>LVM(100*L+D().st.int*Math.max(1,SLC('AM_CANNIBALIZE'))),after:(t,L)=>{if(R()*100<20+10*L)monSt(t,'stun');if(R()*100<5+5*L)monSt(t,'bleeding')},sp:xsp('GN_HELLS_PLANT'),cast:xct('GN_HELLS_PLANT'),fd:L=>`地獄植物：周圍 ATK (${100*L} + INT × 生命體召喚)% × Base Lv/100，暈眩、出血；消耗噬人植物瓶 1`},
- GN_MANDRAGORA:{items:[['i6217',1]],k:'debuff',st:'slow',aoeD:1,rng:()=>5,chance:L=>25+10*L,dur:L=>(5+5*L)*1000,sp:xsp('GN_MANDRAGORA'),cast:xct('GN_MANDRAGORA'),fd:L=>`曼陀羅魔花的尖叫：周圍怪物變慢（官方是降低 INT、吸 SP）；消耗曼陀羅魔花盆 1`},
+ GN_MANDRAGORA:{k:'passive',fd:()=>'曼陀羅魔花的尖叫：官方只對玩家有效（降低 INT 4×Lv、吸 SP），對怪物完全沒有作用，所以本遊戲掛機時不會施放'},
  GN_CHANGEMATERIAL:{k:'passive',fd:()=>'素材變化：在「背包 → 製作」把一堆素材換成別的素材（官方配方、成功率與數量）'}, GN_MIX_COOKING:{k:'passive',fd:L=>`調配料理：在「背包 → 製作」做料理（全素質 +20 的食物）；${L>=2?'Lv2 一次用 10 份材料做最多 11 個':'Lv1 一次做 1 個'}，成功率看 Job Lv/4 + LUK/2 + DEX/3`}, GN_S_PHARMACY:{k:'passive',fd:L=>`專門配藥：在「背包 → 製作」做種子、HP／SP 增加藥水等；一次最多 ${[7,8,8,9,9,10,10,11,11,12][Math.min(10,L)-1]} 個（數量看 INT、DEX、LUK、等級、藥水研究）`},
  GN_ILLUSIONDOPING:{items:[['i970',1]],k:'debuff',st:'confuse',aoeD:1,rng:()=>7,chance:L=>100-10*L,dur:()=>10000,sp:xsp('GN_ILLUSIONDOPING'),cast:xct('GN_ILLUSIONDOPING'),fd:L=>`幻覺禁藥：周圍怪物 ${100-10*L}% 機率混亂；消耗酒精 1`},
  /* ===== 十字斬首者 ===== */
@@ -730,7 +730,7 @@ const SKI={
  SC_WEAKNESS:{k:'debuff',st:'fullstrip',rng:()=>3,chance:()=>100,dur:L=>(5+5*L)*1000,sp:xsp('SC_WEAKNESS'),cast:xct('SC_WEAKNESS'),fd:L=>`面具－衰弱：卸除武器和盾牌（攻擊、防禦下降）`},
  SC_STRIPACCESSARY:{k:'passive',fd:()=>'卸除配件：只對玩家有效'}, SC_MANHOLE:{k:'atk',rng:()=>7,mul:()=>0,items:[['i6122',0],['i6123',1]],sp:xsp('SC_MANHOLE'),cast:xct('SC_MANHOLE'),custom:(d,t,L)=>{if(t.boss||t.mvp){log('skill',`人孔：${t.n} 不會掉進去。`);return 1000}t.stop=Math.max(t.stop||0,5000*L);t.stopK='manhole';log('skill',`人孔！${t.n} 掉進洞裡 ${5*L} 秒不能動。`);return 1000},fd:L=>`人孔：讓怪物掉進洞裡 ${5*L} 秒不能行動（BOSS 無效）；要帶塗料筆，消耗表面塗料 1`}, SC_DIMENSIONDOOR:{k:'passive',fd:()=>'異次元之門：移動技能'},
  SC_CHAOSPANIC:{k:'debuff',st:'confuse',aoeD:1,rng:()=>7,chance:L=>35+15*L,dur:L=>5000*L,sp:xsp('SC_CHAOSPANIC'),cast:xct('SC_CHAOSPANIC'),fd:L=>`混沌恐慌：範圍內怪物混亂`},
- SC_MAELSTROM:{k:'passive',fd:()=>'漩渦：吸收地面技能（本遊戲沒有效果）'}, SC_BLOODYLUST:{k:'buff',pw:1,items:[['i6122',0],['i6123',2]],sp:xsp('SC_BLOODYLUST'),cast:xct('SC_BLOODYLUST'),dur:xdu('SC_BLOODYLUST'),fd:L=>`血腥欲望：周圍的隊友（不含自己）狂暴 ${10*L} 秒：ATK +200%、攻擊速度 +30%，但 DEF、MDEF 變 0、FLEE 減半（官方也會讓範圍內的敵人狂暴，本遊戲只算隊友）；要帶塗料筆，消耗表面塗料 2`},
+ SC_MAELSTROM:{k:'passive',fd:()=>'漩渦：吸收地面技能（本遊戲沒有效果）'}, SC_BLOODYLUST:{k:'buff',pw:1,when:()=>!!target&&target.cur>0,onCast:L=>bzkMobs(L),items:[['i6122',0],['i6123',2]],sp:xsp('SC_BLOODYLUST'),cast:xct('SC_BLOODYLUST'),dur:xdu('SC_BLOODYLUST'),fd:L=>`血腥欲望：周圍的隊友（不含自己）狂暴 ${10*L} 秒：ATK +200%、攻擊速度 +30%，但 DEF、MDEF 變 0、FLEE 減半；範圍內的一般怪物（BOSS 除外）也會狂暴：攻擊力 ×3，但 DEF、MDEF 變 0、FLEE 減半；要帶塗料筆，消耗表面塗料 2`},
  SC_FEINTBOMB:{k:'atk',aoe:1,rng:()=>3,mul:L=>LVM((L+1)*D().st.dex/2*S.jlv/10,120),sp:xsp('SC_FEINTBOMB'),cast:xct('SC_FEINTBOMB'),fd:L=>`虛擊炸彈：周圍 ATK [${L+1} × DEX/2 × Job Lv/10]% × Base Lv/120`},
  SC_ESCAPE:{k:'passive',fd:()=>'緊急脫身：往後跳並留下陷阱（掛機中不需要）'},
 
@@ -767,7 +767,7 @@ const SKI={
  WM_VOICEOFSIREN:{k:'passive',fd:()=>'塞壬之音：魅惑異性玩家（本遊戲沒有效果）'},
  WM_DEADHILLHERE:{k:'passive',fd:()=>'死亡峽谷：只能對玩家使用（本遊戲沒有效果）'},
  WM_LULLABY_DEEPSLEEP:{k:'debuff',st:'sleep',aoeD:1,need:['instrument','whip'],rng:()=>3,chance:L=>88+2*L,dur:L=>(10+2*L)*1000,sp:xsp('WM_LULLABY_DEEPSLEEP'),cast:xct('WM_LULLABY_DEEPSLEEP'),fd:L=>`沉睡搖籃曲：周圍怪物深度睡眠 ${10+2*L} 秒`},
- WM_SIRCLEOFNATURE:{k:'buff',need:['instrument','whip'],pw:1,sp:xsp('WM_SIRCLEOFNATURE'),cast:xct('WM_SIRCLEOFNATURE'),dur:()=>180,tick:(L,ms)=>{const d=D();S.hp=Math.min(d.maxHp,S.hp+50*L*ms/3000)},fd:L=>`循環的大自然之音：全隊每 3 秒恢復 ${50*L} HP（官方會消耗 SP）`},
+ WM_SIRCLEOFNATURE:{k:'buff',need:['instrument','whip'],pw:1,sp:xsp('WM_SIRCLEOFNATURE'),cast:xct('WM_SIRCLEOFNATURE'),dur:()=>180,eff:L=>({hpRegP:50*L}),fd:L=>`循環的大自然之音：全隊 180 秒內 HP 自然恢復 +${50*L}%`},
  WM_RANDOMIZESPELL:{k:'random',need:['instrument','whip'],sp:xsp('WM_RANDOMIZESPELL'),cast:xct('WM_RANDOMIZESPELL'),fd:()=>'不確定要素的語言：隨機施放一個技能'},
  WM_GLOOMYDAY:{k:'passive',fd:()=>'羞怯一天的憂鬱：讓玩家變慢（本遊戲沒有效果）'},
  WM_GREAT_ECHO:{k:'magic',aoe:1,ele:'無',hits:()=>1,mul:L=>LVM(250+500*L+50*SLC('WM_LESSON')),sp:xsp('WM_GREAT_ECHO'),cast:xct('WM_GREAT_ECHO'),fd:L=>`巨大共鳴：範圍 ATK (${250+500*L} + 課程×50)% × Base Lv/100（官方有搭檔時 ×2、需要防護喉糖）`},
@@ -827,11 +827,11 @@ const SKI={
  SR_GENTLETOUCH_QUIET:{k:'atk',rng:()=>2,mul:L=>LVM(100*L+D().st.dex),after:(t,L)=>{if(R()*100<5*L+(D().st.dex+S.lv)/10)t.deb.silence=1},sp:xsp('SR_GENTLETOUCH_QUIET'),cast:xct('SR_GENTLETOUCH_QUIET'),fd:L=>`點穴－默：ATK (${100*L} + DEX)% × Base Lv/100，機率沉默`},
  SR_GENTLETOUCH_CURE:{k:'passive',sp:xsp('SR_GENTLETOUCH_CURE'),fd:L=>`點穴－快：自己或隊友 HP 低於「回復技能」設定時補 ${120*L} + ${L}% Max HP；有異常狀態時 (${5*L} + (DEX+Base Lv)/4 − 1～10)% 機率解除石化、冰凍、暈眩、中毒、沉默、黑暗、混亂、出血`},
  SR_GENTLETOUCH_ENERGYGAIN:{k:'buff',sp:xsp('SR_GENTLETOUCH_ENERGYGAIN'),cast:xct('SR_GENTLETOUCH_ENERGYGAIN'),dur:()=>240,fd:L=>`點穴－球：攻擊或被打時 ${10+5*L}% 機率得到 1 顆氣彈`},
- SR_GENTLETOUCH_CHANGE:{k:'buff',sp:xsp('SR_GENTLETOUCH_CHANGE'),cast:xct('SR_GENTLETOUCH_CHANGE'),dur:()=>240,onCast:L=>{const id=(SKBY.SR_GENTLETOUCH_CHANGE||[]).find(i=>S.buffs[i]);if(id)S.buffs[id].eff={atk:8*L,aspdP:Math.floor(D().st.agi*L/60)}},fd:L=>`點穴－反：ATK +${8*L}、攻擊速度 +AGI×${L}/60 %，爆氣散彈等 +30%（官方會降低防禦）`},
+ SR_GENTLETOUCH_CHANGE:{k:'buff',sp:xsp('SR_GENTLETOUCH_CHANGE'),cast:xct('SR_GENTLETOUCH_CHANGE'),dur:()=>240,onCast:L=>{const id=(SKBY.SR_GENTLETOUCH_CHANGE||[]).find(i=>S.buffs[i]);if(id)S.buffs[id].eff={atk:8*L,aspdP:Math.floor(D().st.agi*L/60),atkP:L}},fd:L=>`點穴－反：武器 ATK +${8*L}、物理傷害 +${L}%、攻擊速度 +AGI×${L}/60 %，爆氣散彈 +30%（官方技能說明寫會降低防禦，但官方伺服器實際沒有）`},
  SR_GENTLETOUCH_REVITALIZE:{k:'buff',sp:xsp('SR_GENTLETOUCH_REVITALIZE'),cast:xct('SR_GENTLETOUCH_REVITALIZE'),dur:()=>240,eff:L=>({hpP:2*L,hpRegP:50+30*L}),fd:L=>`點穴－活：Max HP +${2*L}%、HP 恢復 +${50+30*L}%，虎砲等 +30%`},
  SR_HOWLINGOFLION:{k:'atk',aoe:1,rng:()=>3,mul:L=>LVM(500*L),sp:xsp('SR_HOWLINGOFLION'),cast:xct('SR_HOWLINGOFLION'),fd:L=>`獅子吼：周圍 ATK ${500*L}% × Base Lv/100`},
  SR_RIDEINLIGHTNING:{k:'atk',aoe:1,ele:'風',rng:()=>9,mul:L=>LVM(40*L+(wcls()==='knuckle'?50*L:0)),sp:xsp('SR_RIDEINLIGHTNING'),cast:xct('SR_RIDEINLIGHTNING'),fd:L=>`雷光彈：範圍風屬性 ATK ${40*L}%（拳套再 +${50*L}%）× Base Lv/100`},
- SR_FLASHCOMBO:{k:'buff',sp:xsp('SR_FLASHCOMBO'),cast:xct('SR_FLASHCOMBO'),dur:()=>3,eff:L=>({atk:20*L+20}),fd:L=>`閃光連擊：ATK +${20*L+20}（官方會自動連續施放雙龍腳、大纏崩墜、虎砲、天羅地網）`},
+ SR_FLASHCOMBO:{k:'atk',aoe:1,rng:()=>2,mul:()=>0,sp:xsp('SR_FLASHCOMBO'),cast:xct('SR_FLASHCOMBO'),custom:(d,t,L)=>flashCombo(d,t,L),fd:L=>`閃光連擊：3 秒內武器 ATK +${20*L+20}，並自動依序施放 Lv ${L} 的雙龍腳 → 大纏崩墜 → 虎砲（不另外扣 SP）`},
 
  /* ===== 共通：烈火戰車 ===== */
  ALL_FULL_THROTTLE:{k:'buff',sp:()=>1,dur:L=>5+5*L,onCast:L=>{const id=(SKBY.ALL_FULL_THROTTLE||[]).find(i=>S.buffs[i]);if(!id)return;const st=D().st,g={};for(const k of ['str','agi','vit','int','dex','luk'])g[k]=Math.floor(st[k]*.2);S.buffs[id].eff=g},fd:L=>`烈火戰車：${5+5*L} 秒內所有能力 +20%、移動變快，結束後 ${L===1?6:6-L} 秒變慢；冷卻 50 分鐘`},
@@ -903,7 +903,7 @@ const SKI={
  SO_POISON_BUSTER:{k:'magic',aoe:1,ele:'毒',hits:()=>1,mul:L=>LVM(1000+300*L+D().st.int),mulT:(t,L)=>t.cloud>S.clock?(1000+500*L)/(1000+300*L):1,sp:xsp('SO_POISON_BUSTER'),cast:xct('SO_POISON_BUSTER'),fd:L=>`劇毒猛擊：毒屬性範圍 MATK (${1000+300*L} + INT)% × Base Lv/100，雲殺中的怪物再 +${200*L}%`},
  SO_PSYCHIC_WAVE:{k:'magic',aoe:1,ele:'無',hits:L=>L+1,mul:L=>LVM(70*L+3*D().st.int),sp:xsp('SO_PSYCHIC_WAVE'),cast:xct('SO_PSYCHIC_WAVE'),fd:L=>`超自然波：範圍 MATK (${70*L} + INT×3)% × Base Lv/100，連續 ${L+1} 下`},
  SO_CLOUD_KILL:{k:'magic',aoe:1,ele:'毒',hits:L=>L,mul:L=>LVM(40*L+3*D().st.int),onHit:t=>{t.cloud=S.clock+10000},sp:xsp('SO_CLOUD_KILL'),cast:xct('SO_CLOUD_KILL'),fd:L=>`雲殺：毒雲 ${L} 秒，每秒 MATK (${40*L} + INT×3)% × Base Lv/100`},
- SO_STRIKING:{k:'buff',sup:1,sp:xsp('SO_STRIKING'),cast:xct('SO_STRIKING'),dur:()=>90,eff:L=>({atk:50*L}),fd:L=>`打擊強化：武器 ATK +${50*L}（官方還看武器精煉，本遊戲簡化）`},
+ SO_STRIKING:{k:'buff',sup:1,sp:xsp('SO_STRIKING'),cast:xct('SO_STRIKING'),dur:()=>90,eff:L=>({atk:20*L*((W()||{}).wl||0),sureP:20+10*L}),tick:(L,ms)=>{S.stkT=(S.stkT||0)+ms;while(S.stkT>=1000){S.stkT-=1000;const c=6-Math.min(5,L);if(S.sp<c){for(const id of SKBY.SO_STRIKING||[])delete S.buffs[id];EBV++;log('skill','SP 不夠，打擊強化結束了。');break}S.sp-=c}},fd:L=>`打擊強化（自己或隊友 90 秒）：武器 ATK +${20*L} × 武器等級、必中機率 +${20+10*L}%；被施放的人每秒扣 ${6-Math.min(5,L)} SP`},
  SO_WARMER:{k:'buff',pw:1,sp:xsp('SO_WARMER'),cast:xct('SO_WARMER'),dur:xdu('SO_WARMER'),tick:(L,ms)=>{const d=D();S.hp=Math.min(d.maxHp,S.hp+d.maxHp*L*.01*ms/3000)},fd:L=>`加熱術：全隊每 3 秒恢復 ${L}% HP，而且不會被冰凍`},
  SO_VACUUM_EXTREME:{k:'debuff',st:'stun',aoeD:1,rng:()=>9,chance:()=>100,dur:L=>(2+2*L)*1000,sp:xsp('SO_VACUUM_EXTREME'),cast:xct('SO_VACUUM_EXTREME'),fd:L=>`極限空虛：把周圍怪物吸住 ${2+2*L} 秒不能動（BOSS 無效）`},
  SO_VARETYR_SPEAR:{k:'magic',aoe:1,ele:'風',hits:()=>3,mul:L=>{const st=D().st;return LVM((2*st.int+150*(SLC('SO_STRIKING')+SLC('SA_LIGHTNINGLOADER'))+st.int*L/2)/3)},onHit:(t,L)=>{if(R()*100<5*L)monSt(t,'stun')},sp:xsp('SO_VARETYR_SPEAR'),cast:xct('SO_VARETYR_SPEAR'),fd:L=>`聖槍刺擊：風屬性範圍 3 下，每下 MATK [(INT×2 + (打擊強化+雷擊之刃)×150 + INT×${L}/2)/3]% × Base Lv/100`},
@@ -918,10 +918,10 @@ const SKI={
  SO_SUMMON_AQUA:{items:[['i991',3,1],['i991',6,2],['i995',1,3]],k:'buff',elem:'水',sp:xsp('SO_SUMMON_AQUA'),cast:xct('SO_SUMMON_AQUA'),dur:L=>600+300*(L-1),fd:L=>`召喚水精靈：精靈每 3 秒對目標造成 MATK ${100*L}% 水屬性傷害；消耗水靈礦石 3／6 或水靈原石 1`},
  SO_SUMMON_VENTUS:{items:[['i992',3,1],['i992',6,2],['i996',1,3]],k:'buff',elem:'風',sp:xsp('SO_SUMMON_VENTUS'),cast:xct('SO_SUMMON_VENTUS'),dur:L=>600+300*(L-1),fd:L=>`召喚風精靈：精靈每 3 秒對目標造成 MATK ${100*L}% 風屬性傷害；消耗風靈礦石 3／6 或風靈原石 1`},
  SO_SUMMON_TERA:{items:[['i993',3,1],['i993',6,2],['i997',1,3]],k:'buff',elem:'地',sp:xsp('SO_SUMMON_TERA'),cast:xct('SO_SUMMON_TERA'),dur:L=>600+300*(L-1),fd:L=>`召喚地精靈：精靈每 3 秒對目標造成 MATK ${100*L}% 地屬性傷害；消耗地靈礦石 3／6 或土靈原石 1`},
- SO_FIRE_INSIGNIA:{items:[['i6360',1,1],['i6360',2,2],['i6360',3,3]],k:'buff',ins:'火',sp:xsp('SO_FIRE_INSIGNIA'),cast:xct('SO_FIRE_INSIGNIA'),dur:()=>60,fd:L=>`火之紋章：火屬性魔法傷害 +${10*L}%（官方還有其他效果，本遊戲簡化）；消耗火靈碎片 Lv 個`},
- SO_WATER_INSIGNIA:{items:[['i6361',1,1],['i6361',2,2],['i6361',3,3]],k:'buff',ins:'水',sp:xsp('SO_WATER_INSIGNIA'),cast:xct('SO_WATER_INSIGNIA'),dur:()=>60,fd:L=>`水之紋章：水屬性魔法傷害 +${10*L}%；消耗水靈碎片 Lv 個`},
- SO_WIND_INSIGNIA:{items:[['i6362',1,1],['i6362',2,2],['i6362',3,3]],k:'buff',ins:'風',sp:xsp('SO_WIND_INSIGNIA'),cast:xct('SO_WIND_INSIGNIA'),dur:()=>60,fd:L=>`風之紋章：風屬性魔法傷害 +${10*L}%；消耗風靈碎片 Lv 個`},
- SO_EARTH_INSIGNIA:{items:[['i6363',1,1],['i6363',2,2],['i6363',3,3]],k:'buff',ins:'地',sp:xsp('SO_EARTH_INSIGNIA'),cast:xct('SO_EARTH_INSIGNIA'),dur:()=>60,fd:L=>`地之紋章：地屬性魔法傷害 +${10*L}%；消耗地靈碎片 Lv 個`},
+ SO_FIRE_INSIGNIA:{items:[['i6360',1,1],['i6360',2,2],['i6360',3,3]],k:'buff',ins:'火',pw:1,eff:L=>insEff('火',L),tick:(L,ms)=>insTick('火',ms),sp:xsp('SO_FIRE_INSIGNIA'),cast:xct('SO_FIRE_INSIGNIA'),dur:()=>60,fd:L=>`火之紋章（全隊 60 秒）：站在上面的怪物受到的水屬性傷害 +50%；每 5 秒穿火屬性鎧甲的人恢復 1% HP、穿地屬性鎧甲的人失去 1% HP。Lv1：火精靈傷害 +20%｜Lv2：武器變火屬性、武器 ATK +50 再 +10%｜Lv3：MATK +50、火屬性魔法傷害 +25%（只有施放的那一級有效）；消耗火靈碎片 Lv 個`},
+ SO_WATER_INSIGNIA:{items:[['i6361',1,1],['i6361',2,2],['i6361',3,3]],k:'buff',ins:'水',pw:1,eff:L=>insEff('水',L),tick:(L,ms)=>insTick('水',ms),sp:xsp('SO_WATER_INSIGNIA'),cast:xct('SO_WATER_INSIGNIA'),dur:()=>60,fd:L=>`水之紋章（全隊 60 秒）：站在上面的怪物受到的風屬性傷害 +50%；每 5 秒穿水屬性鎧甲的人恢復 1% HP、穿火屬性鎧甲的人失去 1% HP。Lv1：水精靈傷害 +20%｜Lv2：武器變水屬性、武器 ATK +10%（官方另有受到治療 +10%）｜Lv3：水屬性魔法變動詠唱 −30%、水屬性魔法傷害 +25%（只有施放的那一級有效）；消耗水靈碎片 Lv 個`},
+ SO_WIND_INSIGNIA:{items:[['i6362',1,1],['i6362',2,2],['i6362',3,3]],k:'buff',ins:'風',pw:1,eff:L=>insEff('風',L),tick:(L,ms)=>insTick('風',ms),sp:xsp('SO_WIND_INSIGNIA'),cast:xct('SO_WIND_INSIGNIA'),dur:()=>60,fd:L=>`風之紋章（全隊 60 秒）：站在上面的怪物受到的地屬性傷害 +50%；每 5 秒穿風屬性鎧甲的人恢復 1% HP、穿水屬性鎧甲的人失去 1% HP。Lv1：風精靈傷害 +20%｜Lv2：武器變風屬性、武器 ATK +10%、攻擊速度 +10%｜Lv3：風屬性魔法變動詠唱 −30%、風屬性魔法傷害 +25%（只有施放的那一級有效）；消耗風靈碎片 Lv 個`},
+ SO_EARTH_INSIGNIA:{items:[['i6363',1,1],['i6363',2,2],['i6363',3,3]],k:'buff',ins:'地',pw:1,eff:L=>insEff('地',L),tick:(L,ms)=>insTick('地',ms),sp:xsp('SO_EARTH_INSIGNIA'),cast:xct('SO_EARTH_INSIGNIA'),dur:()=>60,fd:L=>`地之紋章（全隊 60 秒）：站在上面的怪物受到的火屬性傷害 +50%；每 5 秒穿地屬性鎧甲的人恢復 1% HP、穿風屬性鎧甲的人失去 1% HP。Lv1：地精靈傷害 +20%｜Lv2：武器變地屬性、武器 ATK +10%、Max HP +500、DEF +5｜Lv3：Max SP +50、MDEF +5、地屬性魔法傷害 +25%（只有施放的那一級有效）；消耗地靈碎片 Lv 個`},
 
  /* ===== 影狼／朧 ===== */
  KO_YAMIKUMO:{k:'passive',fd:()=>'暗雲：躲進陰影（掛機中不需要）'},
@@ -1487,7 +1487,7 @@ for(const id in SK){const s=SK[id];if(s.es)Object.defineProperty(s,'ele',{get(){
 for(const id in SK){const s=SK[id];if(s.c&&RNGC[s.c])s.rng=RNGC[s.c];if(s.fd&&!s.ni)s.d=L=>s.fd(L)+(s.sp?`；SP ${s.sp(L)}`:'')+(s.cast&&s.cast(L)?`；詠唱 ${(s.cast(L)/1000).toFixed(1)} 秒`:'')}
 const wRange=()=>{const w=wcls();if(S.job==='summoner'&&SLC('SU_SOULATTACK'))return 9;return w==='bow'?5+SL('vulture'):w==='gun'?9+SL('snake'):(w==='whip'||w==='instrument'||w==='spear')?2:1};
 const skRange=(s,L)=>s.k==='field'&&['snare','skid','sleep','ftrap','shock'].includes(s.f)?(target&&!target.chase?(SLC('HT_SPRINGTRAP')&&SLC('HT_FALCON')?9:0):99):s.rng?s.rng(L):(s.k==='magic'||s.k==='debuff'||s.k==='field')?9:(s.need&&s.need.some(w=>w==='bow'||w==='gun'))?wRange():Math.min(wRange(),2);
-const castT=(s,L,d)=>Math.round((s.cast?s.cast(L):0)*(1-Math.min(1,d.st.dex/150))*(1-Math.min(80,(d.E.castP||0)+((d.E.castSk||{})[s.c]||0))/100));
+const castT=(s,L,d)=>Math.round((s.cast?s.cast(L):0)*(insCast(s)?.7:1)*(1-Math.min(1,d.st.dex/150))*(1-Math.min(80,(d.E.castP||0)+((d.E.castSk||{})[s.c]||0))/100));
 const buffOnC=c=>(SKBY[c]||[]).some(buffOn);const buffLvC=c=>{const id=(SKBY[c]||[]).find(buffOn);return id?S.buffs[id].lv:0};
 function trapFire(t,trap,d){
         if(trap==='snare'){t.stop=SK[(SKBY.HT_ANKLESNARE||[])[0]]?SK[(SKBY.HT_ANKLESNARE)[0]].val(SL((SKBY.HT_ANKLESNARE)[0])):4000;if(t.boss||t.mvp)t.stop=Math.floor(t.stop/5);t.stopK='snare';log('skill',`${t.n} 被定位陷阱夾住了！`)}
@@ -2212,7 +2212,16 @@ function onHurtEff(d,t){const E=d.E;cardAbon(d,'hurt');if(t.rng<=3&&E.aeh)for(co
   return t.cur<=0}
 const HITP={SM_BASH:L=>5*L,SM_MAGNUM:L=>10*L,KN_PIERCE:L=>5*L,AS_SONICBLOW:()=>SLC('AS_SONICACCEL')?50:0};
 /* 賢者領域（官方）：領域裡該屬性的攻擊傷害 +10/14/17/19/20% */
-const zoneMul=e=>{const k={'火':'SA_VOLCANO','水':'SA_DELUGE','風':'SA_VIOLENTGALE'}[eleOf(e||'無')];if(!k)return 1;const L=buffLvC(k);return L?1+[10,14,17,19,20][Math.min(5,L)-1]/100:1};
+
+/* 妖術師紋章（新版官方效果） */
+const INSW={火:'水',水:'風',風:'地',地:'火'},INSA={火:'地',水:'火',風:'水',地:'風'};
+const insOn=()=>{for(const x in S.buffs){const s=SK[x];if(s&&s.ins&&buffOn(x))return [s.ins,S.buffs[x].lv]}return null};
+function insEff(e,L){const w=W(),wa=w?w.atk||0:0;if(L===2){const o={wEle:e,atk:Math.floor((wa+(e==='火'?50:0))*.1)+(e==='火'?50:0)};if(e==='風')o.aspdP=10;if(e==='地'){o.hp=500;o.def=5}return o}if(L===3){if(e==='火')return{matk:50};if(e==='地')return{sp:50,mdef:5}}return{}}
+function insTick(e,ms){S.insT=(S.insT||0)+ms;while(S.insT>=5000){S.insT-=5000;const d=D(),ae=eleOf(d.E.armorEle||'無');if(ae===e)S.hp=Math.min(d.maxHp,S.hp+d.maxHp/100);else if(ae===INSA[e])S.hp=Math.max(1,S.hp-d.maxHp/100)}}
+const insWk=e=>{const i=insOn();return !!i&&INSW[i[0]]===eleOf(e||'無')};
+const insCast=s=>{const i=insOn();return !!i&&i[1]===3&&s.k==='magic'&&s.ele===i[0]&&(i[0]==='水'||i[0]==='風')};
+const zoneMul=e=>insWk(e)?1.5*zoneMul0(e):zoneMul0(e);
+const zoneMul0=e=>{const k={'火':'SA_VOLCANO','水':'SA_DELUGE','風':'SA_VIOLENTGALE'}[eleOf(e||'無')];if(!k)return 1;const L=buffLvC(k);return L?1+[10,14,17,19,20][Math.min(5,L)-1]/100:1};
 /* 盾牌技能基礎（官方前期）：素質 ATK + 4×盾牌精煉 + 盾牌重量 */
 const shieldBase=d=>{const st=d.st,it=ITEMS[S.eq.shield]||{};return st.str+Math.pow(Math.floor(st.str/10),2)+Math.floor(st.dex/5)+Math.floor(st.luk/5)+4*(it.refine||0)+(it.w||0)};
 function physDmg(d,t,mul,ele,flat,opt){opt=opt||{};
@@ -2237,7 +2246,7 @@ function physDmg(d,t,mul,ele,flat,opt){opt=opt||{};
   if(d.E.drain&&dmg>0)S.hp=Math.min(d.maxHp,S.hp+dmg*d.E.drain/100);
   return{dmg:Math.max(eMul(ele||d.wele,t.ele)<=0?0:1,Math.round(dmg))}
 }
-function magDmg(d,t,mul,ele){if(ele==='聖'&&t.deb&&t.deb.oratio)mul*=1.2;if(ele==='毒'&&t.deb&&t.deb.venomI)mul*=1.5;let m=(buffOnC('WL_RECOGNIZEDSPELL')?d.matkMax:d.matkMin+R()*(d.matkMax-d.matkMin))*mul;if(ele==='幽靈'&&buffOnC('WL_TELEKINESIS_INTENSE'))m*=1+.4*buffLvC('WL_TELEKINESIS_INTENSE');{const iid=Object.keys(S.buffs).find(x=>SK[x]&&SK[x].ins===ele&&buffOn(x));if(iid)m*=1+.1*S.buffs[iid].lv}m=m*(100-t.mdef*(1-Math.min(100,((d.E.ignMdef||{})[(t.boss||t.mvp)?'b':'n']||0))/100))/100;m*=eMul(ele,t.ele)*modMul(d,t)*(1+((d.E.mRace||{})[t.race]||0)/100)*zoneMul(ele);return Math.max(0,Math.round(m))}
+function magDmg(d,t,mul,ele){if(ele==='聖'&&t.deb&&t.deb.oratio)mul*=1.2;if(ele==='毒'&&t.deb&&t.deb.venomI)mul*=1.5;let m=(buffOnC('WL_RECOGNIZEDSPELL')?d.matkMax:d.matkMin+R()*(d.matkMax-d.matkMin))*mul;if(ele==='幽靈'&&buffOnC('WL_TELEKINESIS_INTENSE'))m*=1+.4*buffLvC('WL_TELEKINESIS_INTENSE');{const i=insOn();if(i&&i[1]===3&&i[0]===ele)m+=(buffOnC('WL_RECOGNIZEDSPELL')?d.matkMax:(d.matkMin+d.matkMax)/2)*.25}m=m*(100-t.mdef*(1-Math.min(100,((d.E.ignMdef||{})[(t.boss||t.mvp)?'b':'n']||0))/100))/100;m*=eMul(ele,t.ele)*modMul(d,t)*(1+((d.E.mRace||{})[t.race]||0)/100)*zoneMul(ele);return Math.max(0,Math.round(m))}
 
 /* 怪物技能與異常狀態 */
 const NPCN={NPC_POISON:'毒攻擊',NPC_BLINDATTACK:'黑暗攻擊',NPC_SILENCEATTACK:'沉默攻擊',NPC_STUNATTACK:'暈眩攻擊',NPC_PETRIFYATTACK:'石化攻擊',NPC_CURSEATTACK:'詛咒攻擊',
@@ -2475,6 +2484,7 @@ function fight(d){
       t.dist=nd;tm=0}
   }
   if(t.dist<=t.rng+.01&&tm>0&&!(t.stop>0)&&!(t.frozen>0))t.monAcc+=tm*(t.deb.slow?.8:1)*(dfm?1-dfmA/100:1);
+  if(t.bzkU&&t.bzkU<=S.clock){t.bzkU=0;if(t.bzkS){[t.def,t.mdef,t.vdef,t.flee]=t.bzkS;t.bzkS=null}}
   while(t.monAcc>=t.aspd){t.monAcc-=t.aspd;if(kiteMiss(d,t))continue;
     if(t.hid>S.clock)continue;
     if(buffOnC('LG_KINGS_GRACE')){continue}
@@ -2500,7 +2510,7 @@ function fight(d){
     if(!incap()&&R()*100>=hitc){log('battle',`閃過了 ${t.n} 的攻擊。`);continue}
     if(!incap()&&R()*100<1+d.st.luk/10+(d.E.pd||0)){log('battle',`完全迴避了 ${t.n} 的攻擊！`);continue}
     let soft=d.soft;if(t.race==='惡魔'||eleOf(t.ele)==='不死')soft+=(Math.floor(S.lv/25)+3)*SL('divprot');
-    let dmg=Math.max(1,Math.round((t.atk*(.8+R()*.4)*(100-d.hard)/100-soft)*resMul(d,t)));
+    let dmg=Math.max(1,Math.round((t.atk*(t.bzkU>S.clock?3:1)*(.8+R()*.4)*(100-d.hard)/100-soft)*resMul(d,t)));
     if(buffOnC('MG_ENERGYCOAT')&&S.sp>0){const pc=S.sp/d.maxSp;const red=pc>=.8?30:pc>=.6?24:pc>=.4?18:pc>=.2?12:6;dmg=Math.max(1,Math.round(dmg*(100-red)/100));S.sp=Math.max(0,S.sp-d.maxSp*(.005+.005*Math.floor(pc*5))) }
     if(t.deb.confuse&&R()<.3){log('battle',`${t.n} 混亂中，攻擊打歪了。`);continue}
     if(S.kyrie&&S.kyrie.n>0&&buffOnC('PR_KYRIE')){const ab=Math.min(dmg,S.kyrie.hp);S.kyrie.hp-=ab;S.kyrie.n--;dmg-=ab;if(S.kyrie.n<=0||S.kyrie.hp<=0){S.kyrie=null;for(const id of SKBY.PR_KYRIE||[])delete S.buffs[id];log('skill','霸邪之陣被打破了。')}
@@ -2596,6 +2606,14 @@ function fireExp(d,t,L){const tg=[t,...pileOf(t).filter(o=>o!==t)];let tot=0;con
 function selfDestruct(d,t,L){let v=(L+1)*(SLC('NC_MAINFRAME')+8)*(S.sp+d.st.vit);if(S.lv>100)v=v*S.lv/100;v+=S.hp;const tg=[t,...pileOf(t).filter(o=>o!==t)];let tot=0,kill=0;
   for(const o of tg){const x=Math.max(1,Math.round(v*eMul('無',o.ele)*modMul(d,o)));hitT(o,x);tot+=x;if(o!==t&&o.cur<=0){kill++;winExtra(d,o)}}
   S.sp=0;S.madoOff=1;EBV++;log('skill',`自我摧毀 Lv ${L}！魔導機甲爆炸，${tg.length} 隻共 ${fmt(tot)} 點傷害${kill?`、擊倒 ${kill} 隻`:''}；SP 歸零，魔導機甲沒了（回城才會重新租）。`);return 1500}
+
+function flashCombo(d,t,L){S.buffs.fc_atk={lv:L,until:S.clock+3000,eff:{atk:20*L+20},n:'閃光連擊'};EBV++;const d2=D();const out=[];let tot=0;
+  for(const c of ['SR_DRAGONCOMBO','SR_FALLENEMPIRE','SR_TIGERCANNON']){const s=SK[(SKBY[c]||[])[0]];if(!s||t.cur<=0)continue;const l=Math.min(L,s.max||L),m=s.mul(l),n=s.hits?s.hits(l,t):1;const tg=s.aoe?[t,...pileOf(t).filter(o=>o!==t)]:[t];let v=0;
+    for(const o of tg){for(let i=0;i<n;i++){const r=physDmg(d2,o,m);if(!r.miss){hitT(o,r.dmg);v+=r.dmg}}if(o!==t&&o.cur<=0)winExtra(d2,o)}if(v>0&&s.after&&t.cur>0)s.after(t,l,d2);out.push(`${s.n} ${fmt(v)}`);tot+=v}
+  log('skill',`閃光連擊 Lv ${L}！${out.join(' → ')}（共 ${fmt(tot)} 點）。`);return 2000}
+/* 血腥欲望：範圍內的敵人也會狂暴（官方） */
+function bzkMobs(L){const t=target;if(!t||t.cur<=0)return;const u=S.clock+10000*L;let n=0;for(const o of [t,...pileOf(t).filter(o=>o!==t)]){if(o.boss||o.mvp||o.cur<=0)continue;if(!o.bzkS)o.bzkS=[o.def,o.mdef,o.vdef,o.flee];o.def=0;o.mdef=0;o.vdef=0;o.flee=Math.floor(o.bzkS[3]/2);o.bzkU=u;n++}
+  if(n)log('skill',`血腥欲望：周圍 ${n} 隻怪物也狂暴了（攻擊力 ×3，DEF、MDEF 變 0、FLEE 減半）。`)}
 function exOnHit(d,t){
   if(S.crush&&t.cur>0){S.crush=0;const w=W()||{};const r=physDmg(d,t,((w.atk||0)+(w.w||0))/100);if(!r.miss){hitT(t,r.dmg);log('skill',`重擊強襲！追加 ${fmt(r.dmg)} 點傷害。`)}}
   if(buffOnC('GC_POISONINGWEAPON')&&S.gcPz&&t.cur>0&&R()*100<4+4*buffLvC('GC_POISONINGWEAPON'))poisonHit(t,S.gcPz);
@@ -2622,7 +2640,7 @@ function rkBreath(d,t,L,ele){let v=(S.hp/50+d.maxSp/4)*L;if(S.lv>100)v=v*S.lv/10
   for(const o of tg){const x=Math.max(1,Math.round(v*eMul(ele,o.ele)*modMul(d,o)));hitT(o,x);tot+=x;if(o.cur>0&&R()<.15){if(ele==='火')o.dot=Math.max(o.dot||0,10000);else if(!(o.boss||o.mvp))o.frozen=Math.max(o.frozen||0,3000)}if(o!==t&&o.cur<=0)winExtra(d,o)}
   log('skill',`龍之氣息${ele==='水'?'－水':''} Lv ${L}！${tg.length} 隻共 ${fmt(tot)} 點傷害。`);return 1000}
 /* 召喚的精靈：每 3 秒攻擊目標 */
-function elemAct(d,t,el){const id=Object.keys(S.buffs).find(x=>SK[x]&&SK[x].elem&&buffOn(x));if(!id||!t||t.cur<=0)return;S.elT=(S.elT||0)+el;while(S.elT>=3000&&t.cur>0){S.elT-=3000;const L=S.buffs[id].lv;const v=magDmg(d,t,L*(1+.05*SLC('SO_EL_SYMPATHY')),SK[id].elem);hitT(t,v);log('skill',`精靈攻擊 ${t.n}，造成 ${fmt(v)} 點傷害。`)}}
+function elemAct(d,t,el){const id=Object.keys(S.buffs).find(x=>SK[x]&&SK[x].elem&&buffOn(x));if(!id||!t||t.cur<=0)return;S.elT=(S.elT||0)+el;while(S.elT>=3000&&t.cur>0){S.elT-=3000;const L=S.buffs[id].lv;const v=magDmg(d,t,L*(1+.05*SLC('SO_EL_SYMPATHY'))*((insOn()||[])[0]===SK[id].elem&&(insOn()||[])[1]===1?1.2:1),SK[id].elem);hitT(t,v);log('skill',`精靈攻擊 ${t.n}，造成 ${fmt(v)} 點傷害。`)}}
 
 /* 盧恩石：學會盧恩精熟後，在「輔助技能」勾選要自動使用的盧恩石 */
 const RUNEB={RK_VITALITYACTIVATION:{healP:50},RK_GIANTGROWTH:{str:30}};
