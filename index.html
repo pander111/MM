@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#79a75a"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="小黑窗"><meta name="apple-mobile-web-app-status-bar-style" content="default"><style>body{margin:0}</style><script>window.RO_GH=1;window.RO_BUILD="20261113173517";if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))</script></head><body>
+<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#79a75a"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="小黑窗"><meta name="apple-mobile-web-app-status-bar-style" content="default"><style>body{margin:0}</style><script>window.RO_GH=1;window.RO_BUILD="20261113182502";if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))</script></head><body>
 <title>仙境放置小黑窗</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <style>
@@ -493,7 +493,7 @@ const J3IT={"i12333":{"n":"神秘水晶","w":1.0,"sell":0,"t":"sp","php":0,"psp"
 for(const k in J3IT)if(!BASE[k])BASE[k]=J3IT[k];
 {const sell=['i6360','i6361','i6362','i6363','i12392','i12393','i12394','i6186','i6213','i6214','i6215','i6216','i6217','i6210','i6211','i6212','i6122','i6123','i7931','i7932','i7933','i7934','i7935','i7936','i7937','i7938','i7939','i12734','i6244','i6284','i11022','i11023','i11024','i6285','i6248','i6249','i6250','i6251','i6252','i6253','i6254','i6255','i6256','i6257','i6258','i6259','i6260','i6261','i6262'].filter(k=>BASE[k]);
  for(const k of sell){if(!SHOP.tool.includes(k))SHOP.tool.push(k)}for(const t of GD.towns)for(const k of sell)if(!t.s.tool.includes(k))t.s.tool.push(k);
- if(BASE.i12333)BASE.i12333.d='大主教用安希拉做出來的水晶：恢復 15% SP；聖靈降臨祈禱需要它。';if(BASE.i6128)BASE.i6128.d='十字斬首者的解毒劑：解除新毒的效果。'}
+ if(BASE.i12333)BASE.i12333.d='大主教用安希拉做出來的水晶：恢復 15% SP，60 秒內治癒量 +15%、SP 自然恢復 +30%，謳歌變成無屬性；聖靈降臨祈禱需要它。';if(BASE.i6128)BASE.i6128.d='十字斬首者的解毒劑：解除新毒的效果。'}
 const madoOn=()=>SLC('NC_MADOLICENCE')>0&&!S.madoOff;
 const SGN=['太陽','月亮','星星'];
 const doy=()=>{const n=new Date(),s0=new Date(n.getFullYear(),0,0);return Math.floor((n-s0)/864e5)};
@@ -2163,7 +2163,7 @@ function drinkBuffPot(){const c=C();autoFood();if(buffOn('pot_aspd'))return;
   const ks=Object.keys(c.bpot||{}).filter(k=>c.bpot[k]&&c.bpot[k].on&&(S.inv[k]||0)>0&&canUseBP(k)).sort((a,b)=>ITEMS[b].aspd-ITEMS[a].aspd);
   if(!ks.length)return;const k=ks[0],it=ITEMS[k];useI(k,1);dirty=true;S.buffs.pot_aspd={lv:it.aspd,until:S.clock+it.dur*1000,n:it.n};
   log('skill',`喝下 ${it.n}，攻擊速度 +${it.aspd}%（${Math.round(it.dur/60)} 分鐘）。`)}
-function potGain(k,d){const it=ITEMS[k],pm=1+(d.E.potP||0)/100;let hp=0,sp=0;
+function potGain(k,d){const it=ITEMS[k],pm=1+(d.E.potP||0)/100;let hp=0,sp=0;if(k==='i12333'){S.buffs.ancilla={lv:1,until:S.clock+60000,eff:{healP:15,spRegP:30},n:'神秘水晶'};EBV++}
   if(it.php){hp=d.maxHp*it.php/100;sp=d.maxSp*it.psp/100}
   else if(it.t==='sp')sp=it.heal*(1+d.st.int*.02)*pm;
   else{hp=it.heal*(1+d.st.vit*.02)*(1+.05*SL('lpotion'))*pm*(.9+R()*.2);if(it.sp)sp=it.sp*(1+d.st.int*.02)*pm}
@@ -2266,6 +2266,7 @@ const MSK={NPC_POISON:{mul:1,st:'poison',dur:30},NPC_BLINDATTACK:{mul:1,st:'blin
  WZ_JUPITEL:{ele:'風',mag:L=>L+2},WZ_WATERBALL:{ele:'水',mag:L=>Math.min(5,L)},WZ_EARTHSPIKE:{ele:'地',mag:L=>L},NPC_DARKSTRIKE:{ele:'暗',mag:L=>Math.ceil(L/2)},NPC_HELLJUDGEMENT:{ele:'暗',mag:L=>1+L}};
 const CURE_SK=[['strecov',['freeze','stone','stun','sleep']],['curesk',['silence','blind','confusion']],['detox',['poison']],['bless',['curse','stone']]];
 for(const [c0,l0] of [['AB_CLEARANCE',['poison','silence','stun','sleep','freeze','stone','curse','blind','confusion','bleeding']],['SR_GENTLETOUCH_CURE',['stone','freeze','stun','poison','silence','blind','confusion','bleeding']]])for(const id of SKBY[c0]||[])if(SK[id])CURE_SK.push([id,l0]);
+for(const id of SKBY.AB_ADORAMUS||[])if(SK[id])Object.defineProperty(SK[id],'ele',{get:()=>buffOn('ancilla')?'無':'聖',configurable:true,enumerable:true});
 const cureRoll=id=>{const c=SK[id]&&SK[id].c,L=SL(id);if(c==='AB_CLEARANCE')return R()*100<60+8*L;if(c==='SR_GENTLETOUCH_CURE'){const d=D();return R()*100<5*L+Math.floor((d.st.dex+S.lv)/4)-1-Math.floor(R()*10)}return true};
 const cureOn=(id,w)=>{const o=(C().cureSk||{})[id]||CURE_DEF[id]||{};return o[w]!==false};
 function inflict(k,secs,d){const rs={poison:'vit',stun:'vit',silence:'vit',bleeding:'vit',blind:'int',sleep:'int',confusion:'int',curse:'luk'}[k];
