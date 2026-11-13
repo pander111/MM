@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#79a75a"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="小黑窗"><meta name="apple-mobile-web-app-status-bar-style" content="default"><style>body{margin:0}</style><script>window.RO_GH=1;window.RO_BUILD="20261114013542";if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))</script></head><body>
+<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#79a75a"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="小黑窗"><meta name="apple-mobile-web-app-status-bar-style" content="default"><style>body{margin:0}</style><script>window.RO_GH=1;window.RO_BUILD="20261114015737";if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))</script></head><body>
 <title>仙境放置小黑窗</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <style>
@@ -2403,6 +2403,29 @@ SIZEMOD.knuckle[2]=75;SIZEMOD.whip[2]=75;
 const EXPJOB=new Set(['kagerou','oboro','rebellion','star_emperor','soul_reaper','super_novice_e','summoner']);
 const potAF=v=>({10:4,15:6,20:9,25:9})[v]||4;
 const cdT=(sk,L)=>Math.max(0,sk.cd(L)+((EB().cdSk||{})[sk.c]||0));
+/* ===== 技能逐項對照新版官方（rAthena 新版）：多段技能每下都是完整倍率、範圍、屬性、盾牌／螺旋擊刺的基礎傷害 ===== */
+const shieldBaseR=d=>d.sAtk+SHW();
+const RENEW2={
+ BA_MUSICALSTRIKE:{hits:()=>2,d:L=>`2 下，每下 ATK ${110+40*L}%`},DC_THROWARROW:{hits:()=>2,d:L=>`2 下，每下 ATK ${110+40*L}%`},
+ KN_BOWLINGBASH:{hits:()=>2,d:L=>`周圍 2 下，每下 ATK ${100+40*L}%；SP ${12+L}`},
+ GN_CART_TORNADO:{mul:L=>2*L+.5*SLC('GN_REMODELING_CART'),fd:L=>`手推車龍捲風：周圍 3 下，每下 ATK (${200*L} + 手推車改良×50)%（官方再加手推車重量）`},
+ GN_SPORE_EXPLOSION:{mul:L=>LVM(400+200*L),fd:L=>`爆炸孢子：範圍 2 下，每下 ATK ${400+200*L}% × Base Lv/100；消耗炸彈香菇芽孢 1`},
+ LG_OVERBRAND:{mul:L=>LVM((S.obR>S.clock?500:350)*L+50*SLC('CR_SPEARQUICKEN')),fd:L=>`支配烙印：長矛前方 3 下，每下 ATK (${350*L} + 長矛加速×50)% × Base Lv/100；半月斬之後使用改成 ${500*L}%`},
+ LG_HESPERUSLIT:{mul:L=>LVM((buffOnC('LG_INSPIRATION')?450:300)*L+D().st.vit/6),fd:L=>`黃昏星之光：長矛 3 下，每下 ATK (${300*L} + VIT/6)% × Base Lv/100，靈感中 ${450*L}%`},
+ RK_SONICWAVE:{mul:L=>LVM(1050+150*L),fd:L=>`音速衝擊波：遠距離 3 下，每下 ATK ${1050+150*L}% × Base Lv/100`},
+ WL_FROSTMISTY:{mul:L=>LVM(200+100*L),fd:L=>`寒冰濃霧：周圍 ${L} 下，每下水屬性 MATK ${200+100*L}% × Base Lv/100，讓怪物凍僵（之後凍僵術更痛）`},
+ WM_METALICSOUND:{mul:L=>LVM(120*L+60*SLC('WM_LESSON')),fd:L=>`重金屬音樂：2 下，每下 MATK (${120*L} + 課程×60)% × Base Lv/100；對睡著的怪物 +100%`},
+ RL_S_STORM:{mul:L=>17+2*L,fd:L=>`粉碎風暴：周圍 ATK ${1700+200*L}%（官方：霰彈槍）`},
+ LG_RAGEBURST:{mul:()=>LVM(S.rage?200*S.rage+(D().maxHp-S.hp)/100:3000+(D().maxHp-S.hp)),fd:()=>'憤怒突擊：有憤怒球時用掉全部，ATK (200 × 球數 + 損失的 HP/100)% × Base Lv/100；沒有球時 ATK (3000 + 損失的 HP)% × Base Lv/100'},
+ AS_VENOMKNIFE:{ele:'無',d:()=>'無屬性 ATK 500%，中毒'},
+ SU_SV_STEMSPEAR:{ele:'幽靈'},
+ PA_SHIELDCHAIN:{flat:undefined,base:(L,d)=>shieldBaseR(d),d:L=>`盾牌 5 下，每下 (素質 ATK + 盾牌重量 + 精煉×4) × (${300+200*L}% + 盾牌重量 + 精煉×4) × Base Lv/100，強制無屬性`},
+ CR_SHIELDBOOMERANG:{base:(L,d)=>shieldBaseR(d),ele:'無',d:L=>`盾牌 (素質 ATK + 盾牌重量 + 精煉×4) × ${80*L}%，強制無屬性`},
+ LK_SPIRALPIERCE:{base:(L,d,t)=>{const w=W();return (d.atk+(w?w.w||0:0))*.7*(t&&t.size==='小'?1.3:t&&t.size==='中'?1.15:1)},d:L=>`長矛 5 下，每下 (ATK + 武器重量) × 70% × ${150+50*L}% × Base Lv/100（小型 ×1.3、中型 ×1.15）`}};
+for(const [c,o] of Object.entries(RENEW2))for(const id of SKBY[c]||[])if(SK[id]){const s=SK[id];for(const k in o){if(k==='d'){s.d=o.d;s.fd=o.d;continue}if(o[k]===undefined)delete s[k];else s[k]=o[k]}}
+/* 屬性跟著武器（官方 Endowed）：艾斯系列 */
+for(const c of ['SL_STIN','SL_STUN','SL_SMA','SP_SPA','SP_SHA','SP_SWHOO'])for(const id of SKBY[c]||[])if(SK[id])Object.defineProperty(SK[id],'ele',{get:()=>{try{return eleOf(D().wele||'無')}catch(e){return '無'}},configurable:true});
+for(const c of ['HT_BLITZBEAT','KN_SPEARSTAB','RG_RAID','RK_HUNDREDSPEAR','ASC_METEORASSAULT','SP_SHA','WL_HELLINFERNO','WL_TETRAVORTEX','WZ_FIREPILLAR','RA_WUGDASH'])AOE.add(c);
 const cureRoll=id=>{const c=SK[id]&&SK[id].c,L=SL(id);if(c==='AB_CLEARANCE')return R()*100<60+8*L;if(c==='SR_GENTLETOUCH_CURE'){const d=D();return R()*100<5*L+Math.floor((d.st.dex+S.lv)/4)-1-Math.floor(R()*10)}return true};
 const cureOn=(id,w)=>{const o=(C().cureSk||{})[id]||CURE_DEF[id]||{};return o[w]!==false};
 function inflict(k,secs,d){const rs={poison:'vit',stun:'vit',silence:'vit',bleeding:'vit',blind:'int',sleep:'int',confusion:'int',curse:'luk'}[k];
