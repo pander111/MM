@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#79a75a"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="小黑窗"><meta name="apple-mobile-web-app-status-bar-style" content="default"><style>body{margin:0}</style><script>window.RO_GH=1;window.RO_BUILD="20261113220354";if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))</script></head><body>
+<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#79a75a"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="小黑窗"><meta name="apple-mobile-web-app-status-bar-style" content="default"><style>body{margin:0}</style><script>window.RO_GH=1;window.RO_BUILD="20261113222532";if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))</script></head><body>
 <title>仙境放置小黑窗</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <style>
@@ -2471,7 +2471,7 @@ function fight(d){
   if(!acted&&t.dist<=9){const tr=tryTame(d,t);if(tr==='ok')return schedule(step,800);if(tr){acted=true;el=1000}}
   let rangeWant=0,waitMob=0;
   if(!acted&&!sil&&!t.plant){for(const r of c.atk.rules){
-    const sk=SK[r.sk],L=Math.min(r.lv||1,SL(r.sk));if(!sk||!L)continue;
+    const sk=SK[r.sk],L=Math.min(r.lv||1,SL(r.sk));if(!sk||!L||typeof sk.sp!=='function')continue;
     if(r.mon&&r.mon!==t.n)continue; if(r.once&&t.used[r.sk])continue; if(r.minMob>1&&pileOf(t).length<r.minMob){if(SL(r.sk)&&S.sp>=spc(SK[r.sk],L))waitMob=Math.max(waitMob,r.minMob);continue} if(r.ele&&eleOf(t.ele)!==r.ele)continue; if(r.cond&&!condOk(r.cond,t))continue;
     if(!needOk(sk))continue;
     if(t.bsLock&&S.bsUntil>S.clock&&!BSOK(S.bsLv||1).includes(sk.c))continue;/* 真劍百破道鎖住時只能用特定技能 */
