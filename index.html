@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#79a75a"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="小黑窗"><meta name="apple-mobile-web-app-status-bar-style" content="default"><style>body{margin:0}</style><script>window.RO_GH=1;window.RO_BUILD="20261113182502";if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))</script></head><body>
+<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#79a75a"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="小黑窗"><meta name="apple-mobile-web-app-status-bar-style" content="default"><style>body{margin:0}</style><script>window.RO_GH=1;window.RO_BUILD="20261113183826";if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))</script></head><body>
 <title>仙境放置小黑窗</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <style>
@@ -483,8 +483,8 @@ const RUNES=[['i12725','那特席茲盧恩石','RK_REFRESH','恢復：解除異�
 const POISONS=[['i12717','麻痺之毒','怪物變慢、攻擊下降'],['i12718','吸血之毒','持續扣血'],['i12719','失憶之毒','怪物不能放技能'],['i12720','污染之毒','持續扣血'],['i12721','麻醉之毒','怪物暫時不能動'],['i12722','熱病之毒','持續扣血、命中下降'],['i12723','狂笑之毒','怪物混亂'],['i12724','衰弱之毒','怪物防禦下降']];
 const BOOKS=[['i100065','咒術魔法書(暴風雪)','WZ_STORMGUST'],['i100066','咒術魔法書(怒雷強擊)','WZ_VERMILION'],['i100067','咒術魔法書(隕石術)','WZ_METEOR'],['i100068','咒術魔法書(吸星大法)','WL_DRAINLIFE'],['i100069','咒術魔法書(凍僵術)','WL_JACKFROST'],['i100070','咒術魔法書(地牛翻身)','WL_EARTHSTRAIN'],['i100071','咒術魔法書(碧血隕石)','WL_CRIMSONROCK'],['i100072','咒術魔法書(連鎖電擊)','WL_CHAINLIGHTNING'],['i100073','咒術魔法書(毀滅慧星)','WL_COMET'],['i100074','咒術魔法書(屬性漩渦)','WL_TETRAVORTEX']];
 {const add=(k,n,w,buy,o)=>{if(!BASE[k])BASE[k]=Object.assign({n,w,sell:Math.floor(buy/2),t:'etc',buy},o||{})};
- for(const [k,n,c,d] of RUNES)add(k,n,1,3000,{d:'盧恩騎士用（要學盧恩精熟）。'+d});
- for(const [k,n,d] of POISONS)add(k,n,1,1500,{d:'十字斬首者用（劇毒武器會塗上設定的毒）。'+d});
+ for(const [k,n,c,d] of RUNES)add(k,n,1,3000,{d:'盧恩騎士用（用盧恩精熟製作，NPC 不賣）。'+d});
+ for(const [k,n,d] of POISONS)add(k,n,1,1500,{d:'十字斬首者用（用新毒製作做出來，NPC 不賣；劇毒武器會塗上設定的毒）。'+d});
  for(const [k,n,c] of BOOKS)add(k,n,5,5000,{d:'咒術士用：閱讀魔法書把這個魔法存起來，之後用「釋放 Lv2」一次放出。'});
  const extra=['x12','x13','x14','x1','x2','x3','x4','x5','x6','x7','x8','x9','x10','x11','i11602',...RUNES.map(r=>r[0]),...POISONS.map(r=>r[0]),...BOOKS.map(r=>r[0])];
  for(const k of extra)if(!SHOP.tool.includes(k))SHOP.tool.push(k);
@@ -494,6 +494,8 @@ for(const k in J3IT)if(!BASE[k])BASE[k]=J3IT[k];
 {const sell=['i6360','i6361','i6362','i6363','i12392','i12393','i12394','i6186','i6213','i6214','i6215','i6216','i6217','i6210','i6211','i6212','i6122','i6123','i7931','i7932','i7933','i7934','i7935','i7936','i7937','i7938','i7939','i12734','i6244','i6284','i11022','i11023','i11024','i6285','i6248','i6249','i6250','i6251','i6252','i6253','i6254','i6255','i6256','i6257','i6258','i6259','i6260','i6261','i6262'].filter(k=>BASE[k]);
  for(const k of sell){if(!SHOP.tool.includes(k))SHOP.tool.push(k)}for(const t of GD.towns)for(const k of sell)if(!t.s.tool.includes(k))t.s.tool.push(k);
  if(BASE.i12333)BASE.i12333.d='大主教用安希拉做出來的水晶：恢復 15% SP，60 秒內治癒量 +15%、SP 自然恢復 +30%，謳歌變成無屬性；聖靈降臨祈禱需要它。';if(BASE.i6128)BASE.i6128.d='十字斬首者的解毒劑：解除新毒的效果。'}
+/* 官方沒有 NPC 賣的三轉成品：盧恩石、新毒、基因種子 → 只能自己製作（或打怪掉落） */
+{const no=new Set([...RUNES.map(r=>r[0]),...POISONS.map(r=>r[0]),'i6210','i6211','i6212']);const strip=a=>{for(let i=a.length-1;i>=0;i--)if(no.has(a[i]))a.splice(i,1)};strip(SHOP.tool);for(const t of GD.towns)strip(t.s.tool)}
 const madoOn=()=>SLC('NC_MADOLICENCE')>0&&!S.madoOff;
 const SGN=['太陽','月亮','星星'];
 const doy=()=>{const n=new Date(),s0=new Date(n.getFullYear(),0,0);return Math.floor((n-s0)/864e5)};
@@ -702,7 +704,7 @@ const SKI={
  GC_CROSSIMPACT:{k:'atk',rng:()=>7,mul:L=>LVM(1400+150*L),sp:xsp('GC_CROSSIMPACT'),cast:xct('GC_CROSSIMPACT'),fd:L=>`十字斬：ATK ${1400+150*L}% × Base Lv/100`},
  GC_DARKILLUSION:{k:'atk',rng:L=>4+L,mul:()=>1,charge:1,sp:xsp('GC_DARKILLUSION'),cast:xct('GC_DARKILLUSION'),fd:()=>'黑色幻影：瞬間移動到目標旁攻擊，ATK 100%'},
  GC_RESEARCHNEWPOISON:{k:'passive',fd:L=>`新毒研究：法紅藥劑（EDP）持續時間 +${30+15*L} 秒`},
- GC_CREATENEWPOISON:{k:'passive',fd:()=>'新毒製作：在「背包 → 製作」用藥缽、製毒工具組、毒草做新毒（成功率 30% + 新毒研究×5%，一次 1～新毒研究等級 瓶；新毒研究 Lv5 可以做解毒劑）；道具商人也有賣新毒。劇毒武器在「輔助技能」設定要塗哪種毒'}, GC_ANTIDOTE:{k:'passive',fd:()=>'解毒劑：消耗解毒劑解除隊友身上的新毒效果（本遊戲的怪物不會使用新毒，所以掛機時不需要；解毒劑可以用新毒製作做出來）'},
+ GC_CREATENEWPOISON:{k:'passive',fd:()=>'新毒製作：在「背包 → 製作」用藥缽、製毒工具組、毒草做新毒（成功率 30% + 新毒研究×5%，一次 1～新毒研究等級 瓶；新毒研究 Lv5 可以做解毒劑）（官方 NPC 不賣新毒，只能自己做）。劇毒武器在「輔助技能」設定要塗哪種毒'}, GC_ANTIDOTE:{k:'passive',fd:()=>'解毒劑：消耗解毒劑解除隊友身上的新毒效果（本遊戲的怪物不會使用新毒，所以掛機時不需要；解毒劑可以用新毒製作做出來）'},
  GC_POISONINGWEAPON:{k:'buff',need:['dagger','katar'],onCast:()=>{const k=C().gcPoison;if(k&&S.inv[k]>0){useI(k,1);if(!S.inv[k])delete S.inv[k];S.gcPz=k;log('skill',`劇毒武器塗上 ${ITEMS[k].n}。`)}else S.gcPz=null},sp:xsp('GC_POISONINGWEAPON'),cast:xct('GC_POISONINGWEAPON'),dur:L=>60*L,fd:L=>`劇毒武器：普通攻擊時 ${4+4*L}% 機率讓怪物中毒（官方可以選 8 種新毒，本遊戲簡化成一般中毒）`},
  GC_WEAPONBLOCKING:{k:'buff',sp:xsp('GC_WEAPONBLOCKING'),cast:xct('GC_WEAPONBLOCKING'),dur:()=>180,fd:L=>`武器抵禦：${10+2*L}% 機率擋下近身物理攻擊（之後可以接反擊斬）`},
  GC_COUNTERSLASH:{k:'atk',aoe:1,rng:()=>2,mul:L=>LVM(200+150*L,120)+(2*D().st.agi+4*S.jlv)/100,sp:xsp('GC_COUNTERSLASH'),cast:xct('GC_COUNTERSLASH'),fd:L=>`反擊斬：周圍 ATK [(${200+150*L})% × Base Lv/120 + AGI×2% + Job Lv×4%]`},
@@ -2662,7 +2664,7 @@ function runeEff(){const e={};if(!S.rb)return e;const RM=SLC('RK_RUNEMASTERY');c
   if(on('RK_GIANTGROWTH'))e.str=30;if(on('RK_VITALITYACTIVATION'))e.healP=50;if(on('RK_FIGHTINGSPIRIT')){e.atk=70+7*RM;e.aspdP=4*RM}
   if(on('RK_STONEHARDSKIN')){const v=Math.floor(S.jlv*RM/4/10);e.def=v;e.mdef=v}if(on('RK_LUXANIMA')){e.atkP=15;e.matkP=15;e.hpP=30}return e}
 function runeUI(){if(!SLC('RK_RUNEMASTERY'))return '';const c=C(),on=c.runes||{};
-  return `<div style="margin-top:8px;border-top:1px dashed var(--btn-edge);padding-top:6px"><b>盧恩石（自動使用）</b><div class="note">勾選後會自動使用背包裡的盧恩石（道具商人有賣，也可以在「背包 → 製作」用盧恩精熟自己做）。官方限制：盧恩精熟等級不夠的盧恩石不能用。</div>${RUNES.map(([k,n,code,dsc])=>`<div class="row"><label class="chk"><input type="checkbox" data-a2="rune" data-k="${k}" ${on[k]?'checked':''}> ${n}</label><span class="note">${RUNEREQ[code]&&SLC('RK_RUNEMASTERY')<RUNEREQ[code]?`<span class="bad">要盧恩精熟 Lv ${RUNEREQ[code]}</span>・`:''}${dsc}・身上 ${S.inv[k]||0}${(S.rb&&S.rb[code]>S.clock)?'・<span class="good">生效中</span>':''}</span></div>`).join('')}</div>`}
+  return `<div style="margin-top:8px;border-top:1px dashed var(--btn-edge);padding-top:6px"><b>盧恩石（自動使用）</b><div class="note">勾選後會自動使用背包裡的盧恩石（官方 NPC 不賣，要在「背包 → 製作」用盧恩精熟自己做；材料高級盧恩原石、光粒、古老樹枝在道具商人有賣）。官方限制：盧恩精熟等級不夠的盧恩石不能用。</div>${RUNES.map(([k,n,code,dsc])=>`<div class="row"><label class="chk"><input type="checkbox" data-a2="rune" data-k="${k}" ${on[k]?'checked':''}> ${n}</label><span class="note">${RUNEREQ[code]&&SLC('RK_RUNEMASTERY')<RUNEREQ[code]?`<span class="bad">要盧恩精熟 Lv ${RUNEREQ[code]}</span>・`:''}${dsc}・身上 ${S.inv[k]||0}${(S.rb&&S.rb[code]>S.clock)?'・<span class="good">生效中</span>':''}</span></div>`).join('')}</div>`}
 /* 新毒：劇毒武器塗上設定的毒 */
 function poisonUI(){if(!SLC('GC_POISONINGWEAPON'))return '';const c=C();return `<div style="margin-top:8px;border-top:1px dashed var(--btn-edge);padding-top:6px"><b>劇毒武器要塗的毒</b> <select data-a2="gcpoison"><option value="">一般劇毒（不消耗）</option>${POISONS.map(([k,n,d])=>`<option value="${k}" ${c.gcPoison===k?'selected':''}>${n}（${d}，身上 ${S.inv[k]||0}）</option>`).join('')}</select><div class="note">施放劇毒武器時消耗 1 瓶設定的毒，期間攻擊有機率讓怪物中這種毒。</div></div>`}
 function poisonHit(t,k){if(!(t.cur>0))return;const B=t.boss||t.mvp;switch(k){case'i12717':t.deb.slow=1;t.atk=Math.floor(t.atk*.9);break;case'i12718':case'i12720':case'i12722':t.dot=Math.max(t.dot||0,10000);if(k==='i12722')t.hit=Math.floor(t.hit*.9);break;case'i12719':t.deb.silence=1;break;case'i12721':if(!B){t.stop=Math.max(t.stop||0,3000);t.stopK='stun'}break;case'i12723':t.deb.confuse=1;break;case'i12724':t.def=Math.floor(t.def*.9);break}}
