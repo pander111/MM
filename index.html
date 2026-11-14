@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#79a75a"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="小黑窗"><meta name="apple-mobile-web-app-status-bar-style" content="default"><style>body{margin:0}</style><script>window.RO_GH=1;window.RO_BUILD="20261115005311";if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))</script></head><body>
+<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#79a75a"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="小黑窗"><meta name="apple-mobile-web-app-status-bar-style" content="default"><style>body{margin:0}</style><script>window.RO_GH=1;window.RO_BUILD="20261115025836";if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))</script></head><body>
 <title>仙境放置小黑窗</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <style>
@@ -433,6 +433,8 @@ function soulStep(d){const c=C(),w=c.soul;if(!w||!w.on||!SLC('PF_SOULCHANGE')||!
   log('skill',`靈魂轉換：和 ${o.name} 交換 SP（${o.name} ${fmt(b)} → ${fmt(o.sp)}，自己 ${fmt(a)} → ${fmt(S.sp)}）。`);return ct+5000}
 function soulUI(){if(!SLC('PF_SOULCHANGE')||!partyOn()||!inParty(CUR))return '';const w=C().soul||{};
   return `<div class="row">${cC('soul.on','靈魂轉換（幫隊友補 SP）')}<label class="chk">隊友 SP 低於 ${cN('soul.mate',40)}%</label><label class="chk">自己 SP 高於 ${cN('soul.me',40)}% 才換</label>${toUI('soul','bto_soul',w)}</div><div class="note">把自己目前的 SP 和隊友交換（官方效果）：適合 SP 很多的智者幫祭司、巫師回魔。需要勾「對隊友施放輔助 / 回復技能」。空白時預設：隊友低於 20%、自己高於 70%。</div>`}
+/* 近身怪靠近、自己還沒有暗之障壁時，攻擊技能先保留放障壁需要的 SP */
+function swRes(t){const c=C(),w=c.swall,L0=SLC('MG_SAFETYWALL');if(!w||!w.on||!L0||w.self===false||!t||t.dead||t.cur<=0||!(t.rng<=3)||swOn(S)||hasS('silence'))return 0;const sk=SK[[].concat(SKBY.MG_SAFETYWALL)[0]],L=Math.max(1,Math.min(w.lv||L0,L0));if(skItemMiss(sk,L))return 0;const v=spc(sk,L);return S.sp>=v?v:0}
 function swallStep(d){const c=C(),w=c.swall,L0=SLC('MG_SAFETYWALL');if(!w||!w.on||!L0||hasS('silence')||incap())return 0;
   const id=[].concat(SKBY.MG_SAFETYWALL)[0],sk=SK[id],L=Math.max(1,Math.min(w.lv||L0,L0));if(S.sp<spc(sk,L)||skItemMiss(sk,L))return 0;
   const melee=j=>{const r=rtOf(j),t=r.target;return r.mode==='fight'&&t&&!t.dead&&t.cur>0&&t.rng<=3&&(t.dist||0)<=t.rng+3};
@@ -2502,9 +2504,9 @@ function fight(d){
     if(S.sp>=cost){S.sp-=cost;const v=Math.floor(Math.floor((S.lv+d.st.int)/8)*(4+8*L)*(1+(d.E.healP||0)/100));S.hp=Math.min(d.maxHp,S.hp+v);log('skill',`施放 治癒術 Lv ${L}，恢復 ${v} HP。`);acted=true;el=1000}}
   if(!acted&&!sil&&c.healSk.on&&j3Heal(d,[CUR])){acted=true;el=1000}
   if(!acted&&!inc&&healMates(d)){acted=true;el=1000}
+  if(!acted){const w=swallStep(d);if(w){acted=true;el=w}}/* 暗之障壁優先於一般增益 */
   if(!acted&&maintainBuffs(d)){acted=true;el=1000}
   if(!acted&&careRes(d)){acted=true;el=800}
-  if(!acted){const w=swallStep(d);if(w){acted=true;el=w}}
   if(!acted){const w=soulStep(d);if(w){acted=true;el=w}}
   if(!acted&&supportMates(d)){acted=true;el=1000}
   if(!acted&&berserkPitch()){acted=true;el=1000}
@@ -2525,6 +2527,7 @@ function fight(d){
     if(sk.k==='debuff'&&(t.deb[sk.st]||(t.tries[r.sk]||0)>=3))continue;
     const cost=spc(sk,L);if(S.sp<cost||S.sp<d.maxSp*(r.spPct||0)/100){if(!(S.spWarnAt>S.clock)){S.spWarnAt=S.clock+60000;log('warn',S.sp<cost?`SP 不足（${S.sp} / 需要 ${cost}），${sk.n} 放不出來${c.atk.onlySkill?'':'，先用普通攻擊'}。`:`SP 低於 ${r.spPct}%，暫停施放 ${sk.n}。`)}continue}
     if(sk.zeny&&S.zeny<sk.zeny(L))continue;
+    {const rs=swRes(t);if(rs&&S.sp-cost<rs)continue}
     if(sk.zg&&S.zeny<500*L)continue;/* 投擲金錢：身上要有 500×Lv Zeny */
     {const mi=skItemMiss(sk,L);if(mi){skItemWarn(sk,mi[0]);continue}}
     if(SPHC.has(sk.c)){const need=sk.c==='MO_EXTREMITYFIST'?5:1;if((S.spheres||0)<need)continue;if(sk.c==='MO_EXTREMITYFIST'&&!buffOnC('MO_EXPLOSIONSPIRITS'))continue}
