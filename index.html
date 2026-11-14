@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#79a75a"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="小黑窗"><meta name="apple-mobile-web-app-status-bar-style" content="default"><style>body{margin:0}</style><script>window.RO_GH=1;window.RO_BUILD="20261114150912";if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))</script></head><body>
+<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#79a75a"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="小黑窗"><meta name="apple-mobile-web-app-status-bar-style" content="default"><style>body{margin:0}</style><script>window.RO_GH=1;window.RO_BUILD="20261114224239";if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))</script></head><body>
 <title>仙境放置小黑窗</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <style>
@@ -184,7 +184,7 @@ const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const pad=n=>String(n).padStart(2,'0');
 const now=()=>{const d=new Date();return `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`};
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const fmt=n=>Math.floor(n).toLocaleString();
+const fmt=n=>{n=Math.floor(n);return n<1000&&n>-1000?String(n):String(n).replace(/\B(?=(\d{3})+(?!\d))/g,',')};
 const GHM=!!window.RO_GH;/* GitHub 版：固定掉寶 ×1、二轉後互轉與洗點要收費 */
 const dur=ms=>{const s=Math.max(0,Math.floor(ms/1000));return `${Math.floor(s/3600)}:${pad(Math.floor(s%3600/60))}:${pad(s%60)}`};
 
@@ -1595,7 +1595,7 @@ const songB=id=>{const b=S.buffs[id];return b&&b.until>S.clock?{lv:b.lv,ps:b.ps|
 const songBC=c=>{for(const id of (SKBY[c]||[])){const b=songB(id);if(b)return b}return null};
 const songRaw=c=>{for(const id of (SKBY[c]||[])){const b=S.buffs[id];if(b&&b.until>S.clock)return {lv:b.lv,ps:b.ps||PS0}}return null};
 
-const SLC=c=>Math.max(0,...(SKBY[c]||[]).map(i=>SL(i)));
+const SLC=c=>{const ids=SKBY[c];if(!ids)return 0;let v=0;for(let i=0;i<ids.length;i++){const x=SL(ids[i]);if(x>v)v=x}return v};
 const cartW=()=>Object.entries(S.cart||{}).reduce((s,[k,n])=>s+(ITEMS[k]?ITEMS[k].w*n:0),0);
 const shuriPick=()=>{const ok=k=>ITEMS[k]&&ITEMS[k].t==='shuri'&&(S.inv[k]||0)>0&&S.lv>=(ITEMS[k].lv||1);const pf=C().shuri;if(pf&&ok(pf))return pf;let b=null;for(const k in S.inv)if(ok(k)&&(!b||ITEMS[k].atk>ITEMS[b].atk))b=k;return b||pf||'i13250'};
 /* 深淵之中、免魔力礦石效果：只免藍／黃／紅色魔力礦石（官方），其他道具（瓶子、陷阱…）照扣 */
@@ -1772,7 +1772,9 @@ function ebSnap(){const q=[];for(const s of _EQS)q.push(S.eq[s]);for(const k of 
 function EB(){const c=_eb.get(S);if(c&&c.clk===S.clock&&c.ev===EBV)return c.v;if(c&&ebSame(c)){c.clk=S.clock;c.ev=EBV;return c.v}const sig=Object.values(S.eq).join(';')+'#'+S.job+'#'+STN.map(x=>S.st[x]).join(',')+'#'+S.jlv;if(c&&c.sig===sig){c.q=ebSnap();c.clk=S.clock;c.ev=EBV;return c.v}const v={};for(const s in S.eq){const k=S.eq[s];if(!k||!ITEMS[k])continue;const bk=baseOf(k),b=BASE[bk];const r=refineOf(k);if(b)addEff(v,CARDJS[bk]!=null?cardEff(bk,cardCtx(S,r)).e:b.eff);for(const cd of cardsOf(k))if(BASE[cd])addEff(v,cardEff(cd,cardCtx(S,r)).e)}
   const set=eqSet();v.combos=[];COMBOS.forEach((cb,i)=>{if(cb.i.every(k=>set.has(k))){addEff(v,cb.e);v.combos.push(i)}});_eb.set(S,{sig,v,q:ebSnap(),clk:S.clock,ev:EBV});return v}
 const _slc=new WeakMap();
-const SL=id=>{let m=_slc.get(S);if(!m||m.clk!==S.clock||m.ev!==EBV){m={clk:S.clock,ev:EBV,v:{}};_slc.set(S,m)}const cv=m.v[id];if(cv!==undefined)return cv;return m.v[id]=SL0(id)};
+let SKV=0;/* 技能等級快取：只在裝備／狀態（EBV）或學技能（SKV）變動時重算；詩人舞孃合奏連動跟時間有關，不快取 */
+let _slS=null,_slM=null;
+const SL=id=>{let m=_slS===S?_slM:(_slS=S,_slM=_slc.get(S));if(!m||m.ev!==EBV||m.sv!==SKV){m={ev:EBV,sv:SKV,v:Object.create(null)};_slc.set(S,m);_slM=m}const cv=m.v[id];if(cv!==undefined)return cv;const c=SKC[id];if(c&&BDPAIR[c])return SL0(id);return m.v[id]=SL0(id)};
 const BDPAIR={DC_HUMMING:'BA_WHISTLE',BA_WHISTLE:'DC_HUMMING',DC_DONTFORGETME:'BA_ASSASSINCROSS',BA_ASSASSINCROSS:'DC_DONTFORGETME',DC_FORTUNEKISS:'BA_POEMBRAGI',BA_POEMBRAGI:'DC_FORTUNEKISS',DC_SERVICEFORYOU:'BA_APPLEIDUN',BA_APPLEIDUN:'DC_SERVICEFORYOU'};
 const bdLinked=()=>(SKBY.SL_BARDDANCER||[]).some(buffOn);
 const SL0=id=>{let v=S.sk[id]||0;const c=SKC[id];if(c)for(const x of SKBY[c])if(S.sk[x]>v)v=S.sk[x];if(S.copy&&c&&S.copy.c===c&&S.copy.lv>v)v=S.copy.lv;if(S.copy2&&c&&S.copy2.c===c&&S.copy2.lv>v)v=S.copy2.lv;if(c&&BDPAIR[c]&&S.buffs&&bdLinked())for(const x of SKBY[BDPAIR[c]]||[])if(S.sk[x]>v)v=S.sk[x];return Math.max(v,((EB().skill)||{})[id]||0)};
@@ -2958,7 +2960,7 @@ function winReward(d,t,bd){
       if(!got){setState('撿取物品');got=true}
       addItem(k,1);bd.push(ITEMS[k].n);log(ITEMS[k].t==='card'?'lvl':'drop',`撿取物品：${ITEMS[k].n} ×1。`);if(ITEMS[k].t==='card')toast(`撿取物品：${ITEMS[k].n} ×1。`)}}}
 }
-function gainExp(be,je){EBV++;
+function gainExp(be,je){
   S.stats.exp+=be;let up=false;
   if(S.lv<maxBase()){S.exp+=be;while(S.lv<maxBase()&&S.exp>=nextBase(S.lv)){S.exp-=nextBase(S.lv);S.lv++;S.pts+=S.lv>=100?STPT[S.lv-100]:Math.floor(S.lv/5)+3;up=true;
     log('lvl',`★ Base 等級提升！現在是 Lv.${S.lv}。`);toast(`${partyOn()&&inParty(CUR)?S.name+' ':''}Base Lv ${S.lv}！`)}}
@@ -2969,7 +2971,7 @@ function gainExp(be,je){EBV++;
     if(S.job==='novice'&&S.jlv>=10)log('sys','初心者 Job 10 達成！把基本技能學到 Lv 9，就能到「職業」轉職。');
     if(J().tier===1&&S.jlv===40)log('sys','Job 40 達成！技能點用完就可以二轉。')}}
   else S.jexp=0;
-  if(up){const d=D();S.hp=d.maxHp;S.sp=d.maxSp;autoAlloc();dirty=true;
+  if(up){EBV++;const d=D();S.hp=d.maxHp;S.sp=d.maxSp;autoAlloc();dirty=true;
     const c=C();if(c.stopLv&&S.lv>=c.stopLv)stop(`到達 Base Lv ${c.stopLv}`);else if(c.stopJlv&&S.jlv>=c.stopJlv)stop(`到達 Job Lv ${c.stopJlv}`)}
 }
 function autoAlloc(){EBV++;const a=C().alloc;if(!a.on)return;let n=0;
@@ -4368,7 +4370,7 @@ function rebirthBox(){const j=JOBS[S.job];if(S.trans||j.tier!==2||!TNAME[S.job])
   return `<div style="height:10px"></div>`+box('轉生（朱諾・女武神）',`<div class="note">二轉職業 Base 99、Job 50 時可以轉生，照官方：<br>・變回「進階初學者」Base 1 / Job 1，屬性全部回到 1，但有 <b>100</b> 點屬性點（一般是 48）。<br>・技能全部重學；之後只能照原本的路線轉回 進階${JOBS[chain(S.job)[1]].n} → <b>${TNAME[S.job]}</b>，轉生二轉的 Job 上限是 70，可以學轉生技能。<br>・轉生後 Max HP、Max SP 多 25%，升級需要的經驗比較多。<br>・背包、倉庫、Zeny 保留；等級不夠的裝備會卸下。費用 ${fmt(REBIRTH_Z)} Zeny。</div>
     ${why.length?why.map(w=>`<div class="bad">✕ ${w}</div>`).join(''):`<button type="button" class="pri" data-a="rebirth">${armed==='rebirth'?'<span>再按一次：確定轉生</span>':'轉生為 '+TNAME[S.job]+' 的路線'}</button>`}`)}
 function doRebirth(){const old=S.job;S.zeny-=REBIRTH_Z;S.trans=1;S.transJob=old;S.job='novice';S.lv=1;S.jlv=1;S.exp=0;S.jexp=0;
-  for(const k in S.st)S.st[k]=1;S.pts=100;S.skp=0;S.sk={};S.buffs={};S.spheres=0;S.coins=0;S.copy=null;
+  for(const k in S.st)S.st[k]=1;S.pts=100;S.skp=0;S.sk={};SKV++;S.buffs={};S.spheres=0;S.coins=0;S.copy=null;
   for(const sl in S.eq){const k=S.eq[sl];if(k&&ITEMS[k]&&!canWield(ITEMS[k])){S.inv[k]=(S.inv[k]||0)+1;S.eq[sl]=null}}
   C().alloc.on=false;C().atk.rules=[];
   const d=D();S.hp=d.maxHp;S.sp=d.maxSp;ui.jobTab=null;
@@ -4674,7 +4676,7 @@ panel.addEventListener('click',e=>{
   case'rsdel':delete c.restock[k];break;
   case'resetst':if(armed==='rst'){const z=resetCost();if(S.zeny<z){toast(`Zeny 不夠，需要 ${fmt(z)}z`);break}if(z){S.zeny-=z;zOut('重置費用',z)}let sp=0;for(const k in S.st){for(let v=1;v<S.st[k];v++)sp+=statCost(v);S.st[k]=1}S.pts+=sp;const off=C().alloc.on;C().alloc.on=false;
     const d=D();S.hp=Math.min(S.hp,d.maxHp);S.sp=Math.min(S.sp,d.maxSp);log('sys',`重置 NPC：屬性點已重置${z?`（花費 ${fmt(z)}z）`:''}，退回 ${sp} 點，目前有 ${S.pts} 點可以分配。`+(off?'（已關閉自動配點）':''));toast('屬性點已重置');tab='char'}else{armed='rst';keepArm=true}break;
-  case'resetsk':if(armed==='rsk'){const z=resetCost();if(S.zeny<z){toast(`Zeny 不夠，需要 ${fmt(z)}z`);break}if(z){S.zeny-=z;zOut('重置費用',z)}let kp=0;for(const k of Object.keys(S.sk))if(SK[k]&&!SK[k].quest&&(k!=='basic'||S.job==='novice')){kp+=S.sk[k];delete S.sk[k]}S.skp+=kp;
+  case'resetsk':if(armed==='rsk'){const z=resetCost();if(S.zeny<z){toast(`Zeny 不夠，需要 ${fmt(z)}z`);break}if(z){S.zeny-=z;zOut('重置費用',z)}let kp=0;for(const k of Object.keys(S.sk))if(SK[k]&&!SK[k].quest&&(k!=='basic'||S.job==='novice')){kp+=S.sk[k];delete S.sk[k];SKV++}S.skp+=kp;
     const d=D();S.hp=Math.min(S.hp,d.maxHp);S.sp=Math.min(S.sp,d.maxSp);log('sys',`重置 NPC：技能已重置${z?`（花費 ${fmt(z)}z）`:''}，退回 ${kp} 點技能點。`);toast('技能點已重置');tab='job'}else{armed='rsk';keepArm=true}break;
   case'buy':{const p=priceBuy(k)*n;if(S.zeny>=p){S.zeny-=p;zOut('手動購買',p);S.inv[k]=(S.inv[k]||0)+n;S.restockCD=0;log('sys',`購買 ${ITEMS[k].n} ×${n}（-${dcZ(ITEMS[k].buy*n,p)}）。`);if(dcPct())toast(`${fmt(ITEMS[k].buy*n)}z ⇒ ${fmt(p)}z（${dcSrc()} −${dcPct()}%）`)}}break;
   case'ssell':{const have=ROOT.stor[k]||0;if(!have||!(ITEMS[k].sell>0))break;let q;if(b.dataset.all){if(armed!=='ss_'+k){armed='ss_'+k;keepArm=true;break}q=have}else{const qi=document.getElementById('sw_'+k);q=qi?Math.floor(Number(qi.value)||0):1;if(q<1){toast('請輸入要賣的數量');rr=false;break}q=Math.min(q,have)}
@@ -4687,11 +4689,11 @@ panel.addEventListener('click',e=>{
   case'c2b':{const m=S.cart[k]||0;S.cart[k]=0;S.inv[k]=(S.inv[k]||0)+m;delete S.vend.list[k]}break;
   case'vend':if(!S.vend.on&&!SLC('MC_VENDING')){toast('需要學「露天商店」');break}S.vend.on=!S.vend.on;target=null;sitting=false;if(S.vend.on){log('sys','開始擺攤，暫停打怪。');S.auto=true;mode='vend';schedule(step,1000)}else{log('sys','收攤。');mode='search';if(S.auto)schedule(step,800)}break;
   case'jtab':ui.jobTab=k;break;
-  case'learn':{const s=SK[k];if(SL(k)>=s.max)break;{const miss=skReqMiss(k);if(miss.length){toast('需要先學：'+miss[0]);break}}if(s.quest){S.sk[k]=SL(k)+1;log('sys',`學會任務技能 ${s.n}。`)}else if(S.skp>0){S.skp--;S.sk[k]=SL(k)+1;log('sys',`${s.n} 提升到 Lv ${S.sk[k]}。`)}
+  case'learn':{const s=SK[k];if(SL(k)>=s.max)break;{const miss=skReqMiss(k);if(miss.length){toast('需要先學：'+miss[0]);break}}if(s.quest){S.sk[k]=SL(k)+1;SKV++;log('sys',`學會任務技能 ${s.n}。`)}else if(S.skp>0){S.skp--;S.sk[k]=SL(k)+1;SKV++;log('sys',`${s.n} 提升到 Lv ${S.sk[k]}。`)}
     if(SK[k].k==='buff'&&!c.buffs[k])c.buffs[k]={on:true,lv:S.sk[k],early:0,spMin:0};if(SK[k].k==='buff'&&c.buffs[k])c.buffs[k].lv=Math.max(c.buffs[k].lv,S.sk[k]);}break;
   case'jobswap':if(armed==='swap'+k&&swapJobs().includes(k)&&(!JOBS[k].sex||c.look.g===JOBS[k].sex)){const zc=swapCost();if(S.zeny<zc){toast(`Zeny 不夠，這次互轉需要 ${fmt(zc)}z`);break}if(zc){S.zeny-=zc;zOut('職業互轉',zc);S.swapN=(S.swapN||0)+1}const old=J().n,oj=S.job;let kp=0;
     const cross=PARENT[k]!==PARENT[oj],drop=cross?new Set(chain(oj).filter(x=>x!=='novice')):new Set([oj]);
-    for(const id of Object.keys(S.sk))if(SK[id]&&drop.has(SK[id].j)){if(!SK[id].quest)kp+=S.sk[id];delete S.sk[id];if(c.buffs[id])delete c.buffs[id]}
+    for(const id of Object.keys(S.sk))if(SK[id]&&drop.has(SK[id].j)){if(!SK[id].quest)kp+=S.sk[id];delete S.sk[id];SKV++;if(c.buffs[id])delete c.buffs[id]}
     S.skp+=kp;S.job=k;
     if(cross&&chain(oj).includes('merch')&&!chain(k).includes('merch')){let m=0;for(const[x,n]of Object.entries(S.cart||{}))if(n>0){ROOT.stor[x]=(ROOT.stor[x]||0)+n;m+=n}S.cart={};if(S.vend){S.vend.on=false;S.vend.list={}}if(m)log('sys',`手推車裡的 ${m} 個道具已存進倉庫。`)}if(S.hom&&oj==='alchemist')S.hom.out=false;
     if(S.eq.weapon&&!canWield(ITEMS[S.eq.weapon])){S.inv[S.eq.weapon]=(S.inv[S.eq.weapon]||0)+1;S.eq.weapon=null;log('sys','新職業不能用原本的武器，已卸下。')}
