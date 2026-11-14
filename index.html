@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#79a75a"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="小黑窗"><meta name="apple-mobile-web-app-status-bar-style" content="default"><style>body{margin:0}</style><script>window.RO_GH=1;window.RO_BUILD="20261115025836";if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))</script></head><body>
+<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#79a75a"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="小黑窗"><meta name="apple-mobile-web-app-status-bar-style" content="default"><style>body{margin:0}</style><script>window.RO_GH=1;window.RO_BUILD="20261115032212";if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))</script></head><body>
 <title>仙境放置小黑窗</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <style>
@@ -2027,7 +2027,9 @@ function step(){
   const needHp=c.rest.on&&S.hp<d.maxHp*c.rest.hp/100,needSp=c.rest.spOn&&S.sp<d.maxSp*c.rest.sp/100;
   if((needHp||needSp)&&wp<50){
     sitting=true;mode='rest';setState('坐下休息');log('sys',`${needHp&&needSp?'HP、SP':needHp?'HP':'SP'} 偏低，坐下休息（回復速度 ×2）。`);return schedule(step,1000)}
-  if(healMates(d))return schedule(step,1000);
+  if(healMates(d,35))return schedule(step,1000);
+  {const w=swallStep(d);if(w)return schedule(step,w)}
+  if(healMates(d))return schedule(step,1000);/* 自己在找怪時也幫正在被近身怪打的隊友放暗之障壁 */
   if(maintainBuffs(d))return schedule(step,1000);
   if(careRes(d))return schedule(step,800);
   if(supportMates(d))return schedule(step,1000);
@@ -2061,7 +2063,7 @@ function step(){
 }
 /* 純輔助：不找怪，平常坐著回 SP，隊友要補血／輔助時才站起來 */
 function supStep(d,c){
-  const busy=()=>{sitting=false;return healMates(d)||!!swallStep(d)||!!soulStep(d)||maintainBuffs(d)||careRes(d)||supportMates(d)};
+  const busy=()=>{sitting=false;return healMates(d,35)||!!swallStep(d)||healMates(d)||!!soulStep(d)||maintainBuffs(d)||careRes(d)||supportMates(d)};
   if(busy()){S.supSit=0;setState('輔助隊友');return schedule(step,1000)}
   sitting=true;if(!S.supSit){S.supSit=1;log('sys',S.sp<d.maxSp?'沒有需要幫忙的，坐下等 SP。':'待命中，坐著等隊友需要補血或輔助。')}
   setState(S.sp<d.maxSp||S.hp<d.maxHp?'坐下等 SP':'待命（坐著）');
@@ -2503,8 +2505,9 @@ function fight(d){
   if(!acted&&!sil&&c.healSk.on&&SL('heal')&&S.hp<d.maxHp*c.healSk.pct/100){const L=SL('heal'),cost=spc(SK.heal,L);
     if(S.sp>=cost){S.sp-=cost;const v=Math.floor(Math.floor((S.lv+d.st.int)/8)*(4+8*L)*(1+(d.E.healP||0)/100));S.hp=Math.min(d.maxHp,S.hp+v);log('skill',`施放 治癒術 Lv ${L}，恢復 ${v} HP。`);acted=true;el=1000}}
   if(!acted&&!sil&&c.healSk.on&&j3Heal(d,[CUR])){acted=true;el=1000}
-  if(!acted&&!inc&&healMates(d)){acted=true;el=1000}
-  if(!acted){const w=swallStep(d);if(w){acted=true;el=w}}/* 暗之障壁優先於一般增益 */
+  if(!acted&&!inc&&healMates(d,35)){acted=true;el=1000}
+  if(!acted){const w=swallStep(d);if(w){acted=true;el=w}}
+  if(!acted&&!inc&&healMates(d)){acted=true;el=1000}/* 暗之障壁優先於一般增益 */
   if(!acted&&maintainBuffs(d)){acted=true;el=1000}
   if(!acted&&careRes(d)){acted=true;el=800}
   if(!acted){const w=soulStep(d);if(w){acted=true;el=w}}
@@ -2882,9 +2885,10 @@ function supNeed(d){const c=C();if(!c.partySupport||!partyOn()||!inParty(CUR))re
     const lack=(sk.sup?(sk.c==='PR_SUFFRAGIUM'||sk.spirit?mates:[...mates,CUR]):[CUR]).some(j=>{const o=ROOT.chars[j],cb=o.buffs[id];if(j!==CUR&&!buffTo(b,o))return false;if(j!==CUR&&!supFit(sk,o))return false;return !(cb&&cb.until-o.clock>(b.early||0)*1000)});
     if(lack)need=Math.max(need,cost)}
   return need}
-function healMates(d){const c=C();if(!c.healSk.on||!c.partySupport||!partyOn()||!inParty(CUR)||!SL('heal')||hasS('silence')||incap())return false;
+/* cap：只補 HP 低於這個 % 的隊友（危急時先補，其餘的先讓暗之障壁） */
+function healMates(d,cap){const c=C();if(!c.healSk.on||!c.partySupport||!partyOn()||!inParty(CUR)||!SL('heal')||hasS('silence')||incap())return false;
   const L=SL('heal'),cost=spc(SK.heal,L);if(S.sp<cost)return false;
-  let best=null,br=1;for(const j of P().members){const o=ROOT.chars[j];if(!o||o.hp<=0||o.cfg.map!==c.map)continue;const mx=j===CUR?d.maxHp:withChar(j,()=>D().maxHp);const r=o.hp/mx;if(r<c.healSk.pct/100&&r<br){br=r;best=[j,o,mx]}}
+  let best=null,br=1;for(const j of P().members){const o=ROOT.chars[j];if(!o||o.hp<=0||o.cfg.map!==c.map)continue;const mx=j===CUR?d.maxHp:withChar(j,()=>D().maxHp);const r=o.hp/mx;if(r<Math.min(c.healSk.pct,cap||100)/100&&r<br){br=r;best=[j,o,mx]}}
   if(!best)return false;const [j,o,mx]=best;S.sp-=cost;const v=Math.floor(Math.floor((S.lv+d.st.int)/8)*(4+8*L)*(1+(d.E.healP||0)/100));o.hp=Math.min(mx,o.hp+v);
   log('skill',`對 ${j===CUR?'自己':o.name} 施放 治癒術 Lv ${L}，恢復 ${v} HP（剩 ${Math.round(br*100)}% → ${Math.round(o.hp/mx*100)}%）。`);return true}
 
