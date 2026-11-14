@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#79a75a"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="小黑窗"><meta name="apple-mobile-web-app-status-bar-style" content="default"><style>body{margin:0}</style><script>window.RO_GH=1;window.RO_BUILD="20261114020247";if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))</script></head><body>
+<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#79a75a"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="小黑窗"><meta name="apple-mobile-web-app-status-bar-style" content="default"><style>body{margin:0}</style><script>window.RO_GH=1;window.RO_BUILD="20261114121926";if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))</script></head><body>
 <title>仙境放置小黑窗</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <style>
@@ -4363,7 +4363,7 @@ function doRebirth(){const old=S.job;S.zeny-=REBIRTH_Z;S.trans=1;S.transJob=old;
   C().alloc.on=false;C().atk.rules=[];
   const d=D();S.hp=d.maxHp;S.sp=d.maxSp;ui.jobTab=null;
   log('lvl',`★ ${S.name} 轉生了！成為進階初學者，目標是${TNAME[old]}。`);toast('轉生成功！');dirty=true}
-function transNext(j){if(EXN[S.job]&&!S.trans)return S.lv>=99?EXN[S.job]:[];if(j.tier===2&&THIRD[S.job])return S.lv>=99?THIRD[S.job]:[];if(!S.trans)return j.next;const tj=S.transJob;if(!tj)return j.next;const ch=chain(tj);const want=ch[ch.indexOf(S.job)+1];return want?[want]:[]}
+function transNext(j){if(EXN[S.job]&&!S.trans)return S.lv>=99?EXN[S.job]:[];if(j.tier===2&&THIRD[S.job])return S.lv>=99?THIRD[S.job]:[];if(!S.trans)return j.next;const tj=S.transJob;if(!tj)return j.next;if(j.tier===4)return [];const ch=chain(tj),ix=ch.indexOf(S.job);if(ix<0)return [];const want=ch[ix+1];return want?[want]:[]}
 function swapJobs(){const j=JOBS[S.job];if(!j||j.ext||(j.tier!==1&&j.tier!==2))return[];const pa=PARENT[S.job];
   const all=Object.keys(JOBS).filter(k=>k!==S.job&&!k.startsWith('t_')&&JOBS[k].tier===j.tier&&!JOBS[k].ext);
   return all.sort((a,b)=>(PARENT[b]===pa)-(PARENT[a]===pa))}
