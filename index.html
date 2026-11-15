@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#79a75a"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="小黑窗"><meta name="apple-mobile-web-app-status-bar-style" content="default"><style>body{margin:0}</style><script>window.RO_GH=1;window.RO_BUILD="20261115032212";if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))</script></head><body>
+<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#79a75a"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="小黑窗"><meta name="apple-mobile-web-app-status-bar-style" content="default"><style>body{margin:0}</style><script>window.RO_GH=1;window.RO_BUILD="20261115090232";if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))</script></head><body>
 <title>仙境放置小黑窗</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <style>
@@ -2037,7 +2037,7 @@ function step(){
     log('sys',`隊友缺輔助技能，SP 不夠（${Math.floor(S.sp)} / 需要 ${need}），先坐下回 SP。`);return schedule(step,1000)}}
   if(c.supOnly&&partyOn()&&inParty(CUR)&&P().members.some(j=>j!==CUR&&ROOT.chars[j]&&ROOT.chars[j].cfg.map===c.map))return supStep(d,c);
   if((c.assist||c.assistOnly||c.assistMvp!==false)&&partyOn()&&inParty(CUR)){const all=P().members.filter(j=>j!==CUR&&ROOT.chars[j]&&ROOT.chars[j].cfg.map===c.map).map(j=>(RT[j]||{}).target).filter(t=>t&&!t.dead&&t.cur>0);
-    const big=c.assistMvp!==false?all.filter(t=>(t.boss||t.mvp)&&!['flee','skip'].includes(c.mc[t.n])):[];
+    const big=c.assistMvp!==false?all.filter(t=>isBig(t)&&!['flee','skip'].includes(c.mc[t.n])):[];
     if(big.length){const t=pick(big);target=t;mode='fight';setState('戰鬥中');log('lvl',`協助隊友圍攻 ${t.mvp?'MVP':'BOSS'}「${t.n}」（HP ${fmt(Math.floor(t.cur))} / ${fmt(t.hp)}）！`);return schedule(step2,500)}
     const ts=c.assist||c.assistOnly?all.filter(t=>!['flee','skip'].includes(c.mc[t.n])):[];
     if(ts.length&&(c.assistOnly||R()<.7)){const t=pick(ts);target=t;mode='fight';setState('戰鬥中');log('battle',`協助隊友攻擊 ${t.n}（HP ${Math.floor(t.cur)} / ${t.hp}）。`);return schedule(step2,500)}}
@@ -2080,12 +2080,13 @@ function revealHid(d,t){if(!(t.hid>S.clock))return 0;
   if(SLC('MG_SIGHT')&&S.sp>=10&&!hasS('silence')){S.sp-=10;t.hid=0;log('skill',`施放 火狩，把躲起來的 ${t.n} 照了出來！`);return 1}
   if(!t.hidLog){t.hidLog=1;log('battle',`${t.n} 躲起來了，看不到牠……（光獵、火狩、獵鷹尋敵可以揭穿）`)}return 2}
 /* ===== BOSS／MVP：受傷保留＋戰鬥紀錄 ===== */
-const isBig=t=>t&&(t.boss||t.mvp);
+/* 只算真正的 MVP／小王：同張圖 5 隻以上的 BOSS 屬性怪（火蜥蜴、火鳥…）只是 BOSS 屬性的普通怪 */
+const isBig=t=>{if(!t)return false;if(t.mvp||t.bb)return true;if(!t.boss)return false;try{const mm=(MAPS[C().map]||{mons:[]}).mons.find(x=>x.n===t.n);return !(mm&&(mm.count||1)>=5)}catch(e){return true}};
 function bossLog(t,res,drops){if(!isBig(t))return;if(res!=='擊殺'&&res!=='被擊倒'&&!((t.dmgBy||{})[CUR]>0))return;ROOT.bossLog=ROOT.bossLog||[];const c=C();
   const dmg=Object.values(t.dmgBy||{}).reduce((a,b)=>a+b,0);
   ROOT.bossSeq=(ROOT.bossSeq||0)+1;const help=Object.keys(t.dmgBy||{}).filter(j=>+j!==CUR&&t.dmgBy[j]>0&&ROOT.chars[j]).map(j=>ROOT.chars[j].name);
   ROOT.bossLog.push({seq:ROOT.bossSeq,help,t:Date.now(),who:S.name,n:t.n,mvp:!!t.mvp,map:(MAPS[c.map]||{}).n||'',res,hp:Math.max(0,Math.floor(t.cur)),mhp:t.hp,dmg:Math.round(dmg),dur:Math.round(((S.clock||0)-(t.st0||S.clock))/1000),drops:drops||[]});
-  if(ROOT.bossLog.length>50)ROOT.bossLog.splice(0,ROOT.bossLog.length-50);dirty=true}
+  if(ROOT.bossLog.length>200)ROOT.bossLog.splice(0,ROOT.bossLog.length-200);dirty=true}
 /* 血腥樹枝：在目前地圖召喚隨機 MVP，停留 24 小時 */
 const BBDUR=24*3600e3;
 const bbBusy=e=>RUNNERS().some(j=>{const t=j===CUR?target:(RT[j]||{}).target;return t&&t.bb===e.u&&!t.dead&&t.cur>0});
