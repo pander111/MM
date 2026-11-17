@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#79a75a"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="小黑窗"><meta name="apple-mobile-web-app-status-bar-style" content="default"><style>body{margin:0}</style><script>window.RO_GH=1;window.RO_BUILD="20261115090232";if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))</script></head><body>
+<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#79a75a"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="小黑窗"><meta name="apple-mobile-web-app-status-bar-style" content="default"><style>body{margin:0}</style><script>window.RO_GH=1;window.RO_BUILD="20261117153121";if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))</script></head><body>
 <title>仙境放置小黑窗</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <style>
@@ -1655,6 +1655,7 @@ function normalize(c){if(!c.mapv){if(c.cfg&&MAPMIG[c.cfg.map]>=0)c.cfg.map=MAPMI
     if(c.ammo&&c.ammo.id)c.ammo.id=migKey(c.ammo.id);c.vend={on:false,list:{}}}
   if(c.cfg.rest.spOn==null){c.cfg.rest.spOn=c.cfg.rest.sp>0;if(!c.cfg.rest.sp){c.cfg.rest.sp=20;c.cfg.rest.spTo=80}}c.cfg.bpot=c.cfg.bpot||{};c.cfg.cure=c.cfg.cure||{green:{on:true},i511:{on:true},i525:{on:true},i523:{on:true}};
   c.eq=Object.assign({weapon:null,shield:null,armor:null,head:null,garment:null,shoes:null,acc1:null,acc2:null},c.eq);for(const k in c.eq)if(c.eq[k]&&!ITEMS[c.eq[k]])c.eq[k]=null;
+  if(!c.cfg.ihMig){c.cfg.ihMig=1;c.cfg.ih=c.cfg.ih||{};const seen=Object.assign({},(c.stats||{}).items||{},c.inv||{});for(const k in seen){const it=ITEMS[k];if(!it||c.cfg.ih[k]||String(k).includes('|')||it.t==='box'||it.keep)continue;if(['etc','eq','hp','sp'].includes(it.t))c.cfg.ih[k]={pick:true,act:'sell'}}}
   if(!c.cfg.potMig){c.cfg.potMig=1;for(const k of ['yellow_herb','honey','white_herb','royal'])if(!c.cfg.potList.includes(k))c.cfg.potList.push(k);
   if(!c.cfg.spList.includes('blue_herb'))c.cfg.spList.splice(1,0,'blue_herb')}
   if(c.cfg.map>=MAPS.length||c.cfg.map<0)c.cfg.map=mapIdx('prt_fild08');
@@ -1912,7 +1913,7 @@ const ocPct=()=>DCP[SL('overcharge')]||0;
 const ocZ=(base,got)=>ocPct()&&got>base?`${fmt(base)}z ⇒ ${fmt(got)}z（高價賣出 +${ocPct()}%）`:`${fmt(got)}z`;
 const ocCell=k=>ocPct()?`<span class="note">${fmt(ITEMS[k].sell)}⇒</span><b class="good">${fmt(priceSell(k))}</b>`:fmt(priceSell(k));
 const keepDef=k=>{const c=C(),it=ITEMS[k],r=c.restock[k];if(typeof craftMat==='function'&&craftMat(k))return 999999;if(r&&r.on)return r.to;if(c.potList.includes(k)||c.spList.includes(k))return 30;if(c.cure&&c.cure[k]&&c.cure[k].on)return 10;return 0};
-const ih=k=>{const it=ITEMS[k];const d=String(k).includes('|')||it.t==='box'||it.keep?'none':(it.t==='etc'||it.t==='eq'||it.t==='hp'||it.t==='sp')?'sell':it.t==='card'?'store':'none';const o=Object.assign({pick:true,act:d,keep:keepDef(k)},C().ih[k]||{});o.keep=Math.max(0,Math.floor(Number(o.keep)||0));return o};
+const ih=k=>{const it=ITEMS[k];const d=String(k).includes('|')||it.t==='box'||it.keep?'none':(it.t==='etc'||it.t==='eq'||it.t==='hp'||it.t==='sp'||it.t==='card')?'store':'none';const o=Object.assign({pick:true,act:d,keep:keepDef(k)},C().ih[k]||{});o.keep=Math.max(0,Math.floor(Number(o.keep)||0));return o};
 const sellQty=k=>{const h=ih(k);if(h.act!=='sell'||!(S.inv[k]>0))return 0;const r=C().restock[k];return Math.max(0,S.inv[k]-Math.max(h.keep,r&&r.on?r.to:0))};
 
 /* ================= 戰鬥訊息與聊天 ================= */
