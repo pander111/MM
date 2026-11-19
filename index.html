@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#79a75a"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="小黑窗"><meta name="apple-mobile-web-app-status-bar-style" content="default"><style>body{margin:0}</style><script>window.RO_GH=1;window.RO_BUILD="20261120025142";if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))</script></head><body>
+<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#79a75a"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="小黑窗"><meta name="apple-mobile-web-app-status-bar-style" content="default"><style>body{margin:0}</style><script>window.RO_GH=1;window.RO_BUILD="20261120025952";if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))</script></head><body>
 <title>仙境放置小黑窗</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <style>
@@ -368,14 +368,14 @@ const MON={};for(const id in GD.mobs){const o=GD.mobs[id];MON[id]={...o,id:+id,b
 /* ===== 附魔系統（資料）：附魔石照 rAthena 官方附魔道具；學徒工匠等 NPC 規則照 npc 腳本 ===== */
 const EN_TIER=['普通','稀有','罕見','傳說'],EN_TW=[60,28,10,2],EN_DROP=0.01,EN_MINLV=100,EN_XCOST=1000,EN_PCOST=1000;
 const EN_ST={"en4700": {"n": "STR+1", "t": 0}, "en4701": {"n": "STR+2", "t": 0}, "en4702": {"n": "STR+3", "t": 1}, "en4710": {"n": "INT+1", "t": 0}, "en4711": {"n": "INT+2", "t": 0}, "en4712": {"n": "INT+3", "t": 1}, "en4720": {"n": "DEX+1", "t": 0}, "en4721": {"n": "DEX+2", "t": 0}, "en4722": {"n": "DEX+3", "t": 1}, "en4730": {"n": "AGI+1", "t": 0}, "en4731": {"n": "AGI+2", "t": 0}, "en4732": {"n": "AGI+3", "t": 1}, "en4740": {"n": "VIT+1", "t": 0}, "en4741": {"n": "VIT+2", "t": 0}, "en4742": {"n": "VIT+3", "t": 1}, "en4750": {"n": "LUK+1", "t": 0}, "en4751": {"n": "LUK+2", "t": 0}, "en4752": {"n": "LUK+3", "t": 1}};
-for(const k in EN_ST){const s=EN_ST[k];BASE[k]={n:`附魔石 ${s.n}`,sn:s.n,w:1,sell:0,t:'etc',keep:1,en:s.t,d:`${EN_TIER[s.t]}級附魔石：${s.n}。\n到城鎮「商店」的附魔師鑲進可以附魔的裝備；娛樂場可以用遊樂幣換成同等級的其他附魔石。`}}
+for(const k in EN_ST){const s=EN_ST[k];BASE[k]={n:`附魔石 ${s.n}`,sn:s.n,w:1,sell:0,t:'etc',en:s.t,d:`${EN_TIER[s.t]}級附魔石：${s.n}。\n可以存進倉庫給其他角色用；要附魔時須放在背包，到「商店與 NPC」的附魔師鑲進可以附魔的裝備。娛樂場可以用遊樂幣換成同等級的其他附魔石。`}}
 BASE.en_rand={n:'附魔石（隨機）',w:1,sell:0,t:'etc',d:`Lv ${EN_MINLV} 以上的怪物都可能掉落（機率和卡片一樣），撿到時會隨機變成一顆附魔石，等級越高越稀有。`};
 BASE.en_prot={n:'附魔保護卷',w:0,sell:0,t:'etc',keep:1,d:'鑲嵌附魔前可以選擇使用。不論成功或失敗都會用掉 1 張；失敗時裝備不會損壞、已有的附魔也不會被洗掉。\n不能保護精煉值歸零。只能用遊樂幣兌換。'};
 const EN_NPC=[
- {id:'arm',n:'學徒工匠',town:'普隆德拉',cost:400000,slots:1,clean:1,wipe:1,items:{"i2307": 50, "i2309": 50, "i2314": 50, "i2316": 50, "i2321": 50, "i2325": 50, "i2327": 50, "i2328": 50, "i2330": 50, "i2332": 50, "i2334": 50, "i2335": 50, "i2341": 50, "i2344": 50, "i2337": 50, "i2311": 55, "i2318": 55, "i2319": 55, "i2320": 55, "i2308": 55, "i2310": 55, "i2315": 55, "i2317": 55, "i2322": 55, "i2324": 55, "i2326": 55, "i2331": 55, "i2333": 55, "i2336": 55, "i2345": 55, "i2364": 60, "i2365": 60, "i2374": 60, "i2375": 60, "i2387": 60, "i2389": 60},
+ {id:'arm',n:'學徒工匠',town:'普隆德拉',cost:400000,slots:1,wipe:1,items:{"i2307": 50, "i2309": 50, "i2314": 50, "i2316": 50, "i2321": 50, "i2325": 50, "i2327": 50, "i2328": 50, "i2330": 50, "i2332": 50, "i2334": 50, "i2335": 50, "i2341": 50, "i2344": 50, "i2337": 50, "i2311": 55, "i2318": 55, "i2319": 55, "i2320": 55, "i2308": 55, "i2310": 55, "i2315": 55, "i2317": 55, "i2322": 55, "i2324": 55, "i2326": 55, "i2331": 55, "i2333": 55, "i2336": 55, "i2345": 55, "i2364": 60, "i2365": 60, "i2374": 60, "i2375": 60, "i2387": 60, "i2389": 60},
   pool:['en4700','en4701','en4702','en4710','en4711','en4712','en4720','en4721','en4722','en4730','en4731','en4732','en4740','en4741','en4742','en4750','en4751','en4752'],
   rate:k=>36/EN_NPC[0].items[baseOf(k)],
-  note:'官方：花 40 萬 Z 在鎧甲第 4 洞隨機附上六圍其中一項 +1～+3。一般鎧甲成功率 72%、有洞鎧甲 65%、高級鎧甲 60%，失敗鎧甲會消失。只收沒精煉、沒插卡的鎧甲（官方附魔後精煉和卡片都會清空）；已經附過的再附一次會覆蓋原本的附魔。'}
+  note:'官方：花 40 萬 Z 在鎧甲第 4 洞隨機附上六圍其中一項 +1～+3。一般鎧甲成功率 72%、有洞鎧甲 65%、高級鎧甲 60%，失敗鎧甲會消失。附魔成功後精煉值和卡片會清空（官方規則）；已經附過的再附一次會覆蓋原本的附魔。'}
 ];
 for(const id in MON){const m=MON[id];if(m.lv>=EN_MINLV&&Array.isArray(m.drops)&&!m.drops.some(x=>x[0]==='en_rand'))m.drops.push(['en_rand',EN_DROP])}
 
@@ -3849,9 +3849,8 @@ function enRoll(){const pool=Object.keys(EN_ST);if(!pool.length)return null;cons
 const enNpcOf=k=>EN_NPC.find(N=>N.items[baseOf(k)]!=null);
 const enName=k=>BASE[k]?(BASE[k].sn||BASE[k].n):k;
 function enTargets(){return Object.keys(S.inv).filter(k=>S.inv[k]>0&&ITEMS[k]&&ITEMS[k].t==='eq'&&enNpcOf(k))}
-function enCheck(k,st){const N=enNpcOf(k);if(!N)return'這件裝備不能附魔';
-  if(N.clean&&(refineOf(k)||cardsOf(k).length))return`${N.n}只收沒精煉、沒插卡的裝備`;
-  if(!st)return'請選擇附魔石';if(!N.pool.includes(st))return`${enName(st)} 不能鑲在這件裝備`;if(!(S.inv[st]>0))return`背包沒有 ${enName(st)}`;
+function enCheck(k,st){const N=enNpcOf(k);if(!N)return'這件裝備不能附魔';if(!(S.inv[k]>0))return'背包裡沒有這件裝備';
+  if(!st)return'請選擇附魔石';if(!N.pool.includes(st))return`${enName(st)} 不能鑲在這件裝備`;if(!(S.inv[st]>0))return`背包沒有 ${enName(st)}（倉庫的要先領出來）`;
   if(S.zeny<N.cost)return'Zeny 不夠';return''}
 function enDo(k,st,prot){const N=enNpcOf(k);const err=enCheck(k,st);if(err){toast(err);return}
   if(prot&&!(S.inv.en_prot>0)){toast('背包沒有附魔保護卷');return}
@@ -3863,17 +3862,30 @@ function enDo(k,st,prot){const N=enNpcOf(k);const err=enCheck(k,st);if(err){toas
   else if(prot){log('warn',`附魔失敗……保護卷保護了 ${n0}，沒有損壞（${enName(st)} 已用掉）。`);toast('附魔失敗，保護卷保住了裝備')}
   else{useI(k,1);if(!S.inv[k])delete S.inv[k];log('warn',`附魔失敗……${n0} 消失了。`);toast('附魔失敗，裝備消失了')}
   EN_UI.stone='';dirty=true;save()}
+/* 附魔確認視窗：顯示成功率、費用、保護卷勾選（沒有就不能勾）、精煉／卡片會被清空的提醒 */
+function enAsk(k,st){const err=enCheck(k,st);if(err){toast(err);return}const N=enNpcOf(k),rate=N.rate(k),pn=S.inv.en_prot||0;
+  const lose=N.wipe&&(refineOf(k)||cardsOf(k).length),old=enchOf(k);
+  document.getElementById('enPop')?.remove();const o=document.createElement('div');o.id='enPop';o.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px';
+  o.innerHTML=`<div style="background:var(--win,#fff);color:var(--ink,#222);border-radius:10px;padding:16px 18px;max-width:420px;width:100%;max-height:85vh;overflow:auto;line-height:1.7">
+    <b>確認附魔</b><div>把 <b>${esc(enName(st))}</b> 鑲進 <b>${esc(ITEMS[k].n)}</b></div>
+    <div class="note">附魔師：${esc(N.n)}・費用 ${fmt(N.cost)}z＋附魔石 1・成功率 <b class="${rate<1?'bad':''}">${Math.round(rate*100)}%</b>${rate<1?'・失敗裝備會消失':''}</div>
+    ${old.length&&N.slots<=1?`<div class="note bad">這件已經有附魔（${esc(old.map(enName).join('、'))}），成功後會被覆蓋。</div>`:''}
+    ${lose?`<div class="bad" style="margin:6px 0">⚠ 這件裝備${refineOf(k)?`有精煉 +${refineOf(k)}`:''}${refineOf(k)&&cardsOf(k).length?'、':''}${cardsOf(k).length?`插了卡片（${esc(cardsOf(k).map(c=>ITEMS[c]?ITEMS[c].n:c).join('、'))}）`:''}。繼續附魔，成功後精煉等級和卡片都會清空（保護卷不能保護這部分）。</div>`:''}
+    <label class="chk" style="display:block;margin:8px 0"><input type="checkbox" id="enProtM" ${pn?'':'disabled'}> 使用附魔保護卷（目前有 <b>${pn}</b> 張）${pn?'':'<span class="note">・身上沒有保護卷，可以到娛樂場用遊樂幣兌換</span>'}</label>
+    <div class="note">保護卷：成功或失敗都會用掉 1 張；失敗時裝備不會損壞。附魔石和 Zeny 不論結果都會用掉。</div>
+    <div class="row" style="justify-content:flex-end;gap:8px;margin-top:10px"><button type="button" id="enNo">取消</button><button type="button" class="pri" id="enYes">確認附魔</button></div></div>`;
+  document.body.appendChild(o);const close=()=>o.remove();o.addEventListener('click',e=>{if(e.target===o)close()});o.querySelector('#enNo').onclick=close;
+  o.querySelector('#enYes').onclick=()=>{const pr=!!o.querySelector('#enProtM').checked;close();enDo(k,st,pr);renderTab()}}
 function enchantBox(){const list=enTargets();if(!list.includes(EN_UI.item))EN_UI.item=list[0]||'';const k=EN_UI.item,N=k&&enNpcOf(k);
-  const has=N?N.pool.filter(x=>S.inv[x]>0):[];if(!has.includes(EN_UI.stone))EN_UI.stone=has[0]||'';
   const npcs=EN_NPC.map(N=>`<div class="note"><b>${N.n}</b>（${N.town}）：${N.note}</div>`).join('');
-  if(!list.length)return box('裝備附魔',`<div class="note">背包裡沒有可以附魔的裝備（目前開放：${EN_NPC.map(N=>N.n).join('、')}）。附魔石由 Lv ${EN_MINLV} 以上的怪物掉落。</div>${npcs}`);
-  const err=enCheck(k,EN_UI.stone),rate=N.rate(k),pn=S.inv.en_prot||0;
+  if(!list.length)return box('裝備附魔',`<div class="note">背包裡沒有可以附魔的裝備（目前開放：${EN_NPC.map(N=>N.n).join('、')}）。附魔石由 Lv ${EN_MINLV} 以上的怪物掉落；放在倉庫的附魔石要先領到背包才能用。</div>${npcs}`);
+  const has=N.pool.filter(x=>S.inv[x]>0),rate=N.rate(k);
   return box('裝備附魔',`<div class="row"><select id="enItem" style="max-width:100%">${list.map(x=>`<option value="${esc(x)}" ${x===k?'selected':''}>${esc(ITEMS[x].n)}（${S.inv[x]}）</option>`).join('')}</select></div>
-    <div class="note">附魔師：<b>${N.n}</b>・費用 ${fmt(N.cost)}z＋附魔石 1・成功率 <b class="${rate<1?'bad':''}">${Math.round(rate*100)}%</b>${enchOf(k).length?`・目前附魔：${enchOf(k).map(enName).join('、')}`:''}</div>
-    <div class="row"><select id="enStone">${has.length?has.map(x=>`<option value="${x}" ${x===EN_UI.stone?'selected':''}>${esc(enName(x))}（${EN_TIER[EN_ST[x].t]}・有 ${S.inv[x]}）</option>`).join(''):'<option value="">（背包沒有能鑲在這件的附魔石）</option>'}</select></div>
-    <div class="note">可用附魔石：${N.pool.map(x=>`${enName(x)}${S.inv[x]?`×${S.inv[x]}`:''}`).join('、')}</div>
-    <label class="chk"><input type="checkbox" id="enProt" ${pn?'':'disabled'}> 使用附魔保護卷（有 ${pn} 張；成功或失敗都會用掉，失敗時裝備不會壞）</label>
-    <div class="row"><button type="button" data-a="enc" data-k="${esc(k)}" ${err?'disabled':''}>附魔</button>${err?`<span class="note bad">${esc(err)}</span>`:''}</div>${npcs}`)}
+    <div class="note">附魔師：<b>${N.n}</b>・費用 ${fmt(N.cost)}z＋附魔石 1・成功率 <b class="${rate<1?'bad':''}">${Math.round(rate*100)}%</b>・保護卷 ${S.inv.en_prot||0} 張${enchOf(k).length?`・目前附魔：${enchOf(k).map(enName).join('、')}`:''}</div>
+    <div class="note">點一下背包裡的附魔石開始附魔：</div>
+    <div class="btns" style="flex-wrap:wrap">${has.length?has.map(x=>`<button type="button" class="sm" data-a="enc" data-k="${esc(k)}" data-n="0" data-st="${x}" ${S.zeny<N.cost?'disabled':''}>${esc(enName(x))} ×${S.inv[x]}</button>`).join(''):'<span class="note">背包沒有能鑲在這件的附魔石（倉庫的要先領出來）。</span>'}</div>
+    ${S.zeny<N.cost?'<div class="note bad">Zeny 不夠</div>':''}
+    <div class="note">這件可用的附魔石：${N.pool.map(enName).join('、')}</div>${npcs}`)}
 function enXCard(){const F=fun();const mine=Object.keys(EN_ST).filter(x=>S.inv[x]>0);if(!mine.includes(EN_UI.xf))EN_UI.xf=mine[0]||'';const f=EN_UI.xf;
   const tg=f?Object.keys(EN_ST).filter(x=>x!==f&&EN_ST[x].t===EN_ST[f].t):[];if(!tg.includes(EN_UI.xt))EN_UI.xt=tg[0]||'';
   return card('附魔石交換',`<div class="note">把不要的附魔石換成<b>同等級</b>的指定附魔石，每次 ${fmt(EN_XCOST)} 遊樂幣（目前有 ${fmt(F.coin)}）。等級：${EN_TIER.join(' ＜ ')}。</div>
@@ -3882,7 +3894,7 @@ function enXCard(){const F=fun();const mine=Object.keys(EN_ST).filter(x=>S.inv[x
 function enX(f,t){if(funLocked())return;const F=fun();if(!EN_ST[f]||!EN_ST[t]||f===t||EN_ST[f].t!==EN_ST[t].t){toast('只能換同等級的附魔石');return}
   if(!(S.inv[f]>0)){toast(`背包沒有 ${enName(f)}`);return}if(F.coin<EN_XCOST){toast('遊樂幣不夠');return}
   F.coin-=EN_XCOST;useI(f,1);if(!S.inv[f])delete S.inv[f];S.inv[t]=(S.inv[t]||0)+1;log('drop',`用 ${EN_XCOST} 遊樂幣把 ${enName(f)} 換成 ${enName(t)}。`);toast(`換到 ${enName(t)}！`);dirty=true;save()}
-panel.addEventListener('change',e=>{const id=e.target&&e.target.id;if(id==='enItem'){EN_UI.item=e.target.value;EN_UI.stone='';renderTab()}else if(id==='enStone')EN_UI.stone=e.target.value;else if(id==='enXF'){EN_UI.xf=e.target.value;EN_UI.xt='';renderTab()}else if(id==='enXT')EN_UI.xt=e.target.value});
+panel.addEventListener('change',e=>{const id=e.target&&e.target.id;if(id==='enItem'){EN_UI.item=e.target.value;renderTab()}else if(id==='enXF'){EN_UI.xf=e.target.value;EN_UI.xt='';renderTab()}else if(id==='enXT')EN_UI.xt=e.target.value});
 /* 設定綁定 */
 const gp=(o,p)=>p.split('.').reduce((x,k)=>x==null?x:x[k],o);
 function sp_(o,p,v){const ks=p.split('.');let x=o;for(let i=0;i<ks.length-1;i++)x=x[ks[i]]??(x[ks[i]]={});x[ks[ks.length-1]]=v}
@@ -4733,7 +4745,7 @@ panel.addEventListener('click',e=>{
     if(risky&&armed!=='brf'+k){armed='brf'+k;keepArm=true;toast('目標超過安全值，失敗會碎掉，再按一次確認');break}batchRefine(k,cnt,to)}break;
   case'refine':{const it=ITEMS[(k.startsWith('eq:')?S.eq[k.slice(3)]:k.slice(4))];const tb=it&&refRow(k.startsWith('eq:')?S.eq[k.slice(3)]:k.slice(4));const r=it?it.refine||0:0;
     if(tb&&r<10&&tb[r][6]&&armed!=='rf'+k){armed='rf'+k;keepArm=true;break}doRefine(k)}break;
-  case'enc':{const st=EN_UI.stone,pr=!!($('enProt')||{}).checked;if(armed!=='enc'+k+st+pr){armed='enc'+k+st+pr;keepArm=true;toast(pr?'再按一次確認附魔（會用掉 1 張保護卷）':'再按一次確認附魔（失敗裝備會消失）');rr=false;break}rr=false;enDo(k,st,pr);renderTab()}break;
+  case'enc':rr=false;enAsk(k,b.dataset.st);break;
   case'enx':rr=false;enX(EN_UI.xf,EN_UI.xt);renderTab();break;
   case'purify':{const [a,b2]=k.split('|');purify(a,b2)}break;
   case'gcreate':rr=false;gCreate(($('gName')||{}).value||'');break;
