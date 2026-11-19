@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#79a75a"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="小黑窗"><meta name="apple-mobile-web-app-status-bar-style" content="default"><style>body{margin:0}</style><script>window.RO_GH=1;window.RO_BUILD="20261119115818";if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))</script></head><body>
+<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#79a75a"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="小黑窗"><meta name="apple-mobile-web-app-status-bar-style" content="default"><style>body{margin:0}</style><script>window.RO_GH=1;window.RO_BUILD="20261120020938";if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))</script></head><body>
 <title>仙境放置小黑窗</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <style>
@@ -4597,7 +4597,8 @@ async function cloudPull(force){
   if(!data||!data.save){if(force)toast('雲端還沒有存檔');else if(!LOCAL_FRESH)cloudPush(true);return}
   if(!CLOUD.at){CLOUD.at=data.at;CLOUD.last=data.save}CLOUD.pulled=true;
   const localAt=LOCAL_FRESH?0:(ROOT.ui.savedAt||0);
-  if(!force&&!(data.at>localAt+5000)){CLOUD.last=data.save;CLOUD.at=data.at;cloudPush(false);return}
+  if(data.sc)CLOUD.score=data.sc;
+  if(!force&&!(data.at>localAt+5000)&&!(data.sc&&progScore(ROOT)<data.sc*.8-10)){CLOUD.last=data.save;CLOUD.at=data.at;cloudPush(false);return}
   const go=async()=>{if(FF){setTimeout(go,500);return}
     try{const obj=await unpackSave(data.save);if(!obj||!Array.isArray(obj.chars)||!obj.chars.length)throw new Error('bad');CLOUD.score=progScore(obj);
       if(!force){const loc=LOCAL_FRESH?progScore(localBest()):progScore(ROOT);if(loc>CLOUD.score*1.25+10){CLOUD.guard=true;const lb=LOCAL_FRESH?localBest():null;if(lb){applySave(lb,true)}
