@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#79a75a"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="小黑窗"><meta name="apple-mobile-web-app-status-bar-style" content="default"><style>body{margin:0}</style><script>window.RO_GH=1;window.RO_BUILD="20261120173351";if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))</script></head><body>
+<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#79a75a"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="小黑窗"><meta name="apple-mobile-web-app-status-bar-style" content="default"><style>body{margin:0}</style><script>window.RO_GH=1;window.RO_BUILD="20261120173839";if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))</script></head><body>
 <title>仙境放置小黑窗</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <style>
@@ -3723,7 +3723,8 @@ const MJPIC=(()=>{const B='#1d5fb4',G='#2e7d4f',Rd='#c62828',W='#fffdf4';
     5:()=>st(7,3,16,G)+st(23,3,16,B)+st(15,13,16,Rd)+st(7,23,16,B)+st(23,23,16,G),
     6:()=>[3,23].map(y=>st(6,y,16,G)+st(15,y,16,G)+st(24,y,16,G)).join(''),
     7:()=>st(15,1.5,11.5,Rd)+[15,28.5].map(y=>st(6,y,12,G)+st(15,y,12,G)+st(24,y,12,G)).join(''),
-    8:()=>[[3,1],[23,-1]].map(([y,d])=>st(4.5,y,16,G,-16*d)+st(11.5,y,16,G,16*d)+st(18.5,y,16,G,-16*d)+st(25.5,y,16,G,16*d)).join(''),
+    8:()=>{const sl=(x1,y1,x2,y2)=>{if(y1>y2)[x1,y1,x2,y2]=[x2,y2,x1,y1];const L=Math.hypot(x2-x1,y2-y1)-1.2,cx=(x1+x2)/2,cy=(y1+y2)/2;return st(cx,cy-L/2,L,G,(-Math.asin((x2-x1)/(L+1.2))*180/Math.PI).toFixed(1))};
+      return sl(3,3,9,19)+sl(9,19,15,3)+sl(15,3,21,19)+sl(21,19,27,3)+sl(3,39,9,23)+sl(9,23,15,39)+sl(15,39,21,23)+sl(21,23,27,39)},
     9:()=>[1.5,15,28.5].map(y=>st(6,y,12,G)+st(15,y,12,Rd)+st(24,y,12,G)).join('')};
   const memo={};return (su,n)=>{const key=su+'_'+n;if(memo[key])return memo[key];return memo[key]=`<svg viewBox="0 0 30 42" aria-label="${MJ.N[n-1]}${su===1?'筒':'條'}">${(su===1?D:S)[n]()}</svg>`}})();
 function mjT(k,cls=''){if(k==null)return '';if(k>=34)return `<span class="mt fl ${cls}"><b>${MJ.FL[k-34]}</b></span>`;
