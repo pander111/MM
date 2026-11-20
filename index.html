@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#79a75a"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="小黑窗"><meta name="apple-mobile-web-app-status-bar-style" content="default"><style>body{margin:0}</style><script>window.RO_GH=1;window.RO_BUILD="20261120114421";if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))</script></head><body>
+<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#79a75a"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="小黑窗"><meta name="apple-mobile-web-app-status-bar-style" content="default"><style>body{margin:0}</style><script>window.RO_GH=1;window.RO_BUILD="20261120125217";if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))</script></head><body>
 <title>仙境放置小黑窗</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <style>
@@ -3976,8 +3976,8 @@ function skAsk(k){const err=skCheck(k);if(err){toast(err);return}const D0=SOCK[b
   document.body.appendChild(o);const close=()=>o.remove();o.addEventListener('click',e=>{if(e.target===o)close()});o.querySelector('#enNo').onclick=close;
   o.querySelector('#enYes').onclick=()=>{const cb=o.querySelector('#enProtM');close();skDo(k,!!(cb&&cb.checked));renderTab()}}
 function socketBox(){const list=skTargets();
-  const all=`<details><summary class="note">可以加洞的裝備（${Object.keys(SOCK).length} 件）</summary><div class="note">${Object.keys(SOCK).map(b=>`${esc(ITEMS[b].n)}（${Math.round(SOCK[b].r*100)}%・${fmt(SOCK[b].z)}z）`).join('、')}</div></details>`;
-  const rule='<div class="note">Seiyablem／Leablem（官方）：幫沒有洞的裝備加一個卡片洞。成功率只有 10～25%，失敗裝備消失，Zeny 和材料照扣。可以用附魔保護卷保住裝備。</div>';
+  const all=`<details><summary class="note">可以加洞的裝備（${Object.keys(SOCK).length} 件）</summary><div class="note">${Object.keys(SOCK).map(b=>`・<b>${esc(ITEMS[b].n)}</b>：成功 ${Math.round(SOCK[b].r*100)}%・${fmt(SOCK[b].z)}z＋${SOCK[b].m.map(([m,n])=>`${esc(ITEMS[m].n)}×${n}`).join('＋')}`).join('<br>')}</div></details>`;
+  const rule='<div class="note">Seiyablem／Leablem（官方）：幫沒有洞的裝備加一個卡片洞。每次要 Zeny 加材料（鋼鐵、鋁、神之金屬或強化武器金屬，依裝備不同）。成功率只有 10～25%，失敗裝備消失，Zeny 和材料照扣。可以用附魔保護卷保住裝備。</div>';
   if(!list.length)return box('裝備加洞',`<div class="note">背包裡沒有可以加洞的裝備。</div>${rule}${all}`);
   return box('裝備加洞',`${list.map(k=>{const D0=SOCK[baseOf(k)],err=skCheck(k);return`<div class="row" style="flex-wrap:wrap;gap:6px;align-items:center"><span><b>${esc(ITEMS[k].n)}</b>（${S.inv[k]}）→ ${esc(ITEMS[D0.to].n)}</span>
     <span class="note">成功 ${Math.round(D0.r*100)}%・${fmt(D0.z)}z＋${D0.m.map(([m,n])=>`${esc(ITEMS[m].n)}×${n}（有 ${S.inv[m]||0}）`).join('＋')}</span>
