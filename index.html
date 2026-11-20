@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#79a75a"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="小黑窗"><meta name="apple-mobile-web-app-status-bar-style" content="default"><style>body{margin:0}</style><script>window.RO_GH=1;window.RO_BUILD="20261120162247";if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))</script></head><body>
+<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#79a75a"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="小黑窗"><meta name="apple-mobile-web-app-status-bar-style" content="default"><style>body{margin:0}</style><script>window.RO_GH=1;window.RO_BUILD="20261120171141";if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))</script></head><body>
 <title>仙境放置小黑窗</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <style>
@@ -1862,7 +1862,9 @@ function PE(){const e={};
    if(L=buffLvC('SA_VIOLENTGALE'))addEff(e,{flee:3*L})}
   return e}
 const _dc=new WeakMap();
-function D(){const eb=EB();const sig=S.clock+'|'+EBV+'|'+Object.keys(S.buffs).join(',')+'|'+(S.sts?Object.keys(S.sts).join(','):'')+'|'+(S.spheres||0)+'|'+(S.ammo&&S.ammo.id)+(S.ammo&&S.ammo.n>0)+'|'+(S.pet&&S.pet.int>=910)+'|'+(S.trans||0)+S.lv;const c=_dc.get(S);if(c&&c.sig===sig&&c.eb===eb)return c.d;const d=D1();_dc.set(S,{sig,d,eb});return d}
+function _actB(){let a='';const c=S.clock;for(const k in S.buffs){const b=S.buffs[k];if(b&&b.until>c)a+=k+':'+b.lv+(b.ps?'/'+JSON.stringify(b.ps):'')+','}a+='|';if(S.sts)for(const k in S.sts)if(S.sts[k]>c)a+=k+',';return a}
+function _nxE(){let n=Infinity;const c=S.clock;for(const k in S.buffs){const u=S.buffs[k]&&S.buffs[k].until;if(u>c&&u<n)n=u}if(S.sts)for(const k in S.sts){const u=S.sts[k];if(u>c&&u<n)n=u}return n}
+function D(){const eb=EB();const sig=EBV+'|'+_actB()+'|'+(S.spheres||0)+'|'+(S.ammo&&S.ammo.id)+(S.ammo&&S.ammo.n>0)+'|'+(S.pet&&S.pet.int>=910)+'|'+(S.trans||0)+S.lv;const c=_dc.get(S);if(c&&c.sig===sig&&c.eb===eb&&S.clock<c.nx&&S.clock>=c.ck)return c.d;const d=D1();_dc.set(S,{sig,d,eb,nx:_nxE(),ck:S.clock});return d}
 function D1(){const d=D0();
   if(hasS('curse'))d.atk=Math.floor(d.atk*.75);
   if(hasS('blind')){d.hit=Math.floor(d.hit*.75);d.flee=Math.floor(d.flee*.75)}
@@ -1928,8 +1930,14 @@ function D0(){
     hit:175+S.lv+st.dex+Math.floor(st.luk/3)+SL('vulture')+2*SL('wres')+(E.hit||0)+SL('snake')+(wc==='gun'?2*SL('single'):0),flee:100+S.lv+st.agi+Math.floor(st.luk/5)+3*SL('imflee')+(E.flee||0)+(buffOnC('SG_MOON_COMFORT')?Math.floor((S.lv+st.dex+st.luk)/10):0),crit:Math.round((1+st.luk*.3+(E.crit||0)+(bow?(E.critLong||0):0))*10)/10,mdefRaw:Math.floor((E.mdef||0)*(1+(E.mdefP||0)/100)),mdef:RMDEFP(Math.floor((E.mdef||0)*(1+(E.mdefP||0)/100))),smdef:Math.floor(st.int+S.lv/4+(st.dex+st.vit)/5),E,
     oref,refA,mastA,aspd,interval:Math.round(interval),maxHp,maxSp,maxW,wele:(()=>{for(const id in S.buffs){const s=SK[id];if(s&&s.eff&&buffOn(id)){const e=s.eff(S.buffs[id].lv);if(e&&e.wEle)return e.wEle}}if(S.charm&&S.charm.n>=10)return S.charm.ele;return ammoOk()&&ITEMS[S.ammo.id].ele!=='無'?ITEMS[S.ammo.id].ele:(E.wEle||'無')})()}
 }
-const weight=()=>{let w=0;for(const k in S.inv)w+=(ITEMS[k]?.w||0)*S.inv[k];if(S.ammo.id)w+=ITEMS[S.ammo.id].w*S.ammo.n;return w};
+/* 負重快取：背包包一層 Proxy，有增減就讓快取失效（存檔 JSON 不受影響） */
+const _WK=new Map(),_IV=new WeakMap(),_IP=new WeakSet();
+const invTrack=c=>{if(!c||!c.inv||_IP.has(c.inv))return;const raw=c.inv,st={v:0,w:null};const px=new Proxy(raw,{set(o,k,v){if(o[k]!==v){o[k]=v;st.v++;st.w=null}return true},deleteProperty(o,k){if(k in o){delete o[k];st.v++;st.w=null}return true},defineProperty(o,k,d){st.v++;st.w=null;return Reflect.defineProperty(o,k,d)}});_IP.add(px);_IV.set(px,st);c.inv=px};
+/* 背包內容或設定沒變時，重用「有沒有東西可賣／可存」的檢查結果 */
+const _IH=new WeakMap();const invHas=(tag,f)=>{invTrack(S);const st=_IV.get(S.inv),v=st?st.v:-1;let c=_IH.get(S);if(!c||c.v!==v||c.ev!==EBV||c.cfg!==C()){c={v,ev:EBV,cfg:C()};_IH.set(S,c)}if(v>=0&&tag in c)return c[tag];const r=Object.keys(S.inv).some(f);c[tag]=r;return r};
+const weight=()=>{invTrack(S);const st=_IV.get(S.inv);let w=st&&st.w;if(w==null){w=0;for(const k in S.inv){let x=_WK.get(k);if(x===undefined){x=ITEMS[k]?.w||0;_WK.set(k,x)}w+=x*S.inv[k]}if(st)st.w=w}if(S.ammo.id)w+=ITEMS[S.ammo.id].w*S.ammo.n;return w};
 const wPct=d=>Math.floor(weight()/(d||D()).maxW*100);
+const _wt=new WeakMap();const wPctT=d=>{const c=_wt.get(S);if(c&&c.ev===EBV&&S.clock>=c.ck&&S.clock-c.ck<1000)return c.v;const v=wPct(d);_wt.set(S,{v,ev:EBV,ck:S.clock});return v};
 const canWield=(it,job)=>{job=job||S.job;if(it.lv&&S.lv<it.lv)return false;if(it.up&&!(S.trans||String(job).startsWith('t_')))return false;if(it.sex&&C().look.g!==it.sex)return false;if(it.slot==='weapon'&&(it.wc==='other'||!JOBS[job].w.includes(it.wc)))return false;if(/^super_novice/.test(job)&&S.lv>=90&&/^head/.test(it.slot||'')&&buffOnC('SL_SUPERNOVICE'))return true;if(it.j3&&!(JOBS[job]&&JOBS[job].tier===4))return false;if(job==='summoner')return !it.jobs||it.jobs.includes('summoner')||it.slot!=='weapon'&&it.jobs.length>=20;return !it.jobs||it.jobs.includes(job)||it.jobs.includes(job2(job))};
 const DCP=[0,7,9,11,13,15,17,19,21,23,24];
 const dcPct=()=>Math.max(DCP[SL('discount')]||0,SLC('RG_COMPULSION')?5+4*SLC('RG_COMPULSION'):0);
@@ -2016,7 +2024,7 @@ function tick(ms){S.clock+=ms;S.stats.play+=ms;petTick(ms);homTick(ms);
       if(hasS('stone')&&S.hp>mx*.25)S.hp=Math.max(mx*.25,S.hp-mx*.002*ms/1000)}}
   if(mode!=='dead'&&S.hp>0)exTick(ms);
 
-  if(mode!=='dead'&&S.hp>0&&!hasS('bleeding')){const d=D();if(wPct(d)<50){
+  if(mode!=='dead'&&S.hp>0&&!hasS('bleeding')){const d=D();if(wPctT(d)<50){
     const hL=SL('hpreg'),sL=Math.max(SL('spreg'),SL('ninpou')),mL=sitting?SL('mo_spiritsrecovery'):0;
     const tH=sitting?SLC('TK_HPTIME'):0,tS=sitting?SLC('TK_SPTIME'):0;
     const hr=(tH?(30*tH+d.maxHp*tH/500)*ms/10000:0)+(d.maxHp/200+d.st.vit/5+1)*(sitting?(SLC('LK_TENSIONRELAX')?6:2):1)*(1+(d.E.hpRegP||0)/100)*ms/6000+(hL?(5*hL+d.maxHp*hL/500)*ms/10000:0)+(mL?(4*mL+d.maxHp*mL/500)*ms/10000:0);
@@ -2046,9 +2054,9 @@ function step(){
   // search
   setState('尋找怪物');
   const wp=wPct(d);
-  if(wp>=wGate(c.sellAt)&&Object.keys(S.inv).some(k=>sellQty(k)>0))return goTown(`負重 ${wp}%，回城賣`);
+  if(wp>=wGate(c.sellAt)&&invHas('sell',k=>sellQty(k)>0))return goTown(`負重 ${wp}%，回城賣`);
   if(c.stop90&&wp>=90)return stop('負重達 90%');
-  if(c.storeOn&&wp>=wGate(c.storeAt)&&Object.keys(S.inv).some(k=>S.inv[k]>0&&(ih(k).act==='store'||sellQty(k)>0)))return goTown(`負重 ${wp}%，回城賣東西、存倉`);/* 存倉門檻也會順便賣掉設為「賣」的東西 */
+  if(c.storeOn&&wp>=wGate(c.storeAt)&&invHas('store',k=>S.inv[k]>0&&(ih(k).act==='store'||sellQty(k)>0)))return goTown(`負重 ${wp}%，回城賣東西、存倉`);/* 存倉門檻也會順便賣掉設為「賣」的東西 */
   const low=Object.entries(c.restock).find(([k,r])=>r.on&&craftHave(k)<r.min);
   if(low&&!(S.restockCD>S.clock))return goTown(`${ITEMS[low[0]].n} 少於 ${low[1].min}`);
   if(incap())return schedule(step,1000);
@@ -2208,8 +2216,8 @@ function pullTop(t){const c=C();if(!(c.pull>0)||!(c.pullTop>0)||!t||t.dead||t.cu
 const wGate=th=>Math.max(th,S.townW>=th?S.townW+15:0);/* 回城整理後還是超過門檻（身上留的東西太重）：多撿 15% 再回城，不會停掉不回 */
 /* 戰鬥中負重一超過門檻就回城（拖怪、補拖時一直在打，不會回到搜尋），打 BOSS／MVP 時等打完 */
 function fightTown(t){const c=C(),wp=wPct();if(t&&!t.dead&&(t.boss||t.mvp))return false;
-  if(wp>=wGate(c.sellAt)&&Object.keys(S.inv).some(k=>sellQty(k)>0)){goTown(`戰鬥中負重 ${wp}%，先回城賣`);return true}
-  if(c.storeOn&&wp>=wGate(c.storeAt)&&Object.keys(S.inv).some(k=>S.inv[k]>0&&(ih(k).act==='store'||sellQty(k)>0))){goTown(`戰鬥中負重 ${wp}%，先回城賣東西、存倉`);return true}
+  if(wp>=wGate(c.sellAt)&&invHas('sell',k=>sellQty(k)>0)){goTown(`戰鬥中負重 ${wp}%，先回城賣`);return true}
+  if(c.storeOn&&wp>=wGate(c.storeAt)&&invHas('store',k=>S.inv[k]>0&&(ih(k).act==='store'||sellQty(k)>0))){goTown(`戰鬥中負重 ${wp}%，先回城賣東西、存倉`);return true}
   return false}
 function step2(){if(!S.auto)return;const c=C(),t=target;if(t&&t.bb)bbSync(t);if(fightTown(t))return;pullTop(t);
   if(t&&!t.dead&&t.cur>0&&t.owner===CUR&&c.mc[t.n]==='flee'){log('warn',`正在交戰的 ${t.n} Lv.${t.lv} 設定為「看到就逃」，立刻脫離！`);return escape(c.esc.dangerAct==='none'?'fly':c.esc.dangerAct)}
