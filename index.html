@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#79a75a"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="小黑窗"><meta name="apple-mobile-web-app-status-bar-style" content="default"><style>body{margin:0}</style><script>window.RO_GH=1;window.RO_BUILD="20261121032143";if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))</script></head><body>
+<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#79a75a"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="小黑窗"><meta name="apple-mobile-web-app-status-bar-style" content="default"><style>body{margin:0}</style><script>window.RO_GH=1;window.RO_BUILD="20261121032603";if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))</script></head><body>
 <title>仙境放置小黑窗</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <style>
@@ -3136,7 +3136,7 @@ function doRefine(src){const [w,key]=src.split(/:(.+)/);const k=w==='eq'?S.eq[ke
     log('lvl',`精煉成功！${ITEMS[nk].n}`);toast(`精煉成功 +${r+1}`)}
   else{if(w==='eq')S.eq[key]=null;else{useI(k,1);if(!S.inv[k])delete S.inv[k]}log('warn',`精煉失敗……${it0} 碎掉了。`);toast('精煉失敗，裝備碎掉了')}
   dirty=true;save()}
-function batchRefine(src,cnt,to){const [w,key]=src.split(/:(.+)/);let k0=w==='eq'?S.eq[key]:key;if(!k0||!refRow(k0))return;to=Math.min(10,to);if(refineOf(k0)>=to){toast('已經達到目標等級');return}
+function batchRefine(src,cnt,to,q){const [w,key]=src.split(/:(.+)/);let k0=w==='eq'?S.eq[key]:key;if(!k0||!refRow(k0))return;to=Math.min(10,to);if(refineOf(k0)>=to){if(!q)toast('已經達到目標等級');return}
   const units=w==='eq'?1:Math.min(cnt,S.inv[k0]||0);let okN=0,brk=0,stop='',matU=0,zU=0;
   for(let u=0;u<units&&!stop;u++){let cur=k0;if(w==='inv'){if(!(S.inv[cur]>0))break}
     while(refineOf(cur)<to){const tb=refRow(cur),r=refineOf(cur),row=tb[r],mat=MATK_[row[5]];
@@ -3146,8 +3146,13 @@ function batchRefine(src,cnt,to){const [w,key]=src.split(/:(.+)/);let k0=w==='eq
       if(ok){const nk=mkKey(baseOf(cur),cardsOf(cur),r+1,enchOf(cur));if(w==='eq')S.eq[key]=nk;else{useI(cur,1);if(!S.inv[cur])delete S.inv[cur];S.inv[nk]=(S.inv[nk]||0)+1}cur=nk}
       else{if(w==='eq')S.eq[key]=null;else{useI(cur,1);if(!S.inv[cur])delete S.inv[cur]}brk++;cur=null;break}}
     if(cur&&refineOf(cur)>=to)okN++}
+  if(q){q.ok+=okN;q.brk+=brk;q.mat+=matU;q.z+=zU;if(stop)q.stop=stop;return}
   const msg=`批次精煉 ${BASE[baseOf(k0)].n} 到 +${to}：成功 ${okN} 件${brk?`、碎掉 ${brk} 件`:''}；用掉 ${matU} 個精煉石、${fmt(zU)}z${stop?`（${stop}，提前停止）`:''}。`;
   log(okN?'lvl':'warn',msg);toast(msg);dirty=true;save()}
+function massRefine(){const sc=ui.rfmS||'all',to=ui.rfmT||'safe';const L=rfMassList(sc,to);if(!L.length){toast('沒有需要精煉的裝備');return}
+  const q={ok:0,brk:0,mat:0,z:0,stop:'',n:0,miss:new Set(),halt:''};for(const [src,k] of L){const t=to==='safe'?rfSafe(k):+to;const live=src.startsWith('eq:')?S.eq[src.slice(3)]:k;if(!live||refineOf(live)>=t)continue;if(src.startsWith('inv:')&&!(S.inv[k]>0))continue;q.n++;q.stop='';batchRefine(src,src.startsWith('inv:')?S.inv[k]:1,t,q);if(q.stop){if(/Zeny/.test(q.stop)){q.halt=q.stop;break}q.miss.add(q.stop.replace(' 用完了',''))}}
+  const msg=`一鍵精煉（${to==='safe'?'到安全值':'到 +'+to}）：成功 ${q.ok} 件${q.brk?`、碎掉 ${q.brk} 件`:''}；用掉 ${q.mat} 個精煉石、${fmt(q.z)}z${q.miss.size?`；${[...q.miss].join('、')} 不夠，相關裝備沒衝完`:''}${q.halt?`（${q.halt}，提前停止）`:''}。`;
+  log(q.ok?'lvl':'warn',msg);toast(msg);dirty=true;save()}
 function purify(raw,out){if((S.inv[raw]||0)<5){toast(`需要 5 個 ${ITEMS[raw].n}`);return}useI(raw,5);if(!S.inv[raw])delete S.inv[raw];addItem(out,1);log('sys',`把 5 個 ${ITEMS[raw].n} 純化成 ${ITEMS[out].n}。`);save()}
 /* ===== 寵物 ===== */
 const PETS=GD.pets||{};const EGG2MOB={};for(const m in PETS)EGG2MOB[PETS[m].egg]=m;
@@ -4046,6 +4051,7 @@ panel.addEventListener('change',e=>{const el=e.target;
   if(el.dataset.a2==='npctos'){ROOT.ui.npcToStor=el.checked;save();renderTab();return}
   if(el.dataset.a2==='npcall'){ui.npcAll=el.checked;renderTab();return}
   if(el.dataset.a2==='crall'){ui.craftAll=el.checked;renderTab();return}
+  if(el.dataset.a2==='rfm'){ui[el.id]=el.value;armed=null;renderTab();return}
   if(el.dataset.a2==='amobadd'&&el.value){const c=C();c.arrows.mob=c.arrows.mob||{};c.arrows.mob[el.value]=c.arrows.type;save();renderTab();return}
   if(el.dataset.a2==='rsadd'&&el.value){C().restock[el.value]={on:true,min:5,to:20};save();renderTab();return}
   if(el.dataset.c){const v=el.type==='checkbox'?el.checked:(el.type==='number'||el.dataset.num)?Number(el.value)||0:el.value;sp_(C(),el.dataset.c,v);save();if(el.dataset.rr)renderTab();return}
@@ -4112,6 +4118,24 @@ function renderTab(){EBV++;
   refresh();
 }
 
+/* 精煉師（在工匠分頁） */
+const refineBox=()=>{const list=refineList();
+    const rows=list.map(([src,k])=>{const tb=refRow(k),r=refineOf(k),row=r<10?tb[r]:null,mat=row?MATK_[row[5]]:null;
+      return `<tr><td>${src.startsWith('eq:')?'<span class="note">（裝備中）</span>':''}${ITEMS[k].n}${r?`<div class="note">精煉加成：${ITEMS[k].slot==='weapon'?`ATK +${Math.floor(tb[r-1][1]/100)}${tb[r-1][2]?`、過精每下額外 0～${Math.floor(tb[r-1][2]/100)}`:''}`:`DEF +${(tb[r-1][1]/100).toFixed(1)}`}</div>`:''}</td>
+        <td>${row?`+${r+1}：<b class="${row[3]<100?'bad':''}">${row[3]}%</b><div class="note">${ITEMS[mat].n} 1（有 ${S.inv[mat]||0}）・${fmt(row[4])}z${row[6]?'・失敗會碎':''}</div>`:'已達 +10'}</td>
+        <td class="r">${row?`<button type="button" class="sm ${row[3]<100?'':'pri'}" data-a="refine" data-k="${esc(src)}">${armed==='rf'+src?'<span class="bad">再按一次：可能碎掉</span>':'精煉'}</button>`:''}</td></tr>
+        ${row?`<tr><td colspan="3" style="border-top:0;padding-top:0"><div class="row" style="justify-content:flex-end;gap:4px">${src.startsWith('inv:')&&(S.inv[k]||0)>1?`<label class="chk">數量 <input type="number" id="rfn_${esc(src)}" min="1" max="${S.inv[k]}" value="${S.inv[k]}" inputmode="numeric" style="width:4em;padding:3px 4px">／${S.inv[k]}</label>`:''}<label class="chk">精煉到 + <select id="rft_${esc(src)}">${Array.from({length:10-r},(_,i)=>r+1+i).map(v=>`<option value="${v}" ${v===Math.max(r+1,Math.min(10,tb.findIndex(x=>x[6])>=0?tb.findIndex(x=>x[6]):10))?'selected':''}>${v}${tb[v-1][6]?'（會碎）':''}</option>`).join('')}</select></label><button type="button" class="sm" data-a="brefine" data-k="${esc(src)}">${armed==='brf'+src?'<span class="bad">再按一次確認</span>':'批次精煉'}</button></div></td></tr>`:''}`}).join('');
+    return box('精煉師',rfMassUI()+`<div class="note">照官方經典版：武器 Lv1 用${ITEMS.i1010.n}（安全 +7）、Lv2 用${ITEMS.i1011.n}（+6）、Lv3 用${ITEMS.i984.n}（+5）、Lv4 用${ITEMS.i984.n}（+4），防具用${ITEMS.i985.n}（+4）。超過安全值有機率失敗，失敗裝備會碎掉、卡片也一起消失。${ITEMS.i1010.n}、${ITEMS.i1011.n}在吉芬的工坊買；5 個原石可以純化成 1 個${ITEMS.i984.n}或${ITEMS.i985.n}。</div>
+      ${rows?`<div class="tw"><table><thead><tr><th>裝備</th><th>下一級</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>`:'<div class="note">沒有可以精煉的裝備。</div>'}
+      <div class="row"><button type="button" class="sm" data-a="purify" data-k="i756|i984" ${(S.inv.i756||0)<5?'disabled':''}>純化${ITEMS.i984.n}（${ITEMS.i756.n} 5 → 1，有 ${S.inv.i756||0}）</button><button type="button" class="sm" data-a="purify" data-k="i757|i985" ${(S.inv.i757||0)<5?'disabled':''}>純化${ITEMS.i985.n}（${ITEMS.i757.n} 5 → 1，有 ${S.inv.i757||0}）</button></div>`)};
+const rfSafe=k=>{const tb=refRow(k);const i=tb?tb.findIndex(x=>x[6]):-1;return i<0?10:i};
+const rfMassList=(sc,to)=>refineList().filter(([src,k])=>(sc==='all'||src.startsWith(sc+':'))&&refineOf(k)<(to==='safe'?rfSafe(k):+to));
+const rfMassUI=()=>{const sc=ui.rfmS||'all',to=ui.rfmT||'safe';const L=rfMassList(sc,to);const risky=to!=='safe'&&L.some(([,k])=>+to>rfSafe(k));
+  return `<div class="card" style="padding:8px;margin:6px 0;border:1px dashed var(--line,#bbb)"><b>一鍵批量精煉</b><div class="note">把多件裝備一次衝到目標。機率、材料、費用跟單件精煉完全一樣；某種精煉石不夠時，只跳過要用那種石頭的裝備，Zeny 不夠就整個停止。</div>
+  <div class="row" style="gap:6px;flex-wrap:wrap"><label class="chk">範圍 <select data-a2="rfm" id="rfmS"><option value="all" ${sc==='all'?'selected':''}>裝備中＋背包</option><option value="eq" ${sc==='eq'?'selected':''}>只有裝備中的</option><option value="inv" ${sc==='inv'?'selected':''}>只有背包裡的</option></select></label>
+  <label class="chk">目標 <select data-a2="rfm" id="rfmT"><option value="safe" ${to==='safe'?'selected':''}>各自的安全值（不會碎）</option>${Array.from({length:10},(_,i)=>i+1).map(v=>`<option value="${v}" ${to==String(v)?'selected':''}>+${v}</option>`).join('')}</select></label>
+  <button type="button" class="sm ${risky?'':'pri'}" data-a="mrefine" ${L.length?'':'disabled'}>${armed==='mrf'?'<span class="bad">再按一次：超過安全值會碎</span>':`開始（${L.length} 種）`}</button></div>
+  ${risky?'<div class="note bad">目標超過部分裝備的安全值，失敗會碎掉、卡片也會消失。</div>':''}</div>`};
 const VIEWS={
 main(){const d=D(),c=C();const notes=[];
   if(S.pts>=statCost(2))notes.push(`尚有 <b>${S.pts}</b> 屬性點（人物）`);
@@ -4219,15 +4243,7 @@ bag(){const d=D();
     return `<tr><td><b>${IN(k)}</b> ×${n}<div class="note">${itemInfo(k)}</div>${tg.length?`<div class="row" style="margin-top:4px"><select id="ci_${k}">${tg.map(([v,l])=>`<option value="${esc(v)}">${esc(l)}</option>`).join('')}</select><button type="button" class="sm pri" data-a="insert" data-k="${k}">插入</button></div>`:`<div class="note">沒有可以插的${CT[it.ctype]}（需要有空洞）。</div>`}</td><td class="r"><button type="button" class="sm" data-a="sell" data-k="${k}">賣 1</button></td></tr>`}).join('')}</tbody></table></div>`:'<div class="note">（沒有）</div>';
   return box('背包',`<div class="row"><span>Zeny <b>${fmt(S.zeny)}</b></span><span>負重 <b>${fmt(weight())} / ${fmt(d.maxW)}（${wPct(d)}%）</b></span><button type="button" class="sm" data-a="sellall" ${sellable?'':'disabled'}>賣出設定為「賣」的道具（+${fmt(sellable)}z）</button></div>${ocPct()?`<div class="note good">💰 高價賣出 Lv ${SL('overcharge')} 生效中：賣給 NPC 的價錢 +${ocPct()}%（「賣價」欄顯示 原價⇒實拿）。</div>`:''}${t(other)}`)+
    craftBox()+`<div style="height:10px"></div>`+box('裝備品',t(eq))+`<div style="height:10px"></div>`+box('卡片',`${ct}<div class="note">卡片插進有空洞的裝備後就拿不出來。插好的裝備不會被自動賣掉。</div>`)},
-shop(){const refineBox=()=>{const list=refineList();
-    const rows=list.map(([src,k])=>{const tb=refRow(k),r=refineOf(k),row=r<10?tb[r]:null,mat=row?MATK_[row[5]]:null;
-      return `<tr><td>${src.startsWith('eq:')?'<span class="note">（裝備中）</span>':''}${ITEMS[k].n}${r?`<div class="note">精煉加成：${ITEMS[k].slot==='weapon'?`ATK +${Math.floor(tb[r-1][1]/100)}${tb[r-1][2]?`、過精每下額外 0～${Math.floor(tb[r-1][2]/100)}`:''}`:`DEF +${(tb[r-1][1]/100).toFixed(1)}`}</div>`:''}</td>
-        <td>${row?`+${r+1}：<b class="${row[3]<100?'bad':''}">${row[3]}%</b><div class="note">${ITEMS[mat].n} 1（有 ${S.inv[mat]||0}）・${fmt(row[4])}z${row[6]?'・失敗會碎':''}</div>`:'已達 +10'}</td>
-        <td class="r">${row?`<button type="button" class="sm ${row[3]<100?'':'pri'}" data-a="refine" data-k="${esc(src)}">${armed==='rf'+src?'<span class="bad">再按一次：可能碎掉</span>':'精煉'}</button>`:''}</td></tr>
-        ${row?`<tr><td colspan="3" style="border-top:0;padding-top:0"><div class="row" style="justify-content:flex-end;gap:4px">${src.startsWith('inv:')&&(S.inv[k]||0)>1?`<label class="chk">數量 <input type="number" id="rfn_${esc(src)}" min="1" max="${S.inv[k]}" value="${S.inv[k]}" inputmode="numeric" style="width:4em;padding:3px 4px">／${S.inv[k]}</label>`:''}<label class="chk">精煉到 + <select id="rft_${esc(src)}">${Array.from({length:10-r},(_,i)=>r+1+i).map(v=>`<option value="${v}" ${v===Math.max(r+1,Math.min(10,tb.findIndex(x=>x[6])>=0?tb.findIndex(x=>x[6]):10))?'selected':''}>${v}${tb[v-1][6]?'（會碎）':''}</option>`).join('')}</select></label><button type="button" class="sm" data-a="brefine" data-k="${esc(src)}">${armed==='brf'+src?'<span class="bad">再按一次確認</span>':'批次精煉'}</button></div></td></tr>`:''}`}).join('');
-    return box('精煉師',`<div class="note">照官方經典版：武器 Lv1 用${ITEMS.i1010.n}（安全 +7）、Lv2 用${ITEMS.i1011.n}（+6）、Lv3 用${ITEMS.i984.n}（+5）、Lv4 用${ITEMS.i984.n}（+4），防具用${ITEMS.i985.n}（+4）。超過安全值有機率失敗，失敗裝備會碎掉、卡片也一起消失。${ITEMS.i1010.n}、${ITEMS.i1011.n}在吉芬的工坊買；5 個原石可以純化成 1 個${ITEMS.i984.n}或${ITEMS.i985.n}。</div>
-      ${rows?`<div class="tw"><table><thead><tr><th>裝備</th><th>下一級</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>`:'<div class="note">沒有可以精煉的裝備。</div>'}
-      <div class="row"><button type="button" class="sm" data-a="purify" data-k="i756|i984" ${(S.inv.i756||0)<5?'disabled':''}>純化${ITEMS.i984.n}（${ITEMS.i756.n} 5 → 1，有 ${S.inv.i756||0}）</button><button type="button" class="sm" data-a="purify" data-k="i757|i985" ${(S.inv.i757||0)<5?'disabled':''}>純化${ITEMS.i985.n}（${ITEMS.i757.n} 5 → 1，有 ${S.inv.i757||0}）</button></div>`)};
+shop(){
   const towns=GD.towns;let tw=towns.find(t=>t.n===ui.town)||towns[0];ui.town=tw.n;
   const cats=[['tool','道具商人'],['weapon','武器商人'],['armor','防具商人'],['j3','三轉裝備商人']].filter(([c])=>(tw.s[c]||[]).length);
   if(!cats.some(([c])=>c===ui.shopTab))ui.shopTab=cats[0][0];const st=ui.shopTab;const disc=SL('discount');
@@ -4243,8 +4259,8 @@ shop(){const refineBox=()=>{const list=refineList();
     const rc=resetCost();return `<div class="note">把點錯的點數全部退回來重新分配。${GHM?'初心者和一轉免費；二轉以後每次重置（屬性或技能各算一次）收 1,000,000z。':'免費，可以重複使用。'}</div>
     <div class="row"><button type="button" data-a="resetst" ${sp?'':'disabled'}>${armed==='rst'?'<span class="bad">再按一次確認重置屬性點</span>':'重置屬性點'+payNote(rc)}</button><span class="note">六圍全部回到 1，退回 ${fmt(sp)} 點（重置後共 ${fmt(S.pts+sp)} 點）</span></div>
     <div class="row"><button type="button" data-a="resetsk" ${kp?'':'disabled'}>${armed==='rsk'?'<span class="bad">再按一次確認重置技能點</span>':'重置技能點'+payNote(rc)}</button><span class="note">技能全部忘掉，退回 ${kp} 點（${S.job==='novice'?'任務技能保留':'初心者基本技能和任務技能保留'}）</span></div>
-    ${C().alloc.on?'<div class="note"><span class="bad">注意：</span>目前「掛機設定 → 自動配點」是開著的，重置屬性點時會順便幫你關掉，不然升級又會被自動點掉。</div>':''}`})())+`<div style="height:10px"></div>`+refineBox())},
-craft(){return npcBox()},
+    ${C().alloc.on?'<div class="note"><span class="bad">注意：</span>目前「掛機設定 → 自動配點」是開著的，重置屬性點時會順便幫你關掉，不然升級又會被自動點掉。</div>':''}`})()))},
+craft(){return refineBox()+`<div style="height:10px"></div>`+npcBox()},
 ench(){return enchantBox()+`<div style="height:10px"></div>`+socketBox()},
 stor(){const rows=Object.entries(ROOT.stor).filter(([,n])=>n>0);const inv=Object.entries(S.inv).filter(([,n])=>n>0);
   return box('倉庫的錢',`<div class="row"><span>倉庫 <b>${fmt(ROOT.storZ||0)}</b> z</span><span>身上 <b>${fmt(S.zeny)}</b> z</span></div>
@@ -4881,6 +4897,7 @@ panel.addEventListener('click',e=>{
   case'sock':rr=false;skAsk(k);break;
   case'enx':rr=false;enX(EN_UI.xf,EN_UI.xt);renderTab();break;
   case'purify':{const [a,b2]=k.split('|');purify(a,b2)}break;
+  case'mrefine':{const to=ui.rfmT||'safe';const risky=to!=='safe'&&rfMassList(ui.rfmS||'all',to).some(([,k])=>+to>rfSafe(k));if(risky&&armed!=='mrf'){armed='mrf';keepArm=true;break}massRefine()}break;
   case'gcreate':rr=false;gCreate(($('gName')||{}).value||'');break;
   case'gjoin':rr=false;gJoin(k);break;
   case'mksell':rr=false;mkSell();break;
