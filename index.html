@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#79a75a"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="小黑窗"><meta name="apple-mobile-web-app-status-bar-style" content="default"><style>body{margin:0}</style><script>window.RO_GH=1;window.RO_BUILD="20261120171141";if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))</script></head><body>
+<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#79a75a"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="小黑窗"><meta name="apple-mobile-web-app-status-bar-style" content="default"><style>body{margin:0}</style><script>window.RO_GH=1;window.RO_BUILD="20261120173351";if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))</script></head><body>
 <title>仙境放置小黑窗</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <style>
@@ -108,6 +108,7 @@ canvas{image-rendering:pixelated}
 .mt b{font-size:12px}.mt i{font-style:normal;font-size:9px;margin-top:1px}.mt.s0{color:#c62828}.mt.s1{color:#1d5fb4}.mt.s2{color:#2e7d4f}.mt.hz b{font-size:14px;color:#222}.mt.hz.r b{color:#c62828}.mt.hz.g b{color:#2e7d4f}
 .mt .wbx{display:block;width:11px;height:16px;border:2px solid #1d5fb4;border-radius:2px}.mt.fl{background:#fff3e0}.mt.fl b{font-size:11px;color:#a0522d}.mt.bk{background:linear-gradient(#3a9a63,#2e7d4f);border-color:#24603d}
 .mt.big{width:34px;height:46px;border-bottom-width:5px}.mt.big b{font-size:17px}.mt.big i{font-size:12px}.mt.big.hz b{font-size:21px}.mt.big .wbx{width:17px;height:25px}.mt.big.fl b{font-size:16px}
+.mt.pic{padding:2px 1px 1px}.mt.pic svg,.mj.pic svg{width:100%;height:100%;display:block}.mj.pic{padding:5px 4px 3px;box-sizing:border-box}
 .mt.sel{transform:translateY(-9px);border-color:#e91e63;box-shadow:0 3px 8px rgba(233,30,99,.45)}.mt.lastd{outline:2px solid #f39c12;outline-offset:0}
 .mtb{background:none;border:0;padding:0;margin:0;min-height:0;cursor:pointer}.mtb:disabled{opacity:1;cursor:default}
 .mjtop{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin-bottom:4px}.mjp{border-top:1px dashed var(--line,#ccc);padding:3px 0}.mjp.me{background:rgba(121,167,90,.08)}
@@ -3481,7 +3482,7 @@ const E8CN=['白板','一','二','三','四','五','六','七','八','九'];
 const e8pv=t=>t===0?.5:t;
 const e8rank=(a,b)=>a===b?1000+(a===0?10:a):(a+b===10&&(a===2||a===8))?900:((e8pv(a)+e8pv(b))%10)*10;
 const e8name=(a,b)=>{if(a===b)return a===0?'白板對（最大）':`${E8CN[a]}筒對`;if(a+b===10&&(a===2||a===8))return '二八槓';const p=(e8pv(a)+e8pv(b))%10;return p===0?'鱉十（0 點）':p%1?`${p===.5?'':E8CN[Math.floor(p)]}點半`.replace(/^點半/,'半點'):`${E8CN[p]}點`};
-const e8tile=(v,back)=>back?'<span class="mj back"></span>':v===0?'<span class="mj"><i class="wb"></i></span>':`<span class="mj"><b>${E8CN[v]}</b><small>筒</small></span>`;
+const e8tile=(v,back)=>back?'<span class="mj back"></span>':v===0?'<span class="mj"><i class="wb"></i></span>':`<span class="mj pic">${MJPIC(1,v)}</span>`;
 function funE8(){if(FUN.e8busy)return;if(funLocked())return;const F=fun(),bet=F.bet;if(S.zeny<bet){toast(`Zeny 不夠，需要 ${fmt(bet)}z`);return}S.zeny-=bet;zOut('娛樂',bet);F.st.bet+=bet;
   const dk=[];for(let v=0;v<=9;v++)for(let k=0;k<4;k++)dk.push(v);for(let i=dk.length-1;i>0;i--){const j=Math.floor(R()*(i+1));[dk[i],dk[j]]=[dk[j],dk[i]]}
   const p=[dk[0],dk[2]],b=[dk[1],dk[3]],rp=e8rank(...p),rb=e8rank(...b),win=rp>rb,sp=win&&rp>=900,coins=win?coinPay(bet*(sp?E8SP:E8X)):0;F.coin+=coins;F.st.coin+=coins;dirty=true;
@@ -3702,9 +3703,32 @@ MJ.collectClaims=function(st){if(st.pend&&!st.pend.choice)return 'wait';const fr
 const funDebt=()=>fun().debt||0;
 const funLocked=()=>{const d=funDebt();if(d>0){toast(`有麻將欠款 ${fmt(d)} 遊樂幣，還清後才能玩娛樂`);return true}return false};
 const MJS={timer:null,sel:null};
+/* 筒子、條子用圖案畫（SVG），萬子維持字 */
+const MJPIC=(()=>{const B='#1d5fb4',G='#2e7d4f',Rd='#c62828',W='#fffdf4';
+  const dot=(x,y,r,c)=>`<circle cx="${x}" cy="${y}" r="${r}" fill="${c}"/><circle cx="${x}" cy="${y}" r="${(r*.66).toFixed(2)}" fill="${W}"/><circle cx="${x}" cy="${y}" r="${(r*.38).toFixed(2)}" fill="${c}"/>`;
+  const D={1:()=>`<circle cx="15" cy="21" r="12" fill="${G}"/><circle cx="15" cy="21" r="9.6" fill="${W}"/><circle cx="15" cy="21" r="8.2" fill="${B}"/><circle cx="15" cy="21" r="6" fill="${W}"/>${[0,1,2,3,4,5,6,7].map(i=>{const a=i*Math.PI/4;return `<circle cx="${(15+7.1*Math.cos(a)).toFixed(2)}" cy="${(21+7.1*Math.sin(a)).toFixed(2)}" r="1" fill="${W}"/>`}).join('')}<circle cx="15" cy="21" r="4.2" fill="${Rd}"/><circle cx="15" cy="21" r="1.8" fill="${W}"/>`,
+    2:()=>dot(15,11,7.5,G)+dot(15,31,7.5,B),
+    3:()=>dot(7,9,6,B)+dot(15,21,6,Rd)+dot(23,33,6,G),
+    4:()=>dot(8,11,6.2,B)+dot(22,11,6.2,G)+dot(8,31,6.2,G)+dot(22,31,6.2,B),
+    5:()=>dot(7.5,9,5.6,B)+dot(22.5,9,5.6,G)+dot(15,21,5.6,Rd)+dot(7.5,33,5.6,G)+dot(22.5,33,5.6,B),
+    6:()=>dot(9,7,5,G)+dot(21,7,5,G)+[24,36].map(y=>dot(9,y,5,Rd)+dot(21,y,5,Rd)).join(''),
+    7:()=>dot(6,5.5,4.5,G)+dot(15,10.5,4.5,G)+dot(24,15.5,4.5,G)+[27,37].map(y=>dot(9,y,4.6,Rd)+dot(21,y,4.6,Rd)).join(''),
+    8:()=>[5.5,15.8,26.2,36.5].map(y=>dot(9,y,4.8,B)+dot(21,y,4.8,B)).join(''),
+    9:()=>[[7.5,B],[21,Rd],[34.5,G]].map(([y,c])=>dot(6,y,4.6,c)+dot(15,y,4.6,c)+dot(24,y,4.6,c)).join('')};
+  const st=(x,y,h,c,rot)=>`<g${rot?` transform="rotate(${rot} ${x} ${y+h/2})"`:''}><rect x="${x-2.5}" y="${y}" width="5" height="${h}" rx="2.5" fill="${c}"/><rect x="${x-3.1}" y="${(y+h/2-.9).toFixed(2)}" width="6.2" height="1.8" rx=".9" fill="${c}"/><line x1="${x}" y1="${y+1.6}" x2="${x}" y2="${y+h-1.6}" stroke="${W}" stroke-width=".9" stroke-dasharray="${(h/2-2.4).toFixed(2)} 3.2"/></g>`;
+  const S={1:()=>`<path d="M11 27 Q2 24 3 12 Q8 20 12 23Z" fill="${G}"/><path d="M12 26 Q5 18 9 7 Q11 18 14 22Z" fill="${B}"/><path d="M13 25 Q11 14 16 5 Q15 16 16 22Z" fill="${Rd}"/><ellipse cx="17" cy="26" rx="7" ry="6" fill="${G}"/><path d="M14 24 Q18 20 23 25 Q19 28 14 24Z" fill="${B}"/><circle cx="22" cy="17" r="3.6" fill="${G}"/><path d="M25 16 L29 17.5 L25 19Z" fill="${Rd}"/><path d="M20 13.8 Q21 10 23.5 11 Q22 12.5 22 14Z" fill="${Rd}"/><circle cx="23" cy="16.5" r=".9" fill="${W}"/><path d="M15 31 L14 38 M19 31 L20 38 M12 38 L16 38 M18 38 L22 38" stroke="${Rd}" stroke-width="1.2" fill="none" stroke-linecap="round"/>`,
+    2:()=>st(15,3,16,G)+st(15,23,16,B),
+    3:()=>st(15,3,16,B)+st(9,23,16,G)+st(21,23,16,G),
+    4:()=>st(9,3,16,B)+st(21,3,16,G)+st(9,23,16,G)+st(21,23,16,B),
+    5:()=>st(7,3,16,G)+st(23,3,16,B)+st(15,13,16,Rd)+st(7,23,16,B)+st(23,23,16,G),
+    6:()=>[3,23].map(y=>st(6,y,16,G)+st(15,y,16,G)+st(24,y,16,G)).join(''),
+    7:()=>st(15,1.5,11.5,Rd)+[15,28.5].map(y=>st(6,y,12,G)+st(15,y,12,G)+st(24,y,12,G)).join(''),
+    8:()=>[[3,1],[23,-1]].map(([y,d])=>st(4.5,y,16,G,-16*d)+st(11.5,y,16,G,16*d)+st(18.5,y,16,G,-16*d)+st(25.5,y,16,G,16*d)).join(''),
+    9:()=>[1.5,15,28.5].map(y=>st(6,y,12,G)+st(15,y,12,Rd)+st(24,y,12,G)).join('')};
+  const memo={};return (su,n)=>{const key=su+'_'+n;if(memo[key])return memo[key];return memo[key]=`<svg viewBox="0 0 30 42" aria-label="${MJ.N[n-1]}${su===1?'筒':'條'}">${(su===1?D:S)[n]()}</svg>`}})();
 function mjT(k,cls=''){if(k==null)return '';if(k>=34)return `<span class="mt fl ${cls}"><b>${MJ.FL[k-34]}</b></span>`;
   if(k>=27){const h=MJ.HON[k-27];return `<span class="mt hz ${k===31?'r':k===32?'g':k===33?'w':''} ${cls}">${k===33?'<i class="wbx"></i>':`<b>${h}</b>`}</span>`}
-  const su=Math.floor(k/9);return `<span class="mt s${su} ${cls}"><b>${MJ.N[k%9]}</b><i>${['萬','筒','條'][su]}</i></span>`}
+  const su=Math.floor(k/9);if(su>0)return `<span class="mt s${su} pic ${cls}">${MJPIC(su,k%9+1)}</span>`;return `<span class="mt s${su} ${cls}"><b>${MJ.N[k%9]}</b><i>${['萬','筒','條'][su]}</i></span>`}
 const mjSort=a=>a.slice().sort((x,y)=>x-y);
 function mjMelds(st,s){return st.melds[s].map(m=>`<span class="mjm">${(m.t==='akan'?[null,m.k[1],m.k[2],null]:m.k).map(k=>k==null?'<span class="mt bk"></span>':mjT(k)).join('')}</span>`).join('')}
 function mjRiver(st,s){const rv=st.rivers[s];const last=st.last&&st.last.from===s?rv.length-1:-1;return rv.map((r,i)=>r.t?'':mjT(r.k,i===last?'lastd':'')).join('')}
