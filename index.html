@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#79a75a"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="小黑窗"><meta name="apple-mobile-web-app-status-bar-style" content="default"><style>body{margin:0}</style><script>window.RO_GH=1;window.RO_BUILD="20261121181936";if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))</script></head><body>
+<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#79a75a"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="小黑窗"><meta name="apple-mobile-web-app-status-bar-style" content="default"><style>body{margin:0}</style><script>window.RO_GH=1;window.RO_BUILD="20261122010736";if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))</script></head><body>
 <title>仙境放置小黑窗</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <style>
@@ -421,6 +421,7 @@ for(const id in MON){const m=MON[id];if(m.mvp&&Array.isArray(m.drops)&&!m.drops.
  for(const k in BASE)if(BASE[k].t==='card')BASE[k].sell=CARDZ[tier[k]||'n']}
 /* 會變身的怪（例：別西卜→別西卜真身）：設定清單裡也列出變身後的型態 */
 const mapMonsX=map=>{const out=map.mons.slice();for(const m of map.mons)if(m.morph&&MON[m.morph]&&!out.some(x=>x.id===m.morph))out.push({...MON[m.morph],count:0,morphOf:m.n});return out};
+for(const id in MON)if(!Array.isArray(MON[id].drops))MON[id].drops=[];
 const MAPS=GD.maps.map(m=>({r:m.r,n:m.n,c:m.c,mons:m.m.filter(([id])=>MON[id]).map(([id,c])=>({...MON[id],count:c}))}));
 /* 轉生地圖：每張地圖都有一份轉生版，怪物 HP、攻擊、防禦、經驗 ×2，掉寶率 ×2；MVP 被打倒時 20% 給 1 枚商城幣 */
 const MAPNB=MAPS.length;
