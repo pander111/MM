@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#79a75a"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="小黑窗"><meta name="apple-mobile-web-app-status-bar-style" content="default"><style>body{margin:0}</style><script>window.RO_GH=1;window.RO_BUILD="20261121175553";if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))</script></head><body>
+<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#79a75a"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="小黑窗"><meta name="apple-mobile-web-app-status-bar-style" content="default"><style>body{margin:0}</style><script>window.RO_GH=1;window.RO_BUILD="20261121181936";if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))</script></head><body>
 <title>仙境放置小黑窗</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <style>
@@ -4608,7 +4608,18 @@ help(){return box('說明',`<div class="note" style="font-size:14px">
   <b>內容</b>：每 ${GA_DAYS} 天換一期，每期有 ${GA_N_TOP} 件頂級裝備（每件 ${GA_P_TOP}%）、${GA_N_NOR} 件一般裝備（每件 ${GA_P_NOR}%），其餘是道具：戰鬥教範、泡泡糖、天地樹芽、天地樹果實、強化戰鬥教範、濃縮鋁、濃縮神之金屬、美味的泡泡糖、Booster 硬幣、高密度礦石。附魔石不會從轉蛋出，要靠掛機打。<br>
   <b>頂級裝備</b>：有專屬圖示，穿上後在戰鬥畫面角色頭上、人物頁裝備欄都看得到。</p>
   <p><b>無限塔、道館的寶箱</b>也會開出商城幣（必定 1／3／5 枚，還有機會更多；其他道具都是隨機）。</p>
-  <p><b>圖鑑</b>：轉蛋抽到的裝備會登錄進圖鑑（帳號共用）。每收集 10 款，全角色 ATK、MATK、MaxHP +0.5%，上限 100%。同一款抽到第二件不重複計算，多的那件可以穿、可以給別的角色用。在「轉蛋」分頁可以看本期、全部、已收集、未收集的清單。</p></div>`)},
+  <p><b>圖鑑</b>：轉蛋抽到的裝備會登錄進圖鑑（帳號共用）。每收集 10 款，全角色 ATK、MATK、MaxHP +0.5%，上限 100%。同一款抽到第二件不重複計算，多的那件可以穿、可以給別的角色用。在「轉蛋」分頁可以看本期、全部、已收集、未收集的清單。</p></div>`)+'<div style="height:10px"></div>'+box('精煉、工匠、附魔、打洞、套裝',`<div class="note" style="font-size:14px">
+  <p><b>精煉</b>（「工匠」分頁 → 精煉師）：武器 Lv1 用${ITEMS.i1010.n}（安全 +7）、Lv2 用${ITEMS.i1011.n}（+6）、Lv3 用神之金屬（+5）、Lv4 用神之金屬（+4），防具用鋁（+4）。安全值以內一定成功，超過有機率失敗，失敗裝備會碎、插的卡片也一起消失。<br>
+  <b>濃縮神之金屬／濃縮鋁</b>：超過安全值時可以改用，成功率比較高，但失敗一樣會碎。<br>
+  <b>+11～+20</b>：武器用鈽鐳礦石、防具用鈣礦石，每次 10 萬 Z；失敗 20% 會碎，其餘精煉值 −3。改用<b>高密度鈽鐳礦石／高密度鈣礦石</b>時失敗不會碎，只會 −1。<br>
+  <b>批量精煉</b>：從裝備中、身上、倉庫勾選要衝的裝備（同一種可以填數量），選「到安全值」或「到 +N」一次衝完，機率和單件一樣。<br>
+  有些裝備的效果會隨精煉值或等級變化，點裝備名稱看說明，會同時列出官方說明和「目前效果」。</p>
+  <p><b>工匠</b>（「工匠」分頁）：不用技能、100% 成功、免費。原石 5 顆換 1 顆精煉礦石；神之金屬、鋁各 10 個換 1 個濃縮；鈽鐳礦石、鈣礦石各 10 個換 1 個高密度礦；空瓶換聖水；箭矢照弓箭手「製作箭矢」的配方。</p>
+  <p><b>附魔</b>（「附魔」分頁）：Lv ${EN_MINLV} 以上的怪物都可能掉附魔石（機率和卡片一樣），撿到時隨機變成一顆，等級${EN_TIER.join('、')}，越高越稀有（${EN_TW.join('／')}%）。各附魔師可以附的裝備、洞位、附魔石種類和成功率照官方；附魔前可以選用<b>附魔保護卷</b>，失敗時裝備不會壞、原本的附魔也不會洗掉（不能保護精煉值）。<br>
+  <b>Booster 附魔師</b>：Booster 武器用 Booster 硬幣直接指定附魔，一定成功（第 4 洞 80 枚、第 3 洞 180 枚）。Booster 硬幣由 MVP 掉落，副本寶箱和轉蛋也有機會開到。<br>
+  <b>附魔石交換</b>：不要的附魔石可以用遊樂幣換成同等級的指定附魔石。附魔保護卷、清除附魔用的木天蓼果實在「娛樂」用遊樂幣兌換。附魔石不會從轉蛋出，要靠掛機打。</p>
+  <p><b>打洞</b>（「附魔」分頁）：照官方 Seiyablem／Leablem，幫沒有洞的裝備加一個卡片洞，要 Zeny 加材料，成功率 10～25%，失敗裝備消失，可用附魔保護卷保住裝備。</p>
+  <p><b>套裝</b>：同時穿上一整套裝備（或裝備＋卡片）會觸發套裝效果，套裝內容照官方。裝備說明會列出套裝效果，湊齊時顯示「（已生效）」。</p></div>`)},
 chars(){return box('換角色',`<div class="tw"><table><tbody>${ROOT.chars.map((c,i)=>`<tr ${i===ROOT.cur?'style="font-weight:700"':''}><td>${esc(c.name)}${i===ROOT.cur?'（目前）':''}</td><td>${jobName(c)}</td><td>Lv ${c.lv} / Job ${c.jlv}${inParty(i)?'<div class="note">隊伍中</div>':''}</td><td class="r"><span class="btns" style="justify-content:flex-end">${inParty(i)?'':`<button type="button" class="sm" data-a="padd" data-k="${i}">加入隊伍</button>`}${i!==ROOT.cur?`<button type="button" class="sm" data-a="pickchar" data-k="${i}">選擇</button><button type="button" class="sm" data-a="delchar" data-k="${i}">${armed==='del'+i?'確定刪除？':'刪除'}</button>`:''}</span></td></tr>`).join('')}</tbody></table></div>
   ${ROOT.chars.length<MAXC?`<div class="row"><input type="text" id="newName" placeholder="新角色名稱" maxlength="12"><button type="button" class="pri" data-a="newchar">建立角色</button></div>`:`<div class="note">最多 ${MAXC} 個角色。</div>`}`)+
   `<div style="height:10px"></div>`+box('雲端存檔',CLOUD.ok?`<div><b class="good">● 已連到你的 Claude 帳號</b></div><div class="note">每分鐘、以及切到背景時自動上傳，另外每小時留一份備份。換手機或瀏覽器資料被清掉，只要用同一個 Claude 帳號打開這個網頁，就會自動載回來，不用另外設密碼。存檔只有你自己看得到。</div>
