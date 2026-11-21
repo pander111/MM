@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#79a75a"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="小黑窗"><meta name="apple-mobile-web-app-status-bar-style" content="default"><style>body{margin:0}</style><script>window.RO_GH=1;window.RO_BUILD="20261121172643";if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))</script></head><body>
+<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#79a75a"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="小黑窗"><meta name="apple-mobile-web-app-status-bar-style" content="default"><style>body{margin:0}</style><script>window.RO_GH=1;window.RO_BUILD="20261121172957";if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))</script></head><body>
 <title>仙境放置小黑窗</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <style>
@@ -419,7 +419,7 @@ for(const id in MON){const m=MON[id];if(m.mvp&&Array.isArray(m.drops)&&!m.drops.
 /* 會變身的怪（例：別西卜→別西卜真身）：設定清單裡也列出變身後的型態 */
 const mapMonsX=map=>{const out=map.mons.slice();for(const m of map.mons)if(m.morph&&MON[m.morph]&&!out.some(x=>x.id===m.morph))out.push({...MON[m.morph],count:0,morphOf:m.n});return out};
 const MAPS=GD.maps.map(m=>({r:m.r,n:m.n,c:m.c,mons:m.m.filter(([id])=>MON[id]).map(([id,c])=>({...MON[id],count:c}))}));
-/* 轉生地圖：每張地圖都有一份轉生版，怪物 HP、攻擊、防禦、經驗 ×2，掉寶率 ×2；MVP 被打倒時 30% 給 1 枚商城幣 */
+/* 轉生地圖：每張地圖都有一份轉生版，怪物 HP、攻擊、防禦、經驗 ×2，掉寶率 ×2；MVP 被打倒時 20% 給 1 枚商城幣 */
 const MAPNB=MAPS.length;
 const rebMon=m=>{const o={...m,reb:1};for(const f of ['hp','atk','batk','matk','rdef','rmdef','vdef','smdef','exp','jexp'])if(o[f])o[f]=o[f]*2;if(m.rdef!=null)o.def=RDEFP(o.rdef);if(m.rmdef!=null)o.mdef=RMDEFP(o.rmdef);if(Array.isArray(m.drops))o.drops=m.drops.map(([k,r])=>[k,Math.min(100,r*2)]);return o};
 MAPS.push(...MAPS.slice(0,MAPNB).map(m=>({...m,n:m.n+'（轉生）',reb:1,mons:m.mons.map(rebMon)})));
@@ -3027,7 +3027,7 @@ function win(d){
 function winReward(d,t,bd){
   log(t.mvp?'lvl':'battle',t.mvp?`★ 擊敗 MVP「${t.n}」！`:`成功擊敗 ${t.n}！`);if(t.mvp)toast(`擊敗 MVP「${t.n}」！`);
   S.stats.kills[t.n]=(S.stats.kills[t.n]||0)+1;
-  if(t.mvp&&t.reb&&Math.random()<.3){ROOT.coin=(ROOT.coin||0)+1;log('lvl',`🪙 轉生地圖 MVP：得到商城幣 1 枚（帳號共用，現在 ${ROOT.coin} 枚）。`);toast('得到商城幣 ×1')}
+  if(t.mvp&&t.reb&&Math.random()<.2){ROOT.coin=(ROOT.coin||0)+1;log('lvl',`🪙 轉生地圖 MVP：得到商城幣 1 枚（帳號共用，現在 ${ROOT.coin} 枚）。`);toast('得到商城幣 ×1')}
   {let sh=expShares(t);const xm=xMates(S.cfg.map,S.lv);
     if(xm.length){const loc=sh.map(([j])=>j);const n=loc.length+xm.length,per=(1+.1*(n-1))/n;
       sh=loc.map(j=>[j,per]);for(const u of xm)xQueue(u,S.cfg.map,t.id,per)}
@@ -4493,7 +4493,7 @@ help(){return box('說明',`<div class="note" style="font-size:14px">
   <b>存檔</b>：存在這台裝置的瀏覽器，每 10 秒自動存。關掉頁面就會暫停，不會離線掛機。要換裝置可以用「掛機設定 → 匯入/匯出」搬設定。</p>
   <p>隊伍、公會、交易需要伺服器，這個版本沒有。</p></div>`)+'<div style="height:10px"></div>'+box('商城幣、轉蛋與圖鑑',`<div class="note" style="font-size:14px">
   <p><b>商城幣</b>：帳號共用，所有角色一起存、一起用（在「轉蛋」分頁看得到目前有幾枚）。<br>
-  <b>怎麼拿</b>：到<b>轉生地圖</b>掛機，每打倒一隻 MVP 有 30% 機率得到 1 枚。之後開放的無限塔、道館寶箱也會給商城幣。</p>
+  <b>怎麼拿</b>：到<b>轉生地圖</b>掛機，每打倒一隻 MVP 有 20% 機率得到 1 枚。之後開放的無限塔、道館寶箱也會給商城幣。</p>
   <p><b>轉生地圖</b>：在「掛機設定 → 掛機地圖」上方切換「正常／轉生」。轉生地圖的怪物和正常地圖一樣，但 HP、攻擊、防禦都是 2 倍；經驗值和掉寶率也是 2 倍。隊友要選同一個版本的地圖才算同地圖。</p>
   <p><b>轉蛋</b>：抽 1 次 20 枚、抽 11 次 200 枚。獎勵直接放進倉庫。沒有保底、不能直購。<br>
   <b>內容</b>：每 ${GA_DAYS} 天換一期，每期有 ${GA_N_TOP} 件頂級裝備（每件 ${GA_P_TOP}%）、${GA_N_NOR} 件一般裝備（每件 ${GA_P_NOR}%），其餘是道具：戰鬥教範、泡泡糖、天地樹芽、天地樹果實、強化戰鬥教範、濃縮鋁、濃縮神之金屬、美味的泡泡糖、Booster 硬幣、高密度礦石。附魔石不會從轉蛋出，要靠掛機打。<br>
@@ -4789,7 +4789,7 @@ function autoView(){
   const allocRows=c.alloc.rules.map((r,i)=>`<tr><td>${i+1}</td><td>${cS(`alloc.rules.${i}.st`,STN.map(s=>[s,s.toUpperCase()]))}</td><td>${cN(`alloc.rules.${i}.to`,60)}</td><td class="r"><span class="btns" style="justify-content:flex-end"><button type="button" class="sm" data-a="amv" data-k="${i}" data-n="-1">▲</button><button type="button" class="sm" data-a="amv" data-k="${i}" data-n="1">▼</button><button type="button" class="sm" data-a="adel" data-k="${i}">✕</button></span></td></tr>`).join('');
   return `${syncSelHtml()}<div class="row" style="margin-bottom:8px;justify-content:space-between"><span class="row"><span class="note">設定修改後立即生效。</span></span><span class="btns"><button type="button" class="sm" data-a="openall">全部展開</button><button type="button" class="sm" data-a="closeall">全部收合</button></span></div>`+
   (GHM?'':card('掉寶倍率（測試用）',`<label class="chk">掉寶率 <select data-a2="droprate">${[1,2,5,10].map(x=>`<option value="${x}" ${DROPM()===x?'selected':''}>×${x}${x===1?'（官方）':''}</option>`).join('')}</select></label><div class="note">全部角色一起套用，卡片也一樣變多。測試完記得改回 ×1。</div>`))+
-  card('掛機地圖',syncBtn('掛機地圖')+`${(()=>{const RP=realPop();const top=Object.entries(RP).filter(([i])=>MAPS[i]).sort((a,b)=>b[1]-a[1]).slice(0,8);return top.length?`<div style="margin-bottom:8px"><b>現在大家在哪掛機</b><div class="btns" style="margin-top:4px">${top.map(([i,n])=>`<button type="button" class="sm ${+i===c.map?'on':''}" data-a="map" data-k="${i}">${esc(MAPS[i].n)} <b class="good">${n} 人</b></button>`).join('')}</div></div>`:''})()}<div class="row"><input type="search" id="mapMonQ" placeholder="🔍 搜尋怪物名稱：查牠出現在哪些地圖" value="${esc(ui.mapMonQ||'')}" style="flex:1;min-width:10em" autocomplete="off" autocorrect="off" spellcheck="false"></div><div id="mapMonRes">${mapMonQHtml()}</div><div class="btns" style="margin:6px 0"><button type="button" class="sm ${rbm?'':'on'}" data-a="rebmode" data-k="0">正常地圖</button><button type="button" class="sm ${rbm?'on':''}" data-a="rebmode" data-k="1">轉生地圖</button><span class="note">轉生：怪物 HP／攻擊／防禦 ×2，經驗、掉寶 ×2，MVP 30% 給商城幣</span></div><div class="maplist">${mapList}</div><div class="note">人數是真人玩家（包含你自己）在這張地圖掛機的<b>角色數</b>，關掉遊戲在離線掛機的也算（48 小時內有開過遊戲的）。每個角色各自一個世界，不會被搶怪；同地圖的跨玩家隊友可以分經驗。</div><b>${map.n}</b>${monT}`)+
+  card('掛機地圖',syncBtn('掛機地圖')+`${(()=>{const RP=realPop();const top=Object.entries(RP).filter(([i])=>MAPS[i]).sort((a,b)=>b[1]-a[1]).slice(0,8);return top.length?`<div style="margin-bottom:8px"><b>現在大家在哪掛機</b><div class="btns" style="margin-top:4px">${top.map(([i,n])=>`<button type="button" class="sm ${+i===c.map?'on':''}" data-a="map" data-k="${i}">${esc(MAPS[i].n)} <b class="good">${n} 人</b></button>`).join('')}</div></div>`:''})()}<div class="row"><input type="search" id="mapMonQ" placeholder="🔍 搜尋怪物名稱：查牠出現在哪些地圖" value="${esc(ui.mapMonQ||'')}" style="flex:1;min-width:10em" autocomplete="off" autocorrect="off" spellcheck="false"></div><div id="mapMonRes">${mapMonQHtml()}</div><div class="btns" style="margin:6px 0"><button type="button" class="sm ${rbm?'':'on'}" data-a="rebmode" data-k="0">正常地圖</button><button type="button" class="sm ${rbm?'on':''}" data-a="rebmode" data-k="1">轉生地圖</button><span class="note">轉生：怪物 HP／攻擊／防禦 ×2，經驗、掉寶 ×2，MVP 20% 給商城幣</span></div><div class="maplist">${mapList}</div><div class="note">人數是真人玩家（包含你自己）在這張地圖掛機的<b>角色數</b>，關掉遊戲在離線掛機的也算（48 小時內有開過遊戲的）。每個角色各自一個世界，不會被搶怪；同地圖的跨玩家隊友可以分經驗。</div><b>${map.n}</b>${monT}`)+
   card('選怪',syncBtn('選怪')+`<div class="row">怪物等級 ${cN('lvMin',56)} ～ ${cN('lvMax',56)} <span class="note">（0 = 不限）</span></div>${cC('skipAggro','搜尋到主動怪時略過')}
     <div>白名單（只打這些；空 = 不限）：</div><div class="chips">${c.white.map((n,i)=>`<button type="button" class="chip" data-a="wdel" data-k="${i}">${n} ✕</button>`).join('')||'<span class="note">（不限）</span>'}</div>
     <select data-a2="wadd"><option value="">＋ 加入怪物（本地圖的怪物在前）…</option>${[...mapMonsX(map).map(m=>m.n),...mons.filter(n=>!map.mons.some(m=>m.n===n))].map(n=>`<option>${n}</option>`).join('')}</select>
