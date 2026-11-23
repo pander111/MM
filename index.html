@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#79a75a"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="小黑窗"><meta name="apple-mobile-web-app-status-bar-style" content="default"><style>body{margin:0}</style><script>window.RO_GH=1;window.RO_BUILD="20261122155146";if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))</script></head><body>
+<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#79a75a"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="小黑窗"><meta name="apple-mobile-web-app-status-bar-style" content="default"><style>body{margin:0}</style><script>window.RO_GH=1;window.RO_BUILD="20261123135114";if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))</script></head><body>
 <title>仙境放置小黑窗</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <style>
@@ -4034,7 +4034,7 @@ ${SLOT.S.slice().reverse().map(x=>`<tr><td><img src="${(SLIMG[x[0]]||{}).src||''
    card('統計',`<div class="kv"><div>總押注<b>${fmt(F.st.bet)}z</b></div><div>總共贏得<b>${fmt(F.st.coin)} 幣</b></div><div>轉轉樂次數<b>${fmt(F.st.spins)}</b></div><div>免費遊戲<b>${fmt(F.st.free)} 次</b></div><div>最大一次<b>${Math.round(F.st.best)} 倍</b></div></div>`,false)}
 
 const TABS=[['main','主控台'],['char','人物'],['job','職業'],['bag','背包'],['shop','商店與 NPC'],['craft','工匠'],['ench','附魔'],['gacha','轉蛋'],['stor','倉庫'],['query','查詢'],
-  ['auto','掛機設定'],['stats','統計'],['rank','排行榜'],['party','隊伍'],['guild','公會'],['trade','交易'],['cart','手推車與攤位'],['fun','娛樂'],['inst','副本'],['help','說明']];
+  ['auto','掛機設定'],['stats','統計'],['rank','排行榜'],['party','隊伍'],['guild','公會'],['trade','交易會'],['cart','手推車與攤位'],['fun','娛樂'],['inst','副本'],['help','說明']];
 let tab='main',dirty=true,lastTouch=0,armed=null,ui={town:ROOT.ui.town||'普隆德拉',jobTab:null,shopTab:'tool',q:'',mapOpen:{},look:null,dir:0,lookSit:false};
 $('tabs').innerHTML=TABS.map(([k,n])=>`<button type="button" data-t="${k}">${n}</button>`).join('');
 $('tabs').onclick=e=>{const b=e.target.closest('button');if(!b)return;tab=b.dataset.t;armed=null;$('panelWin').classList.remove('min');renderTab();try{window.scrollTo(0,0)}catch(err){}};
@@ -4219,7 +4219,7 @@ panel.addEventListener('change',e=>{const el=e.target;
   if(el.id==='rSk'&&el.value){toast('選好了，記得按「新增規則」')}
   if(el.id==='townSel'){ui.town=el.value;ROOT.ui.town=el.value;renderTab()}
 });
-panel.addEventListener('input',e=>{if(e.target.id==='shopQ'){ui.shopQ=e.target.value;clearTimeout(ui.sqt);ui.sqt=setTimeout(shopQUpd,250);return}if(e.target.id==='mapMonQ'){ui.mapMonQ=e.target.value;clearTimeout(ui.mmt);ui.mmt=setTimeout(mapMonQUpd,250);return}if(e.target.id==='storQ'){ui.storQ=e.target.value;storFilter();return}if(e.target.id==='mkQ'){ui.mkQ=e.target.value;mkFilter();return}if(e.target.id==='mQ'){ui.mQ=e.target.value;const sel=$('mTo');if(sel)sel.innerHTML=mOptHtml();return}if(e.target.id==='svIn'){ui.svIn=e.target.value;ui.svObj=null;ui.svErr=''}if(e.target.id==='qIn'){if(e.isComposing||qComp)return;ui.q=e.target.value;clearTimeout(ui.qt);ui.qt=setTimeout(updQ,300)}});
+panel.addEventListener('input',e=>{if(e.target.id==='shopQ'){ui.shopQ=e.target.value;clearTimeout(ui.sqt);ui.sqt=setTimeout(shopQUpd,250);return}if(e.target.id==='mapMonQ'){ui.mapMonQ=e.target.value;clearTimeout(ui.mmt);ui.mmt=setTimeout(mapMonQUpd,250);return}if(e.target.id==='storQ'){ui.storQ=e.target.value;storFilter();return}if(e.target.id==='mkQ'){ui.mkQ=e.target.value;mkFilter();return}if(e.target.id==='fairQ'){ui.fairQ=e.target.value;fairFilter();return}if(e.target.id==='mQ'){ui.mQ=e.target.value;const sel=$('mTo');if(sel)sel.innerHTML=mOptHtml();return}if(e.target.id==='svIn'){ui.svIn=e.target.value;ui.svObj=null;ui.svErr=''}if(e.target.id==='qIn'){if(e.isComposing||qComp)return;ui.q=e.target.value;clearTimeout(ui.qt);ui.qt=setTimeout(updQ,300)}});
 /* 查詢：注音、倉頡等輸入法選字時不要更新，只更新下方結果，不重畫輸入框 */
 let qComp=false;
 panel.addEventListener('compositionstart',e=>{if(e.target.id==='qIn')qComp=true});
@@ -4270,7 +4270,7 @@ function renderTab(){EBV++;
   if(tab===ui.lastTab){panel.querySelectorAll('details.card').forEach((x,i)=>{if(keep[i]!=null)x.open=keep[i]})}
   ui.lastTab=tab;
   lockH();
-  if(tab==='stor')storFilter();if(tab==='trade')mkFilter();
+  if(tab==='stor')storFilter();if(tab==='trade'){mkFilter();fairFilter()}
   if(tab==='char')drawSprite();
   if(tab==='main'){drawSprite('sprMain');arenaStart()}
   refresh();
@@ -4349,6 +4349,63 @@ function gachaView(){const coin=ROOT.coin||0,p=gaPer(),pool=gaPool(p),end=GA_EPO
     <div class="gaGrid">${list.map(([k])=>gaCell(k,!!coll[k])).join('')||'<span class="note">（沒有）</span>'}</div>`);
   return pullBox+'<div style="height:10px"></div>'+poolBox+'<div style="height:10px"></div>'+collBox}
 function arTop(g,x,y){const ks=[];for(const s in (S.eq||{})){const k=S.eq[s];if(!k)continue;const b=baseOf(k);if(TOPIMG[b]&&!ks.includes(b))ks.push(b)}if(!ks.length)return;const sz=20,w=ks.length*(sz+2)-2;let x0=x-w/2;for(const k of ks){const im=TOPIMG[k];try{if(im.complete)g.drawImage(im,x0,y,sz,sz)}catch(e){}x0+=sz+2}}
+/* ===== 交易會：AI 玩家每天擺攤賣東西、掛收購單（不含 MVP 卡、轉蛋裝備、附魔石、寶箱） ===== */
+const FAIR_N=24;
+const fairRng=seed=>{let a=seed>>>0;return()=>{a=(a+0x6D2B79F5)>>>0;let t=a;t=Math.imul(t^(t>>>15),t|1);t^=t+Math.imul(t^(t>>>7),t|61);return((t^(t>>>14))>>>0)/4294967296}};
+const fairHash=str=>{let h=2166136261;for(const ch of str){h^=ch.charCodeAt(0);h=Math.imul(h,16777619)}return h>>>0};
+let FAIR_POOL=null;
+function fairPool(){if(FAIR_POOL)return FAIR_POOL;const src={};
+  for(let i=0;i<MAPNB;i++)for(const m of MAPS[i].mons)for(const [k,r] of (m.drops||[])){const it=BASE[k];if(!it||!(r>0))continue;
+    if(it.t==='card'&&m.mvp){src[k]={mvpc:1};continue}if(src[k]&&src[k].mvpc)continue;
+    const o=src[k]||(src[k]={r:0,lv:1});if(r>o.r){o.r=r;o.lv=m.lv||1}}
+  const out=[];for(const k in src){const o=src[k],it=BASE[k];if(o.mvpc||!it)continue;if(/^(en_|ibox)/.test(k)||it.ga||it.keep||it.t==='box')continue;
+    const p=Math.min(1,o.r/100),cls=it.t==='card'?'card':it.t==='eq'?'eq':'etc';
+    let v=(o.lv+10)*30/Math.pow(p,.55)*(cls==='card'?3:cls==='eq'?1:.3);v=Math.max(v,(it.sell||1)*2);
+    out.push({k,cls,p,v:Math.round(v)})}
+  return FAIR_POOL=out}
+const fairRound=v=>{if(v<1000)return Math.max(1,Math.round(v));const d=Math.pow(10,Math.floor(Math.log10(v))-2);return Math.round(v/d)*d};
+const fairRefMul=r=>(1+.1*Math.min(r,7))*(r>7?Math.pow(1.35,r-7):1);
+let FAIR_DAY=null,FAIR=null;
+function fairGen(){const day=todayTW();if(FAIR&&FAIR_DAY===day)return FAIR;FAIR_DAY=day;const rnd=fairRng(fairHash('fair'+day)),pool=fairPool(),cards=pool.filter(x=>x.cls==='card');
+  const pick=arr=>{const w=arr.map(x=>Math.pow(x.p,.45)+.002);let s=w.reduce((a,b)=>a+b,0)*rnd();for(let i=0;i<arr.length;i++)if((s-=w[i])<0)return arr[i];return arr[arr.length-1]};
+  const names=NPCS.slice();for(let i=names.length-1;i>0;i--){const j=Math.floor(rnd()*(i+1));[names[i],names[j]]=[names[j],names[i]]}
+  const sell=[],buy=[];
+  for(let m=0;m<Math.min(FAIR_N,names.length);m++){const who=names[m],ns=6+Math.floor(rnd()*5),nb=2+Math.floor(rnd()*4);
+    for(let i=0;i<ns;i++){const x=pick(pool);let k=x.k,v=x.v,q;
+      if(x.cls==='eq'){const it=BASE[k];let r=0;if(refRow(k)){while(r<20&&rnd()<.72)r++}const cs=[];
+        for(let s=0;s<(it.slots||0);s++)if(rnd()<.25){const cc=cards.filter(c=>BASE[c.k].ctype===it.slot);if(cc.length){const c=pick(cc);cs.push(c.k);v+=c.v}}
+        v=v*fairRefMul(r);k=mkKey(k,cs,r);q=rnd()<.1?2:1}
+      else if(x.cls==='card')q=rnd()<.2?2:1;
+      else q=1+Math.floor(rnd()*Math.min(99,5+x.p*200));
+      const f=rnd()<.1?.7+rnd()*.2:1+rnd()*.5;sell.push({id:`s${m}_${i}`,who,k,q,pr:fairRound(v*f),cheap:f<1})}
+    for(let i=0;i<nb;i++){const x=pick(pool);const q=x.cls==='etc'?1+Math.floor(rnd()*Math.min(99,10+x.p*300)):1+Math.floor(rnd()*(x.cls==='card'?2:3));
+      buy.push({id:`b${m}_${i}`,who,k:x.k,q,pr:fairRound(x.v*(.4+rnd()*.3))})}}
+  return FAIR={sell,buy}}
+function fairSt(){const day=todayTW();if(!ROOT.fair||ROOT.fair.d!==day)ROOT.fair={d:day,s:{},b:{}};return ROOT.fair}
+const fairLeftS=x=>Math.max(0,x.q-(fairSt().s[x.id]||0)),fairLeftB=x=>Math.max(0,x.q-(fairSt().b[x.id]||0));
+function fairBuy(id,n){const x=fairGen().sell.find(o=>o.id===id);if(!x)return;const left=fairLeftS(x);n=Math.max(1,Math.min(left,Math.floor(n)||1));if(!left){toast('已經賣完了');return}
+  const cost=x.pr*n;if(S.zeny<cost){toast(`Zeny 不夠（需要 ${fmt(cost)}）`);return}S.zeny-=cost;zOut('交易會購買',cost);addItem(x.k,n);fairSt().s[id]=(fairSt().s[id]||0)+n;
+  log('drop',`🛒 交易會：向 ${x.who} 買了 ${ITEMS[x.k].n} ×${n}，花 ${fmt(cost)}z。`);toast(`買到 ${ITEMS[x.k].n} ×${n}`)}
+function fairSell(id,n){const x=fairGen().buy.find(o=>o.id===id);if(!x)return;const left=fairLeftB(x),have=S.inv[x.k]||0;n=Math.max(1,Math.min(left,have,Math.floor(n)||1));if(!left){toast('對方已經收滿了');return}if(!have){toast('背包裡沒有這個道具');return}
+  S.inv[x.k]-=n;if(!S.inv[x.k])delete S.inv[x.k];const got=x.pr*n;S.zeny+=got;fairSt().b[id]=(fairSt().b[id]||0)+n;dirty=true;
+  log('drop',`💰 交易會：賣給 ${x.who} ${ITEMS[x.k].n} ×${n}，得到 ${fmt(got)}z。`);toast(`賣出 ${ITEMS[x.k].n} ×${n}，+${fmt(got)}z`)}
+function fairFilter(){const q=(ui.fairQ||'').trim().toLowerCase();panel.querySelectorAll('tr[data-fq]').forEach(tr=>{tr.hidden=(!!q&&!tr.dataset.fq.toLowerCase().includes(q))||(ui.fairHave&&tr.dataset.have==='0')})}
+function fairView(){const F=fairGen(),m=ui.fairM||'buy',end=new Date(Date.parse(todayTW()+'T00:00:00+08:00')+864e5),hrs=Math.max(0,Math.ceil((end-Date.now())/36e5));
+  const tb=(v,n)=>`<button type="button" class="sm ${m===v?'on':''}" data-a="fairm" data-k="${v}">${n}</button>`;
+  let rows='';
+  if(m==='buy')rows=F.sell.filter(x=>ITEMS[x.k]&&fairLeftS(x)>0).sort((a,b)=>ITEMS[a.k].n.localeCompare(ITEMS[b.k].n,'zh-Hant')).map(x=>{const left=fairLeftS(x);
+    return `<tr data-fq="${esc(ITEMS[x.k].n+' '+x.who)}" data-have="1"><td>${IN(x.k)}${x.cheap?' <span class="good">便宜賣</span>':''}<div class="note">${esc(x.who)} 的攤位・剩 ${fmt(left)} 個</div></td><td class="r"><b>${fmt(x.pr)}</b>z<div class="note">每個</div></td><td class="r" style="white-space:nowrap">${left>1?`<input type="number" id="fn_${x.id}" value="1" min="1" max="${left}" inputmode="numeric" style="width:3.6em"> `:''}<button type="button" class="sm pri" data-a="fairbuy" data-k="${x.id}" ${S.zeny<x.pr?'disabled':''}>${armed==='fb'+x.id?'再按一次確認':'購買'}</button></td></tr>`}).join('');
+  else rows=F.buy.filter(x=>ITEMS[x.k]&&fairLeftB(x)>0).sort((a,b)=>ITEMS[a.k].n.localeCompare(ITEMS[b.k].n,'zh-Hant')).map(x=>{const left=fairLeftB(x),have=S.inv[x.k]||0;
+    return `<tr data-fq="${esc(ITEMS[x.k].n+' '+x.who)}" data-have="${have?1:0}"><td>${IN(x.k)}<div class="note">${esc(x.who)} 收購・還收 ${fmt(left)} 個・你背包有 ${fmt(have)}</div></td><td class="r"><b>${fmt(x.pr)}</b>z<div class="note">每個</div></td><td class="r" style="white-space:nowrap">${have&&Math.min(left,have)>1?`<input type="number" id="fn_${x.id}" value="${Math.min(left,have)}" min="1" max="${Math.min(left,have)}" inputmode="numeric" style="width:3.6em"> `:''}<button type="button" class="sm pri" data-a="fairsell" data-k="${x.id}" ${have?'':'disabled'}>${armed==='fs'+x.id?'再按一次確認':'賣出'}</button></td></tr>`}).join('');
+  return box('交易會',`<div class="note">AI 玩家每天（台灣時間 0 點）換一批攤位，${hrs} 小時後換貨。可以跟他們買東西，或把背包裡的東西賣給收購的人。有人擺攤、收購時會在聊天頻道喊。不賣 MVP 卡、轉蛋裝備、附魔石。收購只收沒精煉、沒插卡的道具。用的是目前角色「${esc(S.name)}」的 Zeny 和背包。</div>
+    <div class="btns" style="margin:6px 0">${tb('buy','購買（AI 擺攤）')}${tb('sell','販售（AI 收購）')}${m==='sell'?`<label class="chk" style="margin-left:6px"><input type="checkbox" data-a="fairhave" ${ui.fairHave?'checked':''}> 只看我有的</label>`:''}</div>
+    <div class="row"><input type="search" id="fairQ" placeholder="搜尋道具名稱或攤主" value="${esc(ui.fairQ||'')}" autocapitalize="off" autocorrect="off" style="flex:1;min-width:8em"></div>
+    ${rows?`<div class="tw" style="max-height:480px;overflow:auto"><table><tbody>${rows}</tbody></table></div>`:`<div class="note">${m==='buy'?'今天的攤位都賣完了。':'今天的收購都收滿了。'}</div>`}`)}
+function fairShout(){if(FF||document.hidden)return;const F=fairGen();if(Math.random()<.6){const L=F.sell.filter(x=>fairLeftS(x)>0&&ITEMS[x.k]);if(!L.length)return;const x=L[Math.floor(Math.random()*L.length)];
+    chat(x.who,`【擺攤】賣 ${ITEMS[x.k].n}${fairLeftS(x)>1?` ×${fairLeftS(x)}`:''}，每個 ${fmt(x.pr)}z${x.cheap?'，便宜賣！':''}　要的到交易會找我～`,'#ffd27a')}
+  else{const L=F.buy.filter(x=>fairLeftB(x)>0&&ITEMS[x.k]);if(!L.length)return;const x=L[Math.floor(Math.random()*L.length)];
+    chat(x.who,`【收購】收 ${ITEMS[x.k].n}${fairLeftB(x)>1?` ×${fairLeftB(x)}`:''}，每個 ${fmt(x.pr)}z　有的到交易會賣我～`,'#9fe0ff')}}
+setInterval(()=>{try{if(Math.random()<.55)fairShout()}catch(e){}},45000);
 const VIEWS={
 main(){const d=D(),c=C();const notes=[];
   if(S.pts>=statCost(2))notes.push(`尚有 <b>${S.pts}</b> 屬性點（人物）`);
@@ -4561,13 +4618,13 @@ guild(){if(!NET.db)return onlineBox()+netOff('公會');const g=myGuild();
     <div class="term chat" style="height:180px">${gc.map(m=>`<div><span class="ts">[${new Date(m.t).toLocaleTimeString('zh-TW',{hour12:false,hour:'2-digit',minute:'2-digit'})}]</span> <span style="color:#9fe0ff">[公會] ${esc(m.n||'?')}：${esc(m.m||'')}</span></div>`).join('')||'<div class="ts">（還沒有訊息）</div>'}</div>
     <div class="row" style="flex-wrap:nowrap"><input type="text" id="gMsg" maxlength="120" placeholder="公會聊天" style="flex:1;min-width:0"><button type="button" data-a="gsay">送出</button></div>
     <button type="button" data-a="gleave">${armed==='gl'?'<span class="bad">再按一次確認退出</span>':'退出公會'}</button>`)},
-trade(){if(!NET.db)return onlineBox()+netOff('交易（郵寄）');
+trade(){if(!NET.db)return fairView()+'<div style="height:10px"></div>'+onlineBox()+netOff('玩家交易所（郵寄）');
   const others=[];for(const r of NET.rank){if(r.uid===NET.uid)continue;const cs=(r.chars||[]).slice().sort((a,b)=>b.lv-a.lv);if(cs.length)others.push([r.uid,`${cs.slice(0,3).map(c=>`${c.n} Lv${c.lv}`).join('、')}${cs.length>3?` 等 ${cs.length} 角`:''}${r.g?`［${r.g}］`:''}`])}
   {const cnt={};others.forEach(o=>cnt[o[1]]=(cnt[o[1]]||0)+1);others.forEach(o=>{if(cnt[o[1]]>1)o[1]+=`（#${o[0].slice(-4)}）`});others.sort((a,b)=>a[1].localeCompare(b[1],'zh-Hant'))}
   NET.mOpts=others;
   const inv=Object.entries(S.inv).filter(([k,n])=>n>0&&ITEMS[k]);
   const inbox=NET.mail.slice().sort((a,b)=>b.t-a.t).map(m=>`<tr><td>${esc(m.fn||'玩家')}<div class="note">${new Date(m.t).toLocaleString('zh-TW',{hour12:false})}${m.m?`・${esc(m.m)}`:''}</div></td><td>${(m.items||[]).filter(([k])=>ITEMS[k]).map(([k,n])=>`${ITEMS[k].n} ×${n}`).concat(m.z?[`${fmt(m.z)} Zeny`]:[]).join('、')}</td><td class="r"><button type="button" class="sm pri" data-a="mtake" data-k="${esc(m.id)}">收下</button></td></tr>`).join('');
-  return onlineBox()+mkBox()+box(`收件匣（${NET.mail.length}）`,inbox?`<div class="tw"><table><tbody>${inbox}</tbody></table></div><div class="note">收下的東西會放進目前查看中的角色「${esc(S.name)}」的背包。</div>`:'<div class="note">沒有郵件。</div>')+
+  return fairView()+'<div style="height:10px"></div>'+onlineBox()+mkBox()+box(`收件匣（${NET.mail.length}）`,inbox?`<div class="tw"><table><tbody>${inbox}</tbody></table></div><div class="note">收下的東西會放進目前查看中的角色「${esc(S.name)}」的背包。</div>`:'<div class="note">沒有郵件。</div>')+
    `<div style="height:10px"></div>`+box('寄東西給其他玩家',NET.ok?(others.length?`<div class="note">收件人用對方的角色名稱來選（列出他等級最高的 3 隻角色和公會）。可以只寄 Zeny、只寄道具，或一起寄。</div><div class="row"><input type="search" id="mQ" placeholder="搜尋角色名稱或公會" value="${esc(ui.mQ||'')}" autocapitalize="off" autocorrect="off" style="flex:1;min-width:8em"></div><div class="row"><label class="chk">收件人 <select id="mTo">${mOptHtml()}</select></label></div>
     <div class="row"><select id="mItem"><option value="">（不寄道具）</option>${inv.map(([k,n])=>`<option value="${esc(k)}">${ITEMS[k].n}（有 ${n}）</option>`).join('')}</select><label class="chk">數量 <input type="number" id="mN" value="1" min="1" inputmode="numeric" style="width:4.5em"></label></div>
     <div class="row"><label class="chk">Zeny <input type="number" id="mZ" value="0" min="0" inputmode="numeric" style="width:7em"></label><span class="note">（你有 ${fmt(S.zeny)}）</span></div>
@@ -4602,6 +4659,7 @@ help(){return box('說明',`<div class="note" style="font-size:14px">
   <b>經驗值</b>：照新版規則，怪物比你高 1～15 級時經驗加成（最多 +40%），比你低 11 級以上開始打折，相差太多只剩 10%～40%。<br>
   <b>存檔</b>：存在這台裝置的瀏覽器，每 10 秒自動存。關掉頁面就會暫停，不會離線掛機。要換裝置可以用「掛機設定 → 匯入/匯出」搬設定。</p>
   <p><b>不用回城</b>：負重到門檻、藥水等補給用完時，會<b>就地整理</b>：直接賣東西、存倉、從倉庫拿補給，倉庫沒有就直接跟商店買，不用跑回城。一般地圖死亡會在儲存點復活後回到地圖；無限塔、道館裡死亡不會復活，要等隊友救。</p>
+  <p><b>交易會</b>（「交易會」分頁）：AI 玩家每天（台灣時間 0 點）換一批攤位，數量隨機。「購買」可以搜尋道具直接跟 AI 買，裝備可能帶精煉（+0～+20）和卡片；「販售」可以搜尋有沒有 AI 在收購你背包裡的東西，直接賣出（只收沒精煉、沒插卡的）。不賣 MVP 卡、轉蛋裝備、附魔石。AI 擺攤、收購時會在聊天頻道喊。</p>
   <p><b>副本</b>（「副本」分頁）：<b>無限塔</b>共 102 層，每個角色每天一次，打完 50F／75F 可以離開領 1／2 個寶箱或繼續，打完 102F 得 3 個；<b>道館</b>連打 10 隻隨機 MVP，全破每人 1 個寶箱，入場費初級 250 萬、中級 600 萬、高級 1000 萬。難度：中級怪物 HP、攻擊 ×5、防禦 ×2、攻速 ×2；高級 ×10、防禦 ×3、攻速 ×4。副本只在線上進行，離線或關掉網頁會暫停（無限塔從最近的 5 層存檔點接著打）。全隊陣亡就失敗。</p>
   <p>隊伍、公會、交易需要伺服器，這個版本沒有。</p></div>`)+'<div style="height:10px"></div>'+box('商城幣、轉蛋與圖鑑',`<div class="note" style="font-size:14px">
   <p><b>商城幣</b>：帳號共用，所有角色一起存、一起用（在「轉蛋」分頁看得到目前有幾枚）。<br>
@@ -5186,6 +5244,10 @@ panel.addEventListener('click',e=>{
   case'instans':instAnswer(k);break;
   case'instquit':if(armed==='iq'){instEnd(false,0,'放棄')}else{armed='iq';keepArm=true}break;
   case'boxopen':instOpen(+k,b.dataset.n==='2');break;
+  case'fairm':ui.fairM=k;break;
+  case'fairhave':ui.fairHave=!ui.fairHave;break;
+  case'fairbuy':{const el=$('fn_'+k);const n=el?Number(el.value)||1:1;if(armed==='fb'+k){fairBuy(k,n)}else{armed='fb'+k;keepArm=true}}break;
+  case'fairsell':{const el=$('fn_'+k);const n=el?Number(el.value)||1:1;if(armed==='fs'+k){fairSell(k,n)}else{armed='fs'+k;keepArm=true}}break;
   case'gapull':gaPull(+k===11?11:1);break;
   case'gaf':ui.gaF=k;break;
   case'rebmode':ui.reb=+k;break;
