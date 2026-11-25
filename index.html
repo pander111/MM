@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#79a75a"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="小黑窗"><meta name="apple-mobile-web-app-status-bar-style" content="default"><style>body{margin:0}</style><script>window.RO_GH=1;window.RO_BUILD="20261125145456";if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))</script></head><body>
+<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#79a75a"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="小黑窗"><meta name="apple-mobile-web-app-status-bar-style" content="default"><style>body{margin:0}</style><script>window.RO_GH=1;window.RO_BUILD="20261125235127";if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))</script></head><body>
 <title>仙境放置小黑窗</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <style>
@@ -3352,9 +3352,9 @@ function npcBox(){const g=ui.npcG||'ore';const all=ui.npcAll;
   const nmOf=k=>ITEMS[k]?ITEMS[k].n:k;
   const rows=list.map(r=>{const mx=npcMax(r);
     return `<tr><td><b>${nmOf(r.out)}</b>${r.n>1?` ×${r.n}`:''}<div class="note">${r.mats.map(([k,q])=>`<span class="${npcHave(k)<q?'bad':''}">${nmOf(k)} ${q}（身上 ${fmt(S.inv[k]||0)}${npcUseStor()?`＋倉庫 ${fmt(ROOT.stor[k]||0)}`:''}）</span>`).join('、')}</div></td>
-      <td class="r"><span class="btns" style="justify-content:flex-end"><button type="button" class="sm" data-a="npcmk" data-k="${esc(r.id)}" data-n="1" ${mx<1?'disabled':''}>做 1</button><button type="button" class="sm" data-a="npcmk" data-k="${esc(r.id)}" data-n="999999" ${mx<2?'disabled':''}>全做${mx>1?` ${fmt(mx)}`:''}</button></span></td></tr>`}).join('');
+      <td class="r" style="white-space:nowrap"><span class="btns" style="justify-content:flex-end;align-items:center">${mx>1?`<input type="number" id="npq_${esc(r.id)}" value="${Math.min(mx,ui['npq_'+r.id]||1)}" min="1" max="${mx}" inputmode="numeric" style="width:4.2em"><button type="button" class="sm pri" data-a="npcmkq" data-k="${esc(r.id)}">做</button>`:''}<button type="button" class="sm" data-a="npcmk" data-k="${esc(r.id)}" data-n="1" ${mx<1?'disabled':''}>做 1</button><button type="button" class="sm" data-a="npcmk" data-k="${esc(r.id)}" data-n="999999" ${mx<2?'disabled':''}>全做${mx>1?` ${fmt(mx)}`:''}</button></span></td></tr>`}).join('');
   const tabs=[['ore','原石精煉'],['hw','聖水'],['arrow','箭矢']].map(([k,n])=>`<button type="button" class="sm ${g===k?'on':''}" data-a="npcg" data-k="${k}">${n}</button>`).join('');
-  return box('工匠 NPC',`<div class="note">不需要技能、成功率 100%、免費。原石 5 顆換 1 顆精煉礦石；神之金屬／鋁 10 個換 1 個濃縮神之金屬／濃縮鋁；鈽鐳礦石／鈣礦石 10 個換 1 個高密度礦；空瓶換聖水；箭矢照弓箭手「製作箭矢」的配方。</div>
+  return box('工匠 NPC',`<div class="note">不需要技能、成功率 100%、免費。原石 5 顆換 1 顆精煉礦石（可以在數量框輸入要做幾個）；神之金屬／鋁 10 個換 1 個濃縮神之金屬／濃縮鋁；鈽鐳礦石／鈣礦石 10 個換 1 個高密度礦；空瓶換聖水；箭矢照弓箭手「製作箭矢」的配方。</div>
     <div class="btns">${tabs}</div>
     <label class="chk"><input type="checkbox" data-a2="npcstor" ${npcUseStor()?'checked':''}> 材料不夠時從倉庫拿</label>
     <label class="chk"><input type="checkbox" data-a2="npctos" ${ROOT.ui.npcToStor?'checked':''}> 成品一律直接存倉庫（不勾時只有身上放不下才存倉）</label>
@@ -5276,6 +5276,7 @@ panel.addEventListener('click',e=>{
   case'xpleave':if(armed==='xpl'){xpAct('xpleave')}else{armed='xpl';keepArm=true}break;
   case'npcg':ui.npcG=k;break;
   case'npcmk':{const r=NPCBY[k];if(r)npcDo(r,n)}break;
+  case'npcmkq':{const r=NPCBY[k],el=$('npq_'+k);const q=Math.max(1,Math.floor(Number(el&&el.value)||1));ui['npq_'+k]=q;if(r)npcDo(r,q)}break;
   case'crsk':ui.craftSk=k;break;
   case'rebirth':if(armed==='rebirth'&&!S.trans&&S.lv>=99&&S.jlv>=50&&S.zeny>=REBIRTH_Z&&TNAME[S.job]){doRebirth();tab='job'}else{armed='rebirth';keepArm=true}break;
   case'equipL':{const it=ITEMS[k];if(!it||!(S.inv[k]>0)||!(job2(S.job)==='assassin'||S.job==='kagerou'||S.job==='oboro')||W()&&W().two){if(W()&&W().two)toast('右手是雙手武器（例如拳刃）時不能雙手拿');break}const old=S.eq.shield;S.inv[k]--;if(!S.inv[k])delete S.inv[k];if(old)S.inv[old]=(S.inv[old]||0)+1;S.eq.shield=k;log('sys',`左手裝上 ${it.n}。`)}break;
