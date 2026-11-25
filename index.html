@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#79a75a"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="小黑窗"><meta name="apple-mobile-web-app-status-bar-style" content="default"><style>body{margin:0}</style><script>window.RO_GH=1;window.RO_BUILD="20261124170822";if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))</script></head><body>
+<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#79a75a"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="小黑窗"><meta name="apple-mobile-web-app-status-bar-style" content="default"><style>body{margin:0}</style><script>window.RO_GH=1;window.RO_BUILD="20261125145456";if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))</script></head><body>
 <title>仙境放置小黑窗</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <style>
@@ -522,15 +522,30 @@ function instLoad(){const I=ROOT.inst;if(!I)return;if(!I.mem||!I.mem.some(j=>ROO
   instSetFloor();if(I.k==='dun')setTimeout(dunPop,800)}
 function instWake(){const I=ROOT.inst;if(!I)return;for(const j of I.mem)if(ROOT.chars[j])withChar(j,()=>{if(!S.auto)S.auto=true;sitting=false;if(mode!=='dead'){target=null;mode='search'}schedule(step,600+Math.random()*600)})}
 function instMembers(){return partyOn()&&inParty(CUR)?P().members.filter(j=>ROOT.chars[j]):[CUR]}
-function instStart(k,dv){if(ROOT.inst){toast('已經在副本裡了');return}
+/* 無限塔跳層：以全隊最高紀錄為準（依難度分開記），花錢從 50F／75F／100F 開始；跳過的樓層照樣擲掉落（放進倉庫），不給經驗 */
+const ET_JUMP=[[50,500000],[75,1000000],[100,1500000]];
+const etBest=(mem,dv)=>Math.max(0,...mem.map(j=>((ROOT.chars[j]||{}).etBest||{})[dv]||0));
+const etJumps=(mem,dv)=>{const b=etBest(mem,dv);return ET_JUMP.filter(([f])=>f===100?b>=102:b>=f)};
+function etRec(I,f){for(const j of I.mem){const o=ROOT.chars[j];if(!o)continue;o.etBest=o.etBest||{};if(f>(o.etBest[I.dv]||0))o.etBest[I.dv]=f}}
+function etSkipLoot(I,upto){ROOT.stor=ROOT.stor||{};const got={};const roll=m=>{for(const [k,r] of (m.drops||[]))if(BASE[k]&&Math.random()*100<r)got[k]=(got[k]||0)+1};
+  for(let f=1;f<=upto;f++){const L=(ET_FL[f]||[]).filter(([id])=>MON[id]);if(!L.length)continue;const bs=L.filter(([id])=>MON[id].mvp);
+    if(bs.length){for(const [id] of bs)roll(MON[id]);continue}
+    const tot=L.reduce((a,x)=>a+x[1],0),n=f===100?1:Math.max(5,Math.min(15,Math.round(tot/3)));
+    for(let i=0;i<n;i++){let r=Math.random()*tot,id=L[0][0];for(const [x,c] of L){if((r-=c)<0){id=x;break}}roll(MON[id])}}
+  const ks=Object.keys(got);for(const k of ks)ROOT.stor[k]=(ROOT.stor[k]||0)+got[k];
+  log('drop',`🗼 跳過 1F～${upto}F 的掉落已放進倉庫：${ks.length?ks.map(k=>`${BASE[k].n}×${got[k]}`).join('、'):'（沒有掉落）'}`)}
+function instStart(k,dv,jump){if(ROOT.inst){toast('已經在副本裡了');return}
   const mem=instMembers(),names=j=>ROOT.chars[j].name,day=todayTW();
   const busy=mem.filter(j=>ROOT.chars[j].vend&&ROOT.chars[j].vend.on);if(busy.length){toast(`${busy.map(names).join('、')} 正在擺攤，先收攤`);return}
   if(k==='tower'){const cd=mem.filter(j=>ROOT.chars[j].etDay===day);if(cd.length){toast(`${cd.map(names).join('、')} 今天已經進過無限塔了`);return}}
+  const JP=jump?etJumps(mem,dv).find(([f])=>f===jump):null;if(jump){if(k!=='tower'||!JP){toast('還沒打到這一層，不能跳');return}if(S.zeny<JP[1]){toast(`Zeny 不夠（跳層費 ${fmt(JP[1])}）`);return}S.zeny-=JP[1];zOut('無限塔跳層',JP[1])}
   if(k==='dojo'){const fee=IDIFF[dv].fee;if(S.zeny<fee){toast(`Zeny 不夠（入場費 ${fmt(fee)}）`);return}S.zeny-=fee;zOut('道館入場費',fee)}
   const I={k,dv,lead:CUR,mem,back:{},fl:1,kill:0,need:0,st:'run',cp:0,t0:Date.now()};
   if(k==='dojo'){const sp=new Set(MAPS.slice(0,MAPNB).flatMap(x=>x.mons.map(y=>y.id)));const pool=Object.values(MON).filter(m=>m.mvp&&!m.imm&&m.hp>0&&!m.morphOnly&&sp.has(m.id)).map(m=>m.id);
     I.stages=[];while(I.stages.length<10&&pool.length)I.stages.push(pool.splice(Math.floor(Math.random()*pool.length),1)[0])}
   for(const j of mem){const o=ROOT.chars[j];I.back[j]=o.cfg.map<INSTMAP?o.cfg.map:mapIdx('prt_fild08');o.cfg.map=INSTMAP;if(k==='tower')o.etDay=day}
+  if(JP){const f=JP[0];ROOT.inst=I;if(f===100){I.fl=100;I.cp=99;I.st='resume';etSkipLoot(I,99)}else{I.fl=f;I.cp=f;I.st='ask';etSkipLoot(I,f)}instSetFloor();
+    log('lvl',`🗼 花 ${fmt(JP[1])}z 跳到無限塔 ${f}F（${IDIFF[dv].n}），成員：${mem.map(names).join('、')}。${f===100?'按「從 100F 繼續」開始打最後 3 層。':'可以離開領寶箱，或繼續往上（繼續後全隊陣亡就沒有寶箱）。'}`);toast(`跳到無限塔 ${f}F`);save();return}
   ROOT.inst=I;instSetFloor();instWake();
   log('lvl',`${k==='tower'?'🗼 進入無限塔':'🥋 開始挑戰道館'}（${IDIFF[dv].n}），成員：${mem.map(names).join('、')}。${k==='dojo'?`入場費 ${fmt(IDIFF[dv].fee)}z。`:''}`);toast(k==='tower'?'進入無限塔！':'道館挑戰開始！');save()}
 function instKill(t){const I=ROOT.inst;if(!I||I.st!=='run'||!t.inst)return;if(I.k==='dun')dunShadow(t);
@@ -538,7 +553,7 @@ function instKill(t){const I=ROOT.inst;if(!I||I.st!=='run'||!t.inst)return;if(I.
   if(I.kill>=I.need)instClear()}
 function instClear(){const I=ROOT.inst;const f=I.fl;
   if(I.k==='dun'){if(f>=DUN[I.id].st.length)return instEnd(true);I.st='ask';log('lvl',`🏰 ${DUN[I.id].n}：「${dunSt(I).n}」完成！`);save();dunPop();return}
-  if(I.k==='tower'){if(f%5===0)I.cp=f;
+  if(I.k==='tower'){etRec(I,f);if(f%5===0)I.cp=f;
     if(f>=102)return instEnd(true,3);
     if(f===50||f===75){I.st='ask';log('lvl',`🗼 打完 ${f}F！可以現在離開領 ${f===50?1:2} 個寶箱，或繼續往上（繼續後死光就什麼都沒有）。`);toast(`打完無限塔 ${f}F，請選擇離開或繼續`);save();return}
     I.fl++;instSetFloor();log('sys',`🗼 打完 ${f}F，前往 ${I.fl}F${I.fl%5===0?'（MVP 樓層）':''}。`);if(f%5===0)save();return}
@@ -595,7 +610,9 @@ function instView(){const I=ROOT.inst,mem=instMembers(),day=todayTW();
   const dsel=k=>`<div class="btns">${IDIFF.map((x,i)=>`<button type="button" class="sm ${(ui['dv'+k]||0)===i?'on':''}" data-a="instdv" data-k="${k}" data-n="${i}">${x.n}</button>`).join('')}</div>`;
   const tower=box('無限塔',`<div class="note">共 102 層，每 5 層有 MVP；101F 骷髏觸角魔、102F 夜勝魔。一般樓層打倒指定數量的怪物就上樓，MVP 樓層要打倒 MVP。每 5 層存一次進度（關掉網頁後從存檔點下一層接著打）。打完 50F、75F 可以選擇離開（1 個／2 個寶箱）或繼續，打完 102F 得到 3 個寶箱；選擇繼續後全隊陣亡就什麼都沒有。<br>每個角色每天（台灣時間 0 點重置）只能進一次，有進塔的成員都算。寶箱只給隊長（開始的人），寶箱等級＝難度。</div>
     ${dsel('t')}<div class="note">初級：原版數值；中級：怪物 HP、攻擊 ×5、防禦 ×2、攻速 ×2、移動變快；高級：HP、攻擊 ×10、防禦 ×3、攻速 ×4、移動變快。MVP 會依仇恨值轉身攻擊其他人。</div>
-    <div style="margin:6px 0">成員：${who}</div><button type="button" class="pri" data-a="instgo" data-k="tower" ${I?'disabled':''}>進入無限塔（${IDIFF[ui.dvt||0].n}）</button>`);
+    <div style="margin:6px 0">成員：${who}</div><button type="button" class="pri" data-a="instgo" data-k="tower" ${I||mem.some(j=>ROOT.chars[j].etDay===day)?'disabled':''}>進入無限塔（${IDIFF[ui.dvt||0].n}）</button>
+    <div style="margin-top:8px"><b>跳層</b>：隊伍最高紀錄（${IDIFF[ui.dvt||0].n}）<b>${etBest(mem,ui.dvt||0)}F</b></div><div class="btns" style="margin-top:4px">${ET_JUMP.map(([f,z])=>{const ok=etJumps(mem,ui.dvt||0).some(x=>x[0]===f);return `<button type="button" class="sm" data-a="etjump" data-k="${f}" ${I||!ok||S.zeny<z||mem.some(j=>ROOT.chars[j].etDay===day)?'disabled':''}>${armed==='ej'+f?'再按一次確認':`跳到 ${f}F（${fmt(z)}z）`}</button>`}).join('')}</div>
+    <div class="note">打過 50F、75F 或全破 102F 後，可以花錢直接從那一層開始：50F／75F 一到就跳出選擇（領寶箱離開或繼續），100F 從最後 3 層開始打。紀錄依難度分開，以隊伍裡最高的人為準；打完後全隊成員都會記錄。跳層也算當天的那一次。跳過的樓層照樣擲掉落並放進倉庫，不給經驗。</div>`);
   const dojo=box('道館',`<div class="note">連續挑戰 10 隻隨機 MVP，每打倒一隻可以選擇繼續或放棄（這時也會存檔）。10 關全破，隊伍每個人各得到 1 個寶箱；失敗或放棄沒有獎勵。不限次數，入場費只扣開始的人。</div>
     ${dsel('d')}<div style="margin:6px 0">入場費：${IDIFF.map(x=>`${x.n} ${fmt(x.fee)}z`).join('・')}　成員：${mem.map(j=>esc(ROOT.chars[j].name)).join('、')}</div><button type="button" class="pri" data-a="instgo" data-k="dojo" ${I||S.zeny<IDIFF[ui.dvd||0].fee?'disabled':''}>開始挑戰（${IDIFF[ui.dvd||0].n}，${fmt(IDIFF[ui.dvd||0].fee)}z）</button>`);
   const bx=[0,1,2].map(t=>{const k='ibox'+t,n=(S.inv[k]||0)+((ROOT.stor||{})[k]||0);return `<tr><td>${BASE[k].n}</td><td class="r">${n}</td><td class="r"><button type="button" class="sm" data-a="boxopen" data-k="${t}" ${n?'':'disabled'}>開 1 個</button> <button type="button" class="sm" data-a="boxopen" data-k="${t}" data-n="2" ${n>1?'':'disabled'}>全部打開</button></td></tr>`}).join('');
@@ -4753,7 +4770,7 @@ help(){return box('說明',`<div class="note" style="font-size:14px">
   <p><b>不用回城</b>：負重到門檻、藥水等補給用完時，會<b>就地整理</b>：直接賣東西、存倉、從倉庫拿補給，倉庫沒有就直接跟商店買，不用跑回城。一般地圖死亡會在儲存點復活後回到地圖；無限塔、道館裡死亡不會復活，要等隊友救。</p>
   <p><b>交易會</b>（「交易會」分頁）：AI 玩家每天（台灣時間 0 點）換一批攤位，數量隨機。「購買」可以搜尋道具直接跟 AI 買，裝備可能帶精煉（+0～+20）和卡片；「販售」可以搜尋有沒有 AI 在收購你背包裡的東西，直接賣出（只收沒精煉、沒插卡的）。不賣 MVP 卡、神器和神器材料、轉蛋裝備、附魔石。AI 擺攤、收購時會在聊天頻道喊。</p>
   <p><b>分段副本</b>（「副本」分頁）：古代吉拉斯海姆（Lv130）、恐怖玩具工廠（Lv140）、狼人研究所（Lv140）、天空要塞（Lv150）。每段打完會跳出劇情視窗，按「下一段」繼續；每個副本每個角色每天一次。獎勵是怪物掉落（含副本裝備），BOSS、MVP 有機會掉影子裝備。</p>
-  <p><b>副本</b>（「副本」分頁）：<b>無限塔</b>共 102 層，每個角色每天一次，打完 50F／75F 可以離開領 1／2 個寶箱或繼續，打完 102F 得 3 個；<b>道館</b>連打 10 隻隨機 MVP，全破每人 1 個寶箱，入場費初級 250 萬、中級 600 萬、高級 1000 萬。難度：中級怪物 HP、攻擊 ×5、防禦 ×2、攻速 ×2；高級 ×10、防禦 ×3、攻速 ×4。副本只在線上進行，離線或關掉網頁會暫停（無限塔從最近的 5 層存檔點接著打）。全隊陣亡就失敗。</p>
+  <p><b>副本</b>（「副本」分頁）：<b>無限塔</b>共 102 層，每個角色每天一次，打完 50F／75F 可以離開領 1／2 個寶箱或繼續，打完 102F 得 3 個；打過的話可以花錢跳層（50F 50 萬、75F 100 萬、全破後 100F 150 萬），跳過的樓層照樣給掉落（放進倉庫），不給經驗，跳層也算當天那一次；<b>道館</b>連打 10 隻隨機 MVP，全破每人 1 個寶箱，入場費初級 250 萬、中級 600 萬、高級 1000 萬。難度：中級怪物 HP、攻擊 ×5、防禦 ×2、攻速 ×2；高級 ×10、防禦 ×3、攻速 ×4。副本只在線上進行，離線或關掉網頁會暫停（無限塔從最近的 5 層存檔點接著打）。全隊陣亡就失敗。</p>
   <p>隊伍、公會、交易需要伺服器，這個版本沒有。</p></div>`)+'<div style="height:10px"></div>'+box('商城幣、轉蛋與圖鑑',`<div class="note" style="font-size:14px">
   <p><b>商城幣</b>：帳號共用，所有角色一起存、一起用（在「轉蛋」分頁看得到目前有幾枚）。<br>
   <b>怎麼拿</b>：到<b>轉生地圖</b>掛機，每打倒一隻 MVP 有 20% 機率得到 1 枚。之後開放的無限塔、道館寶箱也會給商城幣。</p>
@@ -5335,6 +5352,7 @@ panel.addEventListener('click',e=>{
     if(S.eq.weapon&&!canWield(ITEMS[S.eq.weapon])){S.inv[S.eq.weapon]=(S.inv[S.eq.weapon]||0)+1;S.eq.weapon=null;log('sys','目前職業不能用原本的武器，已卸下。')}
     log('lvl',`★ 恭喜！${old} 轉職為 ${J().n}！`);toast(`轉職為 ${J().n}！`);ui.jobTab=k}else{armed='job'+k;keepArm=true}break;
   case'dungo':dunStart(k,ui.dvx||0);break;
+  case'etjump':if(armed==='ej'+k){instStart('tower',ui.dvt||0,+k)}else{armed='ej'+k;keepArm=true}break;
   case'instgo':instStart(k,k==='tower'?(ui.dvt||0):(ui.dvd||0));break;
   case'instdv':ui['dv'+k]=Number(b.dataset.n)||0;break;
   case'instans':instAnswer(k);break;
