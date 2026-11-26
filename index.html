@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#79a75a"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="小黑窗"><meta name="apple-mobile-web-app-status-bar-style" content="default"><style>body{margin:0}</style><script>window.RO_GH=1;window.RO_BUILD="20261126113448";if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))</script></head><body>
+<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#79a75a"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="小黑窗"><meta name="apple-mobile-web-app-status-bar-style" content="default"><style>body{margin:0}</style><script>window.RO_GH=1;window.RO_BUILD="20261127021503";if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))</script></head><body>
 <title>仙境放置小黑窗</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <style>
@@ -2398,7 +2398,7 @@ function step(){
     if(!c.autoRevive)return stop('死亡後不自動恢復掛機');
     mode='search';setState('尋找怪物');return schedule(step,1500)}
   if(mode==='town')return townStep();
-  if(mode==='rest'){if(healMates(D()))return schedule(step,1000);
+  if(mode==='rest'){if(reviveMates(D())||healMates(D()))return schedule(step,1000);
     const hpOk=!c.rest.on||S.hp>=d.maxHp*c.rest.hpTo/100, spOk=(!c.rest.spOn||S.sp>=d.maxSp*c.rest.spTo/100)&&(!S.restSup||S.sp>=Math.min(d.maxSp*.95,S.restSup));
     if(wPct(d)>=50){sitting=false;log('warn','負重 50% 以上無法自然回復，站起來繼續。');mode='search';return schedule(step,500)}
     if(hpOk&&spOk){S.restSup=0;sitting=false;log('sys',`回復完成（HP ${Math.floor(S.hp)}／SP ${Math.floor(S.sp)}），站起來繼續掛機。`);mode='search';setState('尋找怪物');return schedule(step,500)}
@@ -2421,7 +2421,7 @@ function step(){
   const needHp=c.rest.on&&S.hp<d.maxHp*c.rest.hp/100,needSp=c.rest.spOn&&S.sp<d.maxSp*c.rest.sp/100;
   if((needHp||needSp)&&wp<50){
     sitting=true;mode='rest';setState('坐下休息');log('sys',`${needHp&&needSp?'HP、SP':needHp?'HP':'SP'} 偏低，坐下休息（回復速度 ×2）。`);return schedule(step,1000)}
-  if(healMates(d,35))return schedule(step,1000);
+  if(reviveMates(d)||healMates(d,35))return schedule(step,1000);
   {const w=swallStep(d);if(w)return schedule(step,w)}
   if(healMates(d))return schedule(step,1000);/* 自己在找怪時也幫正在被近身怪打的隊友放暗之障壁 */
   if(maintainBuffs(d))return schedule(step,1000);
@@ -2458,7 +2458,7 @@ function step(){
 }
 /* 純輔助：不找怪，平常坐著回 SP，隊友要補血／輔助時才站起來 */
 function supStep(d,c){
-  const busy=()=>{sitting=false;return healMates(d,35)||!!swallStep(d)||healMates(d)||!!soulStep(d)||maintainBuffs(d)||careRes(d)||supportMates(d)};
+  const busy=()=>{sitting=false;return reviveMates(d)||healMates(d,35)||!!swallStep(d)||healMates(d)||!!soulStep(d)||maintainBuffs(d)||careRes(d)||supportMates(d)};
   if(busy()){S.supSit=0;setState('輔助隊友');return schedule(step,1000)}
   sitting=true;if(!S.supSit){S.supSit=1;log('sys',S.sp<d.maxSp?'沒有需要幫忙的，坐下等 SP。':'待命中，坐著等隊友需要補血或輔助。')}
   setState(S.sp<d.maxSp||S.hp<d.maxHp?'坐下等 SP':'待命（坐著）');
@@ -2908,7 +2908,7 @@ function fight(d){
   if(!acted&&!sil&&c.healSk.on&&SL('heal')&&S.hp<d.maxHp*c.healSk.pct/100){const L=SL('heal'),cost=spc(SK.heal,L);
     if(S.sp>=cost){S.sp-=cost;const v=Math.floor(Math.floor((S.lv+d.st.int)/8)*(4+8*L)*(1+(d.E.healP||0)/100));S.hp=Math.min(d.maxHp,S.hp+v);log('skill',`施放 治癒術 Lv ${L}，恢復 ${v} HP。`);acted=true;el=1000}}
   if(!acted&&!sil&&c.healSk.on&&j3Heal(d,[CUR])){acted=true;el=1000}
-  if(!acted&&!inc&&healMates(d,35)){acted=true;el=1000}
+  if(!acted&&!inc&&(reviveMates(d)||healMates(d,35))){acted=true;el=1000}
   if(!acted){const w=swallStep(d);if(w){acted=true;el=w}}
   if(!acted&&!inc&&healMates(d)){acted=true;el=1000}/* 暗之障壁優先於一般增益 */
   if(!acted&&maintainBuffs(d)){acted=true;el=1000}
@@ -3298,17 +3298,20 @@ function healMates(d,cap){const c=C();if(!c.healSk.on||!c.partySupport||!partyOn
 
 /* 悟靈士：靈魂只能給對應職業；凱系列只能給悟靈士（自己有悟靈士之魂時可給所有人） */
 const supFit=(sk,o)=>sk.souls&&(S.souls||0)<sk.souls?false:sk.spirit?spiritOk(sk,o):sk.ka?(buffOnC('SL_SOULLINKER')||bjobO(o)==='soul_linker'):true;
-function supportMates(d){
-  const c=C();if(!c.partySupport||!partyOn()||!inParty(CUR)||hasS('silence')||incap())return false;
-  for(const [id,cs] of CURE_SK){if(!SL(id)||!cureOn(id,'party'))continue;const cost=spc(SK[id],1);if(S.sp<cost)continue;
-    for(const j of P().members){if(j===CUR)continue;const o=ROOT.chars[j];if(!o||o.hp<=0||o.cfg.map!==c.map||!o.sts)continue;
-      const need=cs.filter(k=>o.sts[k]>o.clock);if(!need.length)continue;S.sp-=cost;const me=S.name;if(!cureRoll(id)){log('skill',`對 ${o.name} 施放 ${SK[id].n} 失敗了。`);return true}withChar(j,()=>cureS(need,`${me} 施放 ${SK[id].n}`));log('skill',`對 ${o.name} 施放 ${SK[id].n}。`);return true}}
+/* 復活：不需開「協助隊友」，休息、找怪、戰鬥中都會優先檢查 */
+function reviveMates(d){const c=C();if(!partyOn()||!inParty(CUR)||hasS('silence')||incap())return false;
   {const rdL=SLC('PR_REDEMPTIO');if(rdL&&S.sp>=400&&!hasS('silence')){const dead=P().members.filter(j=>j!==CUR&&ROOT.chars[j]&&ROOT.chars[j].hp<=0&&ROOT.chars[j].cfg.map===c.map&&rtOf(j).mode==='dead'&&!ROOT.chars[j].revived);
     if(dead.length>=2){for(const j of dead){const o=ROOT.chars[j];o.hp=Math.max(1,Math.floor(withChar(j,()=>D().maxHp)*.5));o.sp=Math.floor(withChar(j,()=>D().maxSp)*.5);o.revived=true}
       const loss=Math.floor(nextBase(S.lv)*Math.max(0,1-.2*dead.length)/100);S.exp=Math.max(0,S.exp-loss);S.sp=0;S.hp=1;log('skill',`施放 捨身取義！${dead.length} 位隊友復活（HP 50%），自己只剩 1 HP${loss?`，損失 ${loss} Base EXP`:''}。`);return true}}}
   {const rL=SLC('ALL_RESURRECTION');if(rL&&S.sp>=60)for(const j of P().members){if(j===CUR)continue;const o=ROOT.chars[j];if(!o||o.hp>0||o.cfg.map!==c.map||rtOf(j).mode!=='dead'||o.revived)continue;
       if(!buffOnC('BD_INTOABYSS')){if(!(S.inv.i717>0)){skItemWarn({n:'復活術'},'i717');break}useI('i717',1);if(!S.inv.i717)delete S.inv.i717}
       S.sp-=60;const mx=withChar(j,()=>D().maxHp);o.hp=Math.max(1,Math.floor(mx*[.1,.3,.5,.8][rL-1]));o.revived=true;log('skill',`對 ${o.name} 施放 復活術，他站起來了！`);return true}}
+  return false}
+function supportMates(d){
+  const c=C();if(!c.partySupport||!partyOn()||!inParty(CUR)||hasS('silence')||incap())return false;
+  for(const [id,cs] of CURE_SK){if(!SL(id)||!cureOn(id,'party'))continue;const cost=spc(SK[id],1);if(S.sp<cost)continue;
+    for(const j of P().members){if(j===CUR)continue;const o=ROOT.chars[j];if(!o||o.hp<=0||o.cfg.map!==c.map||!o.sts)continue;
+      const need=cs.filter(k=>o.sts[k]>o.clock);if(!need.length)continue;S.sp-=cost;const me=S.name;if(!cureRoll(id)){log('skill',`對 ${o.name} 施放 ${SK[id].n} 失敗了。`);return true}withChar(j,()=>cureS(need,`${me} 施放 ${SK[id].n}`));log('skill',`對 ${o.name} 施放 ${SK[id].n}。`);return true}}
   const mates=P().members.filter(j=>j!==CUR&&ROOT.chars[j]&&ROOT.chars[j].hp>0&&ROOT.chars[j].cfg.map===c.map);
 
 
