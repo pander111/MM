@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#79a75a"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="小黑窗"><meta name="apple-mobile-web-app-status-bar-style" content="default"><style>body{margin:0}</style><script>window.RO_GH=1;window.RO_BUILD="20261127021503";if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))</script></head><body>
+<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#79a75a"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="小黑窗"><meta name="apple-mobile-web-app-status-bar-style" content="default"><style>body{margin:0}</style><script>window.RO_GH=1;window.RO_BUILD="20261127021845";if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))</script></head><body>
 <title>仙境放置小黑窗</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <style>
@@ -717,7 +717,13 @@ function instBox(tier){const cn=[1,3,5][tier],R2=[[1,3],[3,5],[5,10]][tier],CR=[
 function instOpen(tier,all){const k='ibox'+tier;ROOT.stor=ROOT.stor||{};const have=(S.inv[k]||0)+(ROOT.stor[k]||0);if(!have){toast('沒有這種寶箱');return}
   const n=all?have:1;let res=[];for(let i=0;i<n;i++){if(S.inv[k]>0){S.inv[k]--;if(!S.inv[k])delete S.inv[k]}else{ROOT.stor[k]--;if(!ROOT.stor[k])delete ROOT.stor[k]}res=res.concat(instBox(tier))}
   ui.boxRes=`打開 ${BASE[k].n} ×${n}：${res.join('、')}（道具已放進倉庫）`;log('drop','🎁 '+ui.boxRes);dirty=true}
-function instBanner(){const I=ROOT.inst;if(!I)return'';const nm=instNm(I),al=I.mem.filter(j=>ROOT.chars[j]&&ROOT.chars[j].hp>0).length;
+function instBanner(){const h=instBannerIn();ui.instBanH=h;return h?`<div id="instBan">${h}</div>`:''}
+/* 副本狀態列即時同步：每秒更新上方狀態框；副本開始／結束／暫停狀態改變時整頁重畫 */
+function instLive(){const I=ROOT.inst,sig=I?[I.k,I.id||'',I.dv,I.st,I.fl].join('|'):'';
+  if(sig!==ui.instSig){const first=ui.instSig===undefined;ui.instSig=sig;if(!first&&tab==='inst'){renderTab();return}}
+  const el=document.getElementById('instBan');if(!el)return;const h=instBannerIn();if(h!==ui.instBanH){ui.instBanH=h;el.innerHTML=h}}
+setInterval(()=>{try{instLive()}catch(e){}},1000);
+function instBannerIn(){const I=ROOT.inst;if(!I)return'';const nm=instNm(I),al=I.mem.filter(j=>ROOT.chars[j]&&ROOT.chars[j].hp>0).length;
   const st=I.k==='tower'?`${I.fl}F／102F・本層 ${I.kill}/${I.need}${INST.bq.length?'（MVP）':''}・存檔點 ${I.cp||0}F`:I.k==='dun'?`第 ${I.fl}／${DUN[I.id].st.length} 段・${esc(dunSt(I).n)}・${I.kill}/${I.need}`:`第 ${I.fl}／10 關`;
   let btn='';if(I.k==='dun'&&I.st!=='run')btn=`<button type="button" class="pri" data-a="instans" data-k="go">下一段</button><button type="button" data-a="instquit">${armed==='iq'?'<span class="bad">再按一次：放棄</span>':'放棄'}</button>`;
   else if(I.st==='ask'&&I.k==='tower')btn=`<button type="button" class="pri" data-a="instans" data-k="leave">離開，領 ${I.fl>=75?2:1} 個寶箱</button><button type="button" data-a="instans" data-k="go">繼續往上（死光就沒有獎勵）</button>`;
